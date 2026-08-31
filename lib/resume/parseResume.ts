@@ -1,5 +1,5 @@
 // @ts-ignore
-import pdf from 'pdf-parse'
+import pdf from 'pdf-parse/lib/pdf-parse.js'
 import Groq from 'groq-sdk'
 import { getAdminClient } from '../supabase-admin'
 import { ParsedResume } from '@/types/resume'
