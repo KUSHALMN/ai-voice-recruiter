@@ -73,10 +73,10 @@ JSON Schema:
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { sessionId } = params
+    const { sessionId } = await params
     const body = await request.json()
     const { questionId, answer, questionIndex } = body
 
