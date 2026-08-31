@@ -7,10 +7,10 @@ export const dynamic = 'force-dynamic'
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { sessionId } = params
+    const { sessionId } = await params
     const body = await request.json()
     const { currentQuestionIndex, difficultyLevel, answeredQuestions } = body
 
@@ -80,7 +80,7 @@ export async function PATCH(
 }
 export async function POST(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   // Support both POST and PATCH method fallback
   return PATCH(request, { params })
