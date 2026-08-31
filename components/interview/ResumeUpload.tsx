@@ -160,7 +160,7 @@ export default function ResumeUpload({ interviewId, onUploadComplete }: ResumeUp
               </div>
               <div>
                 <p className="text-slate-700 font-semibold text-base">
-                  Drag and drop candidate's resume here, or <span className="text-indigo-600 hover:underline">browse</span>
+                  Drag and drop candidate&apos;s resume here, or <span className="text-indigo-600 hover:underline">browse</span>
                 </p>
                 <p className="text-slate-400 text-xs mt-1">Supports PDF up to 5MB</p>
               </div>

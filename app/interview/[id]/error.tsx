@@ -25,7 +25,7 @@ export default function Error({
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
-        <p className="text-gray-600 mb-6">We couldn't load the interview. Please try again.</p>
+        <p className="text-gray-600 mb-6">We couldn&apos;t load the interview. Please try again.</p>
         <div className="flex gap-4 justify-center">
           <button
             onClick={() => reset()}
