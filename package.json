@@ -6,11 +6,7 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "server": "node backend/server/index.js",
-    "generate-audio": "node generate-audio.js",
-    "test-tts": "node test-tts.js",
-    "start:all": "concurrently \"npm run server\" \"npm run dev\" --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,green\""
+    "lint": "next lint"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
