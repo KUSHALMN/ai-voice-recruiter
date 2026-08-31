@@ -537,13 +537,13 @@ export default function CreateInterview() {
             <div className="space-y-8">
               <div className="flex items-center gap-3 pb-6 border-b border-[#E5E7EB]">
                 <Upload className="w-6 h-6 text-[#2563EB]" />
-                <h2 className="text-xl font-semibold text-[#111827]">Upload Candidate's Resume</h2>
+                <h2 className="text-xl font-semibold text-[#111827]">Upload Candidate&apos;s Resume</h2>
               </div>
 
               <div className="space-y-6 max-w-xl mx-auto">
                 <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl p-4 text-sm text-[#1E40AF]">
                   <p className="font-semibold mb-1">Optional but highly recommended:</p>
-                  <p>Uploading the candidate's resume allows Groq to parse their experiences and tailor interview questions specifically to their background.</p>
+                  <p>Uploading the candidate&apos;s resume allows Groq to parse their experiences and tailor interview questions specifically to their background.</p>
                 </div>
                 
                 <ResumeUpload

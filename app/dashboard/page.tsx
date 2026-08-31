@@ -92,7 +92,7 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-slate-900 mb-2">
               Welcome back 👋
             </h1>
-            <p className="text-slate-500">Here's what's happening with your recruitment pipeline.</p>
+            <p className="text-slate-500">Here&apos;s what&apos;s happening with your recruitment pipeline.</p>
           </div>
           <OptimizedButton
             onClick={() => router.push('/dashboard/create-interview')}

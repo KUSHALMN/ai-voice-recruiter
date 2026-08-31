@@ -272,7 +272,7 @@ export default function AdminReportPage() {
                   {feedback.evidence_quote && (
                     <div className="bg-gray-50 border-l-4 border-blue-500 p-4 rounded">
                       <p className="text-sm font-semibold text-gray-600 mb-1">Evidence:</p>
-                      <p className="text-gray-800 italic">"{feedback.evidence_quote}"</p>
+                      <p className="text-gray-800 italic">&quot;{feedback.evidence_quote}&quot;</p>
                     </div>
                   )}
                 </div>
