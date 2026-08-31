@@ -26,7 +26,6 @@ interface InterviewScores {
 export default function InterviewPage() {
   const params = useParams()
   const router = useRouter()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [interview, setInterview] = useState<Record<string, any> | null>(null)
   const [loading, setLoading] = useState(true)
   const [started, setStarted] = useState(false)

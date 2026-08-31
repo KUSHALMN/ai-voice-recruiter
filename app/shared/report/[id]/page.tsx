@@ -14,7 +14,6 @@ interface SharedReportQuestion {
 
 export default function SharedReportPage() {
   const params = useParams()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [report, setReport] = useState<Record<string, any> | null>(null)
   const [loading, setLoading] = useState(true)
 
