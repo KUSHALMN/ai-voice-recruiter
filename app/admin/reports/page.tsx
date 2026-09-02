@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Download, Filter, Search, FileText, Calendar, User } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
@@ -30,7 +30,6 @@ interface Report {
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([])
-  const [filteredReports, setFilteredReports] = useState<Report[]>([])
   const [filter, setFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [dateRange, setDateRange] = useState('all')
@@ -47,8 +46,34 @@ export default function ReportsPage() {
     return () => clearInterval(interval)
   }, [])
 
-  useEffect(() => {
-    filterReports()
+  const filteredReports = useMemo(() => {
+    let filtered = reports
+
+    if (filter !== 'all') {
+      filtered = filtered.filter(report =>
+        report.recommendation.toLowerCase().includes(filter.toLowerCase())
+      )
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(report =>
+        report.candidate_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        report.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        report.candidate_email.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+
+    if (dateRange !== 'all') {
+      const now = new Date()
+      const days = dateRange === 'week' ? 7 : dateRange === 'month' ? 30 : 90
+      const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
+
+      filtered = filtered.filter(report =>
+        new Date(report.completed_at) >= cutoff
+      )
+    }
+
+    return filtered
   }, [reports, filter, searchTerm, dateRange])
 
   const fetchReports = async () => {
@@ -98,36 +123,6 @@ export default function ReportsPage() {
       console.error('❌ Error fetching reports:', error)
       toast.error('Failed to load reports')
     }
-  }
-
-  const filterReports = () => {
-    let filtered = reports
-
-    if (filter !== 'all') {
-      filtered = filtered.filter(report =>
-        report.recommendation.toLowerCase().includes(filter.toLowerCase())
-      )
-    }
-
-    if (searchTerm) {
-      filtered = filtered.filter(report =>
-        report.candidate_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.candidate_email.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
-    if (dateRange !== 'all') {
-      const now = new Date()
-      const days = dateRange === 'week' ? 7 : dateRange === 'month' ? 30 : 90
-      const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000)
-
-      filtered = filtered.filter(report =>
-        new Date(report.completed_at) >= cutoff
-      )
-    }
-
-    setFilteredReports(filtered)
   }
 
   const exportReport = (report: Report, format: 'json' | 'pdf') => {
