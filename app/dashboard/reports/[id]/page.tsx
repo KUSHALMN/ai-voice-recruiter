@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Download, CheckCircle, XCircle, AlertCircle, Code2, Mail, Loader2, Sparkles, Share2, ShieldAlert } from 'lucide-react'
@@ -38,28 +38,7 @@ export default function ReportDetailPage() {
 
   const reportId = params?.id as string
 
-  useEffect(() => {
-    if (!reportId) return
-
-    // If it's a demo report, load static data immediately
-    if (reportId.startsWith('demo-')) {
-      const demoData = DEMO_REPORTS_MAP[reportId]
-      if (demoData) {
-        setReport(demoData)
-      }
-      setLoading(false)
-      return
-    }
-
-    // Real report — fetch from API
-    fetchReport(reportId)
-    
-    return () => {
-      if (pollTimerRef.current) clearTimeout(pollTimerRef.current)
-    }
-  }, [reportId])
-
-  const fetchReport = async (id: string, isPolling = false) => {
+  const fetchReport = useCallback(async (id: string, isPolling = false) => {
     try {
       const res = await fetch(`/api/get-single-report?id=${id}`)
       const json = await res.json()
@@ -106,7 +85,28 @@ export default function ReportDetailPage() {
     } finally {
       if (!isPolling) setLoading(false)
     }
-  }
+  }, [params?.id])
+
+  useEffect(() => {
+    if (!reportId) return
+
+    // If it's a demo report, load static data immediately
+    if (reportId.startsWith('demo-')) {
+      const demoData = DEMO_REPORTS_MAP[reportId]
+      if (demoData) {
+        setReport(demoData)
+      }
+      setLoading(false)
+      return
+    }
+
+    // Real report — fetch from API
+    fetchReport(reportId)
+    
+    return () => {
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current)
+    }
+  }, [reportId, fetchReport])
 
   const handleSendEmail = async () => {
     if (isSendingEmail) return
