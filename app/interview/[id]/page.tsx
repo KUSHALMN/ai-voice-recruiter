@@ -101,6 +101,7 @@ export default function InterviewPage() {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('blur', handleBlur)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -1199,6 +1200,7 @@ export default function InterviewPage() {
                   }}
                   transition={{ repeat: speaking ? Infinity : 0, duration: 1.5, ease: "easeInOut" }}
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/aira-avatar.png"
                     alt="AIRA — AI Hiring Interviewer"
@@ -1435,6 +1437,7 @@ export default function InterviewPage() {
             <div className="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
             <div className="aspect-[4/5] rounded-2xl overflow-hidden relative mb-6 border border-slate-700">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/aira-avatar.png"
                 alt="AIRA — AI Hiring Interviewer"
