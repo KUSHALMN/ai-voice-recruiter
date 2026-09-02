@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Download, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
@@ -27,11 +27,7 @@ export default function AdminReportPage() {
   const [report, setReport] = useState<any | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchReport()
-  }, [params.id])
-
-  const fetchReport = async () => {
+  const fetchReport = useCallback(async () => {
     try {
       const { data: sessionData, error: sessionError } = await supabase
         .from('interview_sessions')
@@ -118,7 +114,11 @@ export default function AdminReportPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params.id])
+
+  useEffect(() => {
+    fetchReport()
+  }, [fetchReport])
 
   const getRecommendationColor = (tag: string) => {
     if (tag === 'Hire') return 'bg-green-100 text-green-800 border-green-300'
