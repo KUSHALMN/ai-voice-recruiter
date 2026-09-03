@@ -138,3 +138,95 @@ div[data-nextjs-dialog-overlay] {
   visibility: hidden !important;
   pointer-events: none !important;
 }
+
+/* ==========================================================================
+   GLOBAL DARK MODE THEME SYSTEM
+   ========================================================================== */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #090D16 !important;
+  color: #F8FAFC !important;
+}
+
+/* Backgrounds in dark mode */
+html.dark,
+html.dark main,
+html.dark [class*="bg-[#F9FAFB]"],
+html.dark .bg-slate-50,
+html.dark .bg-gray-50 {
+  background-color: #090D16 !important;
+}
+
+html.dark .bg-white,
+html.dark [class*="bg-white"] {
+  background-color: #111827 !important;
+}
+
+html.dark [class*="bg-slate-50/50"],
+html.dark [class*="bg-slate-50/40"],
+html.dark .bg-slate-100,
+html.dark .bg-gray-100 {
+  background-color: #1A2234 !important;
+}
+
+/* Borders in dark mode */
+html.dark [class*="border-[#E5E7EB]"],
+html.dark [class*="border-slate-200"],
+html.dark [class*="border-slate-300"],
+html.dark [class*="border-gray-200"],
+html.dark .border-slate-200 {
+  border-color: #1F293D !important;
+}
+
+/* Headings and body texts in dark mode */
+html.dark [class*="text-[#111827]"],
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-gray-900,
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4 {
+  color: #F8FAFC !important;
+}
+
+html.dark [class*="text-[#6B7280]"],
+html.dark [class*="text-[#4B5563]"],
+html.dark .text-slate-600,
+html.dark .text-slate-500,
+html.dark .text-gray-600,
+html.dark .text-gray-500 {
+  color: #94A3B8 !important;
+}
+
+/* Form inputs, textareas, selects */
+html.dark input:not([type="checkbox"]),
+html.dark select,
+html.dark textarea {
+  background-color: #151D2E !important;
+  border-color: #27344E !important;
+  color: #F8FAFC !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748B !important;
+}
+
+/* Navigation, Sidebar, TopBar */
+html.dark aside,
+html.dark header,
+html.dark nav {
+  background-color: #0F1626 !important;
+  border-color: #1E293D !important;
+}
+
+html.dark .card,
+html.dark .glass-card,
+html.dark .glass-panel {
+  background-color: #111827 !important;
+  border-color: #1E293D !important;
+}
