@@ -4,9 +4,21 @@
 @tailwind utilities;
 
 @layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
     @apply bg-slate-50 text-slate-900 font-sans antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    overflow-x: hidden;
   }
 
   h1,
@@ -19,76 +31,82 @@
   }
 }
 
+/* GPU Hardware Acceleration for smooth 60fps / 120fps animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
 .neural-bg {
   background-image:
-    radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
 }
 
 @layer components {
+  /* Lightweight glassmorphism to prevent mobile/desktop GPU lag */
   .glass-panel {
-    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-xl shadow-indigo-500/5;
+    @apply bg-white/85 backdrop-blur-md border border-white/60 shadow-xl shadow-indigo-500/5;
+    transform: translateZ(0);
   }
 
   .glass-card {
-    @apply bg-white/60 backdrop-blur-lg border border-white/50 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300;
+    @apply bg-white/80 backdrop-blur-sm border border-slate-200/80 shadow-sm hover:shadow-lg hover:border-blue-300 transition-all duration-200;
+    transform: translateZ(0);
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-2.5 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-[0.98];
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/25 hover:brightness-105 active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply bg-white text-slate-700 border border-slate-200 px-6 py-2.5 rounded-xl font-medium transition-all duration-300 hover:bg-slate-50 hover:border-slate-300 hover:shadow-md;
+    @apply bg-white text-slate-700 border border-slate-200 px-6 py-2.5 rounded-xl font-medium transition-all duration-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm;
   }
 
   .input-field {
-    @apply bg-white/50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200;
+    @apply bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-150;
   }
 }
 
 /* Animations */
 @keyframes float {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
   }
-
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: float 5s ease-in-out infinite;
+  transform: translateZ(0);
 }
 
 @keyframes pulse-soft {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
   }
-
   50% {
-    opacity: 0.7;
+    opacity: 0.75;
   }
 }
 
 .animate-pulse-soft {
-  animation: pulse-soft 3s ease-in-out infinite;
+  animation: pulse-soft 2.5s ease-in-out infinite;
 }
 
-/* Scrollbar */
+/* Performance-optimized Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -99,11 +117,11 @@
   @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
 }
 
-/* Mobile optimizations */
+/* Mobile performance optimizations */
 @media (max-width: 640px) {
-
   .glass-panel,
   .glass-card {
-    @apply backdrop-blur-md;
+    backdrop-filter: none !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
   }
 }
