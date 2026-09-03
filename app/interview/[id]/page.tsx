@@ -15,6 +15,7 @@ import { InterviewSessionManager, InterviewState } from '@/lib/interview/session
 import { AdaptiveDifficultyEngine } from '@/lib/ai/adaptiveDifficulty'
 import ProgressBar from '@/components/interview/ProgressBar'
 import VoiceWave from '@/components/interview/VoiceWave'
+import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
 
 interface InterviewScores {
   technical: number
@@ -141,24 +142,75 @@ export default function InterviewPage() {
 
   const loadInterview = async () => {
     try {
-      // Use module-level singleton instead of creating new client each time
-      const { data } = await supabase.from('interviews').select('id, candidate_name, candidate_email, job_title, job_description, interview_type, candidate_type, status, duration, enable_probing, enable_strict_proctoring, recruiter_email, created_at, question_set').eq('id', params.id).single()
-      if (data) {
-        setInterview(data)
-        setTimeLeft(data.duration * 60)
+      const interviewId = Array.isArray(params?.id) ? params.id[0] : params?.id
+      if (!interviewId) {
+        setLoading(false)
+        return
+      }
+
+      let interviewData: any = null
+
+      // 1. Fetch from server-side API (bypasses Supabase RLS policies)
+      try {
+        const res = await fetch(`/api/interview/${interviewId}`)
+        if (res.ok) {
+          const json = await res.json()
+          if (json.data) {
+            interviewData = json.data
+          }
+        }
+      } catch (apiErr) {
+        console.warn('API fetch failed, trying client Supabase:', apiErr)
+      }
+
+      // 2. Fallback to client Supabase if API is unreachable
+      if (!interviewData) {
+        const { data } = await supabase
+          .from('interviews')
+          .select('id, candidate_name, candidate_email, job_title, job_description, interview_type, candidate_type, status, duration, enable_probing, enable_strict_proctoring, recruiter_email, created_at, question_set')
+          .eq('id', interviewId)
+          .maybeSingle()
+        if (data) {
+          interviewData = data
+        }
+      }
+
+      // 3. Fallback to demo data if it is a demo interview
+      if (!interviewData && DEMO_REPORTS_MAP[interviewId]) {
+        const demo = DEMO_REPORTS_MAP[interviewId]
+        interviewData = {
+          id: demo.id,
+          candidate_name: demo.candidate_name,
+          candidate_email: demo.candidate_email,
+          job_title: demo.job_title,
+          job_description: `Demo position for ${demo.job_title}`,
+          interview_type: demo.interview_type || 'Technical',
+          candidate_type: 'Experienced',
+          status: demo.status || 'scheduled',
+          duration: 10,
+          enable_probing: true,
+          enable_strict_proctoring: false,
+          recruiter_email: demo.recruiter_email || '',
+          created_at: demo.created_at || new Date().toISOString(),
+        }
+      }
+
+      if (interviewData) {
+        setInterview(interviewData)
+        setTimeLeft((interviewData.duration || 10) * 60)
 
         // Initialize Session Manager and restore session if one exists
-        const manager = new InterviewSessionManager(data.id, '')
+        const manager = new InterviewSessionManager(interviewData.id, '')
         sessionManagerRef.current = manager
 
         const restored = await manager.restoreSession()
-        if (restored && restored.answeredQuestions.length > 0) {
+        if (restored && restored.answeredQuestions && restored.answeredQuestions.length > 0) {
           setResumeState(restored)
           setShowResumeModal(true)
         }
       }
     } catch (err) {
-      console.error(err)
+      console.error('Error loading interview:', err)
     } finally {
       setLoading(false)
     }
