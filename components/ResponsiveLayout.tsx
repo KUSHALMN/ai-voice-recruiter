@@ -13,11 +13,11 @@ export default function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB] overflow-hidden">
+    <div className="flex h-screen bg-[#F9FAFB] dark:bg-black overflow-hidden transition-colors duration-200">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -37,10 +37,10 @@ export default function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
         <div className="relative">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-lg hover:bg-gray-100 lg:hidden"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-900 lg:hidden"
             aria-label="Toggle sidebar"
           >
-            {sidebarOpen ? <X className="w-5 h-5 text-gray-600" /> : <Menu className="w-5 h-5 text-gray-600" />}
+            {sidebarOpen ? <X className="w-5 h-5 text-gray-600 dark:text-neutral-300" /> : <Menu className="w-5 h-5 text-gray-600 dark:text-neutral-300" />}
           </button>
           <TopBar />
         </div>
