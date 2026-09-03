@@ -212,11 +212,11 @@ export default function UserSettingsPage() {
                 onClick={() => handleThemeChange('dark')}
                 className={`p-4 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-2 ${
                   theme === 'dark'
-                    ? 'border-blue-600 bg-slate-900 text-white font-bold ring-2 ring-blue-300 shadow-sm'
+                    ? 'border-blue-600 bg-black text-white font-bold ring-2 ring-blue-500 shadow-sm'
                     : 'border-slate-200 hover:border-slate-300 text-slate-600 bg-slate-50/50'
                 }`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-blue-500 text-white' : 'bg-white text-slate-500'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-white text-slate-500'}`}>
                   <Moon className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-semibold">Dark Mode</span>

@@ -140,45 +140,50 @@ div[data-nextjs-dialog-overlay] {
 }
 
 /* ==========================================================================
-   GLOBAL DARK MODE THEME SYSTEM
+   GLOBAL TRUE OLED PURE BLACK THEME SYSTEM
    ========================================================================== */
 html.dark {
   color-scheme: dark;
 }
 
 html.dark body {
-  background-color: #090D16 !important;
-  color: #F8FAFC !important;
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
 }
 
-/* Backgrounds in dark mode */
+/* Backgrounds in dark mode - PURE BLACK */
 html.dark,
 html.dark main,
 html.dark [class*="bg-[#F9FAFB]"],
 html.dark .bg-slate-50,
-html.dark .bg-gray-50 {
-  background-color: #090D16 !important;
+html.dark .bg-gray-50,
+html.dark .neural-bg {
+  background-color: #000000 !important;
+  background-image: none !important;
 }
 
+/* Cards, Modals, Panels - Deep True Black with border separation */
 html.dark .bg-white,
 html.dark [class*="bg-white"] {
-  background-color: #111827 !important;
+  background-color: #0A0A0A !important;
 }
 
 html.dark [class*="bg-slate-50/50"],
 html.dark [class*="bg-slate-50/40"],
 html.dark .bg-slate-100,
-html.dark .bg-gray-100 {
-  background-color: #1A2234 !important;
+html.dark .bg-gray-100,
+html.dark [class*="bg-gray-50"] {
+  background-color: #121212 !important;
 }
 
-/* Borders in dark mode */
+/* Borders in dark mode - Subtle dark neutral lines */
 html.dark [class*="border-[#E5E7EB]"],
 html.dark [class*="border-slate-200"],
 html.dark [class*="border-slate-300"],
 html.dark [class*="border-gray-200"],
-html.dark .border-slate-200 {
-  border-color: #1F293D !important;
+html.dark .border-slate-200,
+html.dark .border-gray-200 {
+  border-color: #222222 !important;
 }
 
 /* Headings and body texts in dark mode */
@@ -190,7 +195,7 @@ html.dark h1,
 html.dark h2,
 html.dark h3,
 html.dark h4 {
-  color: #F8FAFC !important;
+  color: #FFFFFF !important;
 }
 
 html.dark [class*="text-[#6B7280]"],
@@ -199,34 +204,47 @@ html.dark .text-slate-600,
 html.dark .text-slate-500,
 html.dark .text-gray-600,
 html.dark .text-gray-500 {
-  color: #94A3B8 !important;
+  color: #A1A1AA !important;
 }
 
-/* Form inputs, textareas, selects */
+/* Form inputs, textareas, selects - Pure Black with crisp border */
 html.dark input:not([type="checkbox"]),
 html.dark select,
 html.dark textarea {
-  background-color: #151D2E !important;
-  border-color: #27344E !important;
-  color: #F8FAFC !important;
+  background-color: #050505 !important;
+  border-color: #262626 !important;
+  color: #FFFFFF !important;
 }
 
 html.dark input::placeholder,
 html.dark textarea::placeholder {
-  color: #64748B !important;
+  color: #71717A !important;
 }
 
-/* Navigation, Sidebar, TopBar */
+/* Navigation, Sidebar, TopBar - Pure Black */
 html.dark aside,
+html.dark [class*="w-60 sm:w-64 lg:w-60 bg-white"] {
+  background-color: #000000 !important;
+  border-color: #1A1A1A !important;
+}
+
 html.dark header,
+html.dark [class*="h-14 sm:h-16 bg-white"],
 html.dark nav {
-  background-color: #0F1626 !important;
-  border-color: #1E293D !important;
+  background-color: #000000 !important;
+  border-color: #1A1A1A !important;
 }
 
 html.dark .card,
 html.dark .glass-card,
 html.dark .glass-panel {
-  background-color: #111827 !important;
-  border-color: #1E293D !important;
+  background-color: #0A0A0A !important;
+  border-color: #1A1A1A !important;
+}
+
+/* Active navigation item in pure black mode */
+html.dark a[class*="bg-[#EEF2FF]"],
+html.dark [class*="bg-[#EEF2FF]"] {
+  background-color: #18181B !important;
+  color: #3B82F6 !important;
 }
