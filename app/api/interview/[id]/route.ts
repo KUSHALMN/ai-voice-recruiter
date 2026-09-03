@@ -22,17 +22,23 @@ export async function GET(
     // 1. Fetch from database using admin client (bypasses Supabase RLS)
     const { data, error } = await supabase
       .from('interviews')
-      .select('id, candidate_name, candidate_email, job_title, job_description, interview_type, candidate_type, status, duration, enable_probing, enable_strict_proctoring, recruiter_email, created_at, question_set, resume_url')
+      .select('*')
       .eq('id', interviewId)
       .maybeSingle()
 
     if (error) {
-      console.warn(`Supabase interview query warning for ${interviewId}:`, error.message)
+      console.warn(`Supabase interview query error for ${interviewId}:`, error.message)
     }
 
     if (data) {
       return NextResponse.json(
-        { data },
+        {
+          data: {
+            ...data,
+            enable_probing: data.enable_probing ?? true,
+            enable_strict_proctoring: data.enable_strict_proctoring ?? true,
+          }
+        },
         { headers: { 'Cache-Control': 'no-store, max-age=0' } }
       )
     }

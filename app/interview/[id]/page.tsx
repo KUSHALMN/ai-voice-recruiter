@@ -167,7 +167,7 @@ export default function InterviewPage() {
       if (!interviewData) {
         const { data } = await supabase
           .from('interviews')
-          .select('id, candidate_name, candidate_email, job_title, job_description, interview_type, candidate_type, status, duration, enable_probing, enable_strict_proctoring, recruiter_email, created_at, question_set')
+          .select('*')
           .eq('id', interviewId)
           .maybeSingle()
         if (data) {
