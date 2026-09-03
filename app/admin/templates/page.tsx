@@ -40,19 +40,15 @@ export default function AdminTemplatesPage() {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/templates')
-      if (!response.ok) throw new Error('Failed to fetch')
-      const data = await response.json()
-      setTemplates(data)
-    } catch (error) {
-      console.error('Error fetching templates:', error)
-      // Load from Supabase as fallback
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('interview_templates')
         .select('*')
         .order('created_at', { ascending: false })
 
       setTemplates(data || [])
+    } catch (error) {
+      console.error('Error fetching templates:', error)
+      setTemplates([])
     } finally {
       setLoading(false)
     }

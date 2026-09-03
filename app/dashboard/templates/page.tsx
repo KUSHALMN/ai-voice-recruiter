@@ -54,19 +54,7 @@ export default function TemplatesPage() {
 
   const fetchTemplates = async () => {
     try {
-      // Try fetching from API first
-      try {
-        const response = await fetch('http://localhost:5000/api/templates')
-        if (response.ok) {
-          const data = await response.json()
-          setTemplates(data)
-          return
-        }
-      } catch {
-        // API not available, fallback to Supabase
-      }
-
-      // Fallback to Supabase
+      // Fetch directly from Supabase
       const { data, error } = await supabase
         .from('interview_templates')
         .select('*')

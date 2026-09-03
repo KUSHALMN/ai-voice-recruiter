@@ -1,8 +1,8 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { memo, useState } from 'react'
+import { memo, useState, useEffect } from 'react'
 import {
   LayoutDashboard,
   FileText,
@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase'
 
 function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { data: session } = useSession()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -36,33 +37,54 @@ function Sidebar() {
         { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
       ]
 
+  const settingsHref = isAdminPath ? '/admin/settings' : '/dashboard/settings'
+
+  // Preload all sidebar routes immediately on mount for zero-latency instant transitions
+  useEffect(() => {
+    navigation.forEach(item => {
+      try {
+        router.prefetch(item.href)
+      } catch {}
+    })
+    try {
+      router.prefetch(settingsHref)
+    } catch {}
+  }, [router, settingsHref])
+
   return (
-    <div className="w-60 sm:w-64 lg:w-60 bg-white border-r border-[#E5E7EB] h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide">
+    <aside className="w-60 sm:w-64 lg:w-60 bg-white border-r border-[#E5E7EB] h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 mb-6 sm:mb-8">
-          <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#2563EB]" />
+        <div className="flex items-center gap-2 mb-6 sm:mb-8 px-1">
+          <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#2563EB] flex items-center justify-center">
+            <Sparkles className="w-5 h-5" />
+          </div>
           <div>
-            <span className="text-base sm:text-lg font-semibold text-[#111827] tracking-tight">AIRA</span>
+            <span className="text-base sm:text-lg font-bold text-[#111827] tracking-tight">AIRA</span>
             <p className="text-[10px] text-[#6B7280] leading-none">AI Recruitment Assistant</p>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="space-y-2">
+        <nav className="space-y-1.5" aria-label="Sidebar Navigation">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             const Icon = item.icon
 
             return (
-              <Link key={item.name} href={item.href}>
-                <div className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                  ? 'bg-[#E0E7FF] text-[#2563EB] font-semibold'
-                  : 'text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#2563EB]'
-                  }`}>
-                  <Icon className="w-5 h-5" />
-                  <span className="text-sm">{item.name}</span>
-                </div>
+              <Link
+                key={item.name}
+                href={item.href}
+                prefetch={true}
+                onMouseEnter={() => router.prefetch(item.href)}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-75 cursor-pointer active:scale-[0.97] ${
+                  isActive
+                    ? 'bg-[#EEF2FF] text-[#2563EB] font-bold shadow-sm shadow-indigo-100'
+                    : 'text-[#4B5563] hover:bg-[#F3F4F6] hover:text-[#111827] active:bg-[#E5E7EB]'
+                }`}
+              >
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-[#2563EB]' : 'text-[#6B7280]'}`} />
+                <span>{item.name}</span>
               </Link>
             )
           })}
@@ -70,37 +92,41 @@ function Sidebar() {
 
         {/* Divider */}
         <div className="border-t border-[#E5E7EB] mt-6 pt-6">
-          <Link href={isAdminPath ? "/admin/settings" : "/dashboard/settings"}>
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-              pathname === (isAdminPath ? '/admin/settings' : '/dashboard/settings')
-              ? 'bg-[#E0E7FF] text-[#2563EB] font-semibold'
-              : 'text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#2563EB]'
-              }`}>
-              <Settings className="w-5 h-5" />
-              <span className="text-sm">Settings</span>
-            </div>
+          <Link
+            href={settingsHref}
+            prefetch={true}
+            onMouseEnter={() => router.prefetch(settingsHref)}
+            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-75 cursor-pointer active:scale-[0.97] ${
+              pathname === settingsHref
+                ? 'bg-[#EEF2FF] text-[#2563EB] font-bold shadow-sm shadow-indigo-100'
+                : 'text-[#4B5563] hover:bg-[#F3F4F6] hover:text-[#111827] active:bg-[#E5E7EB]'
+            }`}
+          >
+            <Settings className={`w-5 h-5 shrink-0 ${pathname === settingsHref ? 'text-[#2563EB]' : 'text-[#6B7280]'}`} />
+            <span>Settings</span>
           </Link>
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer / User Profile & Signout */}
       <div>
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-[#F9FAFB] mb-3">
-          <div className="w-8 h-8 bg-[#2563EB] rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-medium">
+        <div className="flex items-center gap-3 p-2.5 rounded-xl bg-[#F9FAFB] border border-[#F3F4F6] mb-3">
+          <div className="w-8 h-8 bg-[#2563EB] rounded-full flex items-center justify-center shrink-0">
+            <span className="text-white text-xs font-bold">
               {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[#111827] truncate">
+            <p className="text-xs font-semibold text-[#111827] truncate">
               {session?.user?.name || 'User'}
             </p>
-            <p className="text-xs text-[#6B7280] truncate">
+            <p className="text-[11px] text-[#6B7280] truncate">
               {session?.user?.email}
             </p>
           </div>
         </div>
         <button
+          type="button"
           onClick={async () => {
             if (isLoggingOut) return
             setIsLoggingOut(true)
@@ -113,13 +139,13 @@ function Sidebar() {
             }
           }}
           disabled={isLoggingOut}
-          className="flex items-center gap-2 w-full px-4 py-2 text-sm text-[#6B7280] hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-xs font-semibold text-[#6B7280] hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-xl transition-all duration-75 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
           {isLoggingOut ? 'Signing out...' : 'Sign Out'}
         </button>
       </div>
-    </div>
+    </aside>
   )
 }
 
