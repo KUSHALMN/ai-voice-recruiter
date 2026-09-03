@@ -125,3 +125,16 @@
     background-color: rgba(255, 255, 255, 0.95) !important;
   }
 }
+
+/* Completely hide Next.js development indicator badge and overlay */
+nextjs-portal,
+[data-nextjs-dev-overlay],
+[data-nextjs-route-announcer],
+[data-nextjs-dev-tools-button],
+[data-nextjs-dev-tools],
+[data-nextjs-toast],
+div[data-nextjs-dialog-overlay] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}

@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false, // Prevents duplicate renders in dev/prod
+  reactStrictMode: false,
   compress: true,
   poweredByHeader: false,
+  devIndicators: false,
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts', 'axios'],
   },
