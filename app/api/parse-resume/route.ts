@@ -4,9 +4,9 @@ import Groq from 'groq-sdk'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const groq = process.env.GROQ_API_KEY
-  ? new Groq({ apiKey: process.env.GROQ_API_KEY })
-  : null
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
 // Heuristic fallback parser when LLM is unavailable
 function fallbackHeuristicParser(text: string) {
@@ -24,15 +24,21 @@ function fallbackHeuristicParser(text: string) {
     }
   }
 
-  // Detect skills
+  // Detect skills safely without RegExp syntax errors on C++, C#, .NET etc.
   const commonSkills = [
-    'React', 'Next.js', 'Node.js', 'TypeScript', 'JavaScript', 'Python', 'Java', 'C++',
+    'React', 'Next.js', 'Node.js', 'TypeScript', 'JavaScript', 'Python', 'Java', 'C++', 'C#',
     'AWS', 'Docker', 'Kubernetes', 'SQL', 'PostgreSQL', 'MongoDB', 'GraphQL', 'Tailwind',
     'Machine Learning', 'AI', 'DevOps', 'Go', 'Rust', 'Product Management', 'Figma'
   ]
-  const detectedSkills = commonSkills.filter(skill => 
-    new RegExp(`\\b${skill}\\b`, 'i').test(text)
-  )
+  
+  const detectedSkills = commonSkills.filter(skill => {
+    try {
+      const escaped = escapeRegExp(skill)
+      return new RegExp(`(?:^|[^a-zA-Z0-9#+])${escaped}(?:$|[^a-zA-Z0-9#+])`, 'i').test(text)
+    } catch {
+      return text.toLowerCase().includes(skill.toLowerCase())
+    }
+  })
 
   // Experience level inference
   const lower = text.toLowerCase()
@@ -108,7 +114,6 @@ export async function POST(req: Request) {
 
     let cleanText = ''
     try {
-      // Dynamic import to prevent bundler issues
       const pdf = require('pdf-parse/lib/pdf-parse.js')
       const data = await pdf(buffer)
       cleanText = (data.text || '')
@@ -117,7 +122,6 @@ export async function POST(req: Request) {
         .trim()
     } catch (parseErr) {
       console.warn('pdf-parse error, attempting buffer string extraction:', parseErr)
-      // Fallback simple text decode from buffer
       const rawStr = buffer.toString('utf-8', 0, Math.min(buffer.length, 50000))
       const textMatches = rawStr.match(/\(([^()]+)\)Tj/g) || []
       cleanText = textMatches.map(m => m.slice(1, -3)).join(' ')
@@ -133,9 +137,11 @@ export async function POST(req: Request) {
       )
     }
 
-    // Try AI-powered parsing if Groq is available
-    if (groq) {
+    // Try AI-powered parsing with Groq
+    const apiKey = process.env.GROQ_API_KEY
+    if (apiKey) {
       try {
+        const groq = new Groq({ apiKey })
         const prompt = `You are an elite AI Recruiter and Resume Parser.
 Analyze the following candidate resume text and extract key structured hiring details, plus generate a comprehensive, tailored Job Description matching this candidate's background.
 
@@ -168,7 +174,6 @@ Respond ONLY with a valid JSON object matching the following structure:
         const rawJson = completion.choices[0]?.message?.content || '{}'
         const parsed = JSON.parse(rawJson)
 
-        // Ensure continent is valid
         const validContinents = [
           'North America', 'South America', 'Europe', 'Asia', 'Africa', 'Australia / Oceania', 'Antarctica'
         ]
@@ -188,7 +193,7 @@ Respond ONLY with a valid JSON object matching the following structure:
           summary: parsed.summary || 'Resume analyzed successfully.'
         })
       } catch (aiErr) {
-        console.error('Groq parsing failed, falling back to heuristic:', aiErr)
+        console.error('Groq parsing error, using heuristic fallback:', aiErr)
       }
     }
 
