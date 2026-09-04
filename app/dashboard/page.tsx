@@ -82,20 +82,20 @@ export default function DashboardPage() {
         <div className="space-y-8 animate-pulse">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="h-8 bg-slate-200 rounded w-48 mb-2"></div>
-              <div className="h-4 bg-slate-200 rounded w-64"></div>
+              <div className="h-8 bg-slate-200 dark:bg-neutral-800 rounded w-48 mb-2"></div>
+              <div className="h-4 bg-slate-200 dark:bg-neutral-800 rounded w-64"></div>
             </div>
-            <div className="h-10 bg-slate-200 rounded w-36"></div>
+            <div className="h-10 bg-slate-200 dark:bg-neutral-800 rounded w-36"></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="glass-card p-6 rounded-2xl h-32 bg-slate-100 flex flex-col justify-end">
-                <div className="h-4 bg-slate-200 rounded w-1/2 mb-2"></div>
-                <div className="h-8 bg-slate-200 rounded w-1/4"></div>
+              <div key={i} className="glass-card p-6 rounded-2xl h-32 bg-slate-100 dark:bg-neutral-900 flex flex-col justify-end border border-slate-200/50 dark:border-neutral-800">
+                <div className="h-4 bg-slate-200 dark:bg-neutral-800 rounded w-1/2 mb-2"></div>
+                <div className="h-8 bg-slate-200 dark:bg-neutral-800 rounded w-1/4"></div>
               </div>
             ))}
           </div>
-          <div className="h-64 bg-slate-100 rounded-2xl glass-card"></div>
+          <div className="h-64 bg-slate-100 dark:bg-neutral-900 rounded-2xl glass-card border border-slate-200/50 dark:border-neutral-800"></div>
         </div>
       </ResponsiveLayout>
     )
@@ -107,14 +107,14 @@ export default function DashboardPage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
               Welcome back 👋
             </h1>
-            <p className="text-slate-500">Here&apos;s what&apos;s happening with your recruitment pipeline.</p>
+            <p className="text-slate-500 dark:text-neutral-400">Here&apos;s what&apos;s happening with your recruitment pipeline.</p>
           </div>
           <OptimizedButton
             onClick={() => router.push('/dashboard/create-interview')}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-200"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg shadow-indigo-500/20 font-medium px-5 py-2.5 rounded-xl transition-all"
           >
             <Plus className="w-5 h-5 mr-2" />
             New Interview
@@ -127,64 +127,64 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass-card p-6 rounded-2xl relative overflow-hidden group"
+            className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
           >
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Users className="w-24 h-24 text-indigo-600 transform rotate-12 translate-x-4 -translate-y-4" />
+              <Users className="w-24 h-24 text-indigo-600 dark:text-indigo-400 transform rotate-12 translate-x-4 -translate-y-4" />
             </div>
-            <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 text-indigo-600 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl flex items-center justify-center mb-4 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300 border border-indigo-100 dark:border-indigo-900/50">
               <Users className="w-6 h-6" />
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 mb-1">{stats.totalInterviews}</h3>
-            <p className="text-slate-500 text-sm font-medium">Total Interviews</p>
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{stats.totalInterviews}</h3>
+            <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium">Total Interviews</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass-card p-6 rounded-2xl relative overflow-hidden group"
+            className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
           >
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <CheckCircle className="w-24 h-24 text-emerald-600 transform rotate-12 translate-x-4 -translate-y-4" />
+              <CheckCircle className="w-24 h-24 text-emerald-600 dark:text-emerald-400 transform rotate-12 translate-x-4 -translate-y-4" />
             </div>
-            <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mb-4 text-emerald-600 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl flex items-center justify-center mb-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform duration-300 border border-emerald-100 dark:border-emerald-900/50">
               <CheckCircle className="w-6 h-6" />
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 mb-1">{stats.completedInterviews}</h3>
-            <p className="text-slate-500 text-sm font-medium">Completed</p>
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{stats.completedInterviews}</h3>
+            <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium">Completed</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="glass-card p-6 rounded-2xl relative overflow-hidden group"
+            className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
           >
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Clock className="w-24 h-24 text-amber-500 transform rotate-12 translate-x-4 -translate-y-4" />
+              <Clock className="w-24 h-24 text-amber-500 dark:text-amber-400 transform rotate-12 translate-x-4 -translate-y-4" />
             </div>
-            <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mb-4 text-amber-600 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/40 rounded-xl flex items-center justify-center mb-4 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform duration-300 border border-amber-100 dark:border-amber-900/50">
               <Clock className="w-6 h-6" />
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 mb-1">{stats.pendingInterviews}</h3>
-            <p className="text-slate-500 text-sm font-medium">Pending</p>
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{stats.pendingInterviews}</h3>
+            <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium">Pending</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="glass-card p-6 rounded-2xl relative overflow-hidden group"
+            className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
           >
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <BarChart3 className="w-24 h-24 text-purple-600 transform rotate-12 translate-x-4 -translate-y-4" />
+              <BarChart3 className="w-24 h-24 text-purple-600 dark:text-purple-400 transform rotate-12 translate-x-4 -translate-y-4" />
             </div>
-            <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-4 text-purple-600 group-hover:scale-110 transition-transform duration-300">
+            <div className="w-12 h-12 bg-purple-50 dark:bg-purple-950/40 rounded-xl flex items-center justify-center mb-4 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform duration-300 border border-purple-100 dark:border-purple-900/50">
               <BarChart3 className="w-6 h-6" />
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 mb-1">{stats.successRate}%</h3>
-            <p className="text-slate-500 text-sm font-medium">Success Rate</p>
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{stats.successRate}%</h3>
+            <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium">Success Rate</p>
           </motion.div>
         </div>
 
@@ -198,28 +198,28 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="glass-panel rounded-2xl p-8"
+          className="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-200/60 dark:border-neutral-800"
         >
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
             <div>
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-indigo-500" />
                 Recent Activity
               </h2>
-              <p className="text-slate-500 text-sm mt-1">Latest updates from your interview sessions</p>
+              <p className="text-slate-500 dark:text-neutral-400 text-sm mt-1">Latest updates from your interview sessions</p>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => fetchDashboardData(true)}
                 disabled={isRefreshing}
-                className="text-slate-600 hover:text-indigo-600 font-medium text-sm px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                className="text-slate-600 dark:text-neutral-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium text-sm px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5 disabled:opacity-50"
               >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`} />
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-indigo-600 dark:text-indigo-400' : ''}`} />
                 <span>Refresh</span>
               </button>
               <button
                 onClick={() => startTransition(() => router.push('/dashboard/interviews'))}
-                className="text-indigo-600 hover:text-indigo-700 font-medium text-sm px-4 py-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors flex items-center gap-1"
+                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium text-sm px-4 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors flex items-center gap-1"
               >
                 View All <ArrowRight className="w-4 h-4" />
               </button>
@@ -234,25 +234,25 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 * i }}
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/50 hover:bg-white border border-slate-100 rounded-xl transition-all duration-300 hover:shadow-md hover:border-indigo-100 gap-4"
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/50 dark:bg-neutral-900/40 hover:bg-white dark:hover:bg-neutral-900 border border-slate-100 dark:border-neutral-800 rounded-xl transition-all duration-300 hover:shadow-md hover:border-indigo-100 dark:hover:border-neutral-700 gap-4"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform duration-300 shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-neutral-800 dark:to-neutral-900 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300 shrink-0 border border-slate-100 dark:border-neutral-800">
                       <FileText className="w-6 h-6" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900 group-hover:text-indigo-600 transition-colors">{interview.job_title}</h3>
-                      <p className="text-sm text-slate-500 flex items-center gap-2">
+                      <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{interview.job_title}</h3>
+                      <p className="text-sm text-slate-500 dark:text-neutral-400 flex items-center gap-2">
                         {interview.candidate_name}
-                        <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                        <span className="w-1 h-1 bg-slate-300 dark:bg-neutral-600 rounded-full"></span>
                         {new Date(interview.created_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2.5 flex-wrap self-end sm:self-auto">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${interview.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                      interview.status === 'in_progress' ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                        'bg-slate-50 text-slate-600 border-slate-100'
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${interview.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/50' :
+                      interview.status === 'in_progress' ? 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800/50' :
+                        'bg-slate-50 text-slate-600 border-slate-100 dark:bg-neutral-800/60 dark:text-neutral-300 dark:border-neutral-700'
                       }`}>
                       {interview.status.replace('_', ' ').toUpperCase()}
                     </span>
@@ -262,7 +262,7 @@ export default function DashboardPage() {
                         href={interview.resume_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-xs text-[#374151] hover:text-[#2563EB] bg-white hover:bg-slate-50 border border-[#E5E7EB] px-3 py-1.5 rounded-lg font-medium transition-all shadow-sm"
+                        className="flex items-center gap-1.5 text-xs text-[#374151] dark:text-neutral-200 hover:text-[#2563EB] dark:hover:text-indigo-400 bg-white dark:bg-neutral-800 hover:bg-slate-50 dark:hover:bg-neutral-700 border border-[#E5E7EB] dark:border-neutral-700 px-3 py-1.5 rounded-lg font-medium transition-all shadow-sm"
                       >
                         <FileText className="w-3.5 h-3.5" />
                         Resume
@@ -273,12 +273,12 @@ export default function DashboardPage() {
                     <button
                       onClick={() => handleCopyLink(interview.id)}
                       title="Copy interview link"
-                      className="flex items-center gap-1 text-xs text-slate-600 hover:text-indigo-600 bg-white hover:bg-indigo-50 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium transition-all shadow-sm"
+                      className="flex items-center gap-1 text-xs text-slate-600 dark:text-neutral-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-white dark:bg-neutral-800 hover:bg-indigo-50 dark:hover:bg-neutral-700 border border-slate-200 dark:border-neutral-700 px-2.5 py-1.5 rounded-lg font-medium transition-all shadow-sm"
                     >
                       {copiedId === interview.id ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-600 font-semibold">Copied</span>
+                          <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Copied</span>
                         </>
                       ) : (
                         <>
@@ -339,12 +339,12 @@ export default function DashboardPage() {
                           startTransition(() => router.push(`/dashboard/reports/${interview.id}`))
                         }}
                         disabled={isPending && navigatingId === interview.id}
-                        className="flex items-center gap-1.5 bg-white text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                        className="flex items-center gap-1.5 bg-white dark:bg-neutral-800 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-50 dark:hover:bg-neutral-700 transition-all shadow-sm disabled:opacity-50"
                       >
                         {isPending && navigatingId === interview.id ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : (
-                          <BarChart3 className="w-3.5 h-3.5 text-indigo-600" />
+                          <BarChart3 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                         )}
                         Report
                       </button>
@@ -354,15 +354,15 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-white/30 rounded-2xl border border-dashed border-slate-200">
-              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-slate-400" />
+            <div className="text-center py-16 bg-white/30 dark:bg-neutral-900/30 rounded-2xl border border-dashed border-slate-200 dark:border-neutral-800">
+              <div className="w-16 h-16 bg-slate-50 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-slate-400 dark:text-neutral-500" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">No interviews yet</h3>
-              <p className="text-slate-500 mb-8 max-w-sm mx-auto">Create your first AI-powered interview to start streamlining your hiring process.</p>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">No interviews yet</h3>
+              <p className="text-slate-500 dark:text-neutral-400 mb-8 max-w-sm mx-auto">Create your first AI-powered interview to start streamlining your hiring process.</p>
               <OptimizedButton
                 onClick={() => startTransition(() => router.push('/dashboard/create-interview'))}
-                className="btn-primary"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/20"
               >
                 Create Interview
               </OptimizedButton>
