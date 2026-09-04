@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Users, FileText, BarChart3, Clock, CheckCircle, Loader2, Sparkles, ArrowRight } from 'lucide-react'
+import { Plus, Users, FileText, BarChart3, Clock, CheckCircle, Loader2, Sparkles, ArrowRight, Copy, Check, Play, PlayCircle, RefreshCw } from 'lucide-react'
 import DashboardCharts from '@/components/DashboardCharts'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
+import toast from 'react-hot-toast'
 
 import { OptimizedButton } from '@/components/OptimizedButton'
 import { motion } from 'framer-motion'
@@ -13,6 +14,9 @@ export default function DashboardPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [loading, setLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [navigatingId, setNavigatingId] = useState<string | null>(null)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [stats, setStats] = useState({
     totalInterviews: 0,
@@ -23,9 +27,22 @@ export default function DashboardPage() {
   const [recentInterviews, setRecentInterviews] = useState<any[]>([])
   const [allInterviewsData, setAllInterviewsData] = useState<any[]>([])
 
-  const fetchDashboardData = useCallback(async () => {
+  const handleCopyLink = useCallback((interviewId: string) => {
+    if (typeof window === 'undefined') return
+    const url = `${window.location.origin}/interview/${interviewId}`
+    navigator.clipboard.writeText(url)
+    setCopiedId(interviewId)
+    toast.success('Interview link copied to clipboard!')
+    setTimeout(() => setCopiedId(null), 2500)
+  }, [])
+
+  const fetchDashboardData = useCallback(async (showRefreshingSpinner = false) => {
     try {
-      setLoading(true)
+      if (showRefreshingSpinner) {
+        setIsRefreshing(true)
+      } else {
+        setLoading(true)
+      }
 
       // Use server-side API to bypass Supabase RLS
       const res = await fetch('/api/get-interviews')
@@ -49,6 +66,7 @@ export default function DashboardPage() {
       console.error('Error fetching dashboard data:', error)
     } finally {
       setLoading(false)
+      setIsRefreshing(false)
     }
   }, [])
 
@@ -192,10 +210,12 @@ export default function DashboardPage() {
             </div>
             <div className="flex gap-3">
               <button
-                onClick={fetchDashboardData}
-                className="text-slate-600 hover:text-indigo-600 font-medium text-sm px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                onClick={() => fetchDashboardData(true)}
+                disabled={isRefreshing}
+                className="text-slate-600 hover:text-indigo-600 font-medium text-sm px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors flex items-center gap-1.5 disabled:opacity-50"
               >
-                Refresh
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-indigo-600' : ''}`} />
+                <span>Refresh</span>
               </button>
               <button
                 onClick={() => startTransition(() => router.push('/dashboard/interviews'))}
@@ -214,10 +234,10 @@ export default function DashboardPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 * i }}
-                  className="group flex items-center justify-between p-4 bg-white/50 hover:bg-white border border-slate-100 rounded-xl transition-all duration-300 hover:shadow-md hover:border-indigo-100"
+                  className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/50 hover:bg-white border border-slate-100 rounded-xl transition-all duration-300 hover:shadow-md hover:border-indigo-100 gap-4"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform duration-300 shrink-0">
                       <FileText className="w-6 h-6" />
                     </div>
                     <div>
@@ -229,7 +249,7 @@ export default function DashboardPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2.5 flex-wrap self-end sm:self-auto">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${interview.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                       interview.status === 'in_progress' ? 'bg-amber-50 text-amber-700 border-amber-100' :
                         'bg-slate-50 text-slate-600 border-slate-100'
@@ -242,34 +262,90 @@ export default function DashboardPage() {
                         href={interview.resume_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-xs text-[#374151] hover:text-[#2563EB] bg-white hover:bg-slate-50 border border-[#E5E7EB] px-3.5 py-2 rounded-xl font-medium transition-all shadow-[0_2px_4px_rgba(0,0,0,0.02)]"
+                        className="flex items-center gap-1.5 text-xs text-[#374151] hover:text-[#2563EB] bg-white hover:bg-slate-50 border border-[#E5E7EB] px-3 py-1.5 rounded-lg font-medium transition-all shadow-sm"
                       >
                         <FileText className="w-3.5 h-3.5" />
-                        View Resume
+                        Resume
                       </a>
                     )}
+
+                    {/* Quick Copy Link button */}
+                    <button
+                      onClick={() => handleCopyLink(interview.id)}
+                      title="Copy interview link"
+                      className="flex items-center gap-1 text-xs text-slate-600 hover:text-indigo-600 bg-white hover:bg-indigo-50 border border-slate-200 px-2.5 py-1.5 rounded-lg font-medium transition-all shadow-sm"
+                    >
+                      {copiedId === interview.id ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-600 font-semibold">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          <span>Link</span>
+                        </>
+                      )}
+                    </button>
 
                     {interview.status === 'scheduled' && (
                       <button
                         onClick={() => {
                           if (!interview.id) {
-                            alert('Interview ID is missing')
+                            toast.error('Interview ID is missing')
                             return
                           }
+                          setNavigatingId(interview.id)
                           startTransition(() => router.push(`/interview/${interview.id}`))
                         }}
-                        disabled={isPending}
-                        className="opacity-0 group-hover:opacity-100 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 transform translate-x-2 group-hover:translate-x-0"
+                        disabled={isPending && navigatingId === interview.id}
+                        className="flex items-center gap-1.5 bg-indigo-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 disabled:opacity-50"
                       >
+                        {isPending && navigatingId === interview.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Play className="w-3.5 h-3.5 fill-current" />
+                        )}
                         Start
                       </button>
                     )}
+
+                    {interview.status === 'in_progress' && (
+                      <button
+                        onClick={() => {
+                          if (!interview.id) {
+                            toast.error('Interview ID is missing')
+                            return
+                          }
+                          setNavigatingId(interview.id)
+                          startTransition(() => router.push(`/interview/${interview.id}`))
+                        }}
+                        disabled={isPending && navigatingId === interview.id}
+                        className="flex items-center gap-1.5 bg-amber-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-amber-700 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
+                      >
+                        {isPending && navigatingId === interview.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <PlayCircle className="w-3.5 h-3.5" />
+                        )}
+                        Continue
+                      </button>
+                    )}
+
                     {interview.status === 'completed' && (
                       <button
-                        onClick={() => startTransition(() => router.push(`/dashboard/reports/${interview.id}`))}
-                        disabled={isPending}
-                        className="opacity-0 group-hover:opacity-100 bg-white text-slate-700 border border-slate-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 transition-all transform translate-x-2 group-hover:translate-x-0"
+                        onClick={() => {
+                          setNavigatingId(interview.id)
+                          startTransition(() => router.push(`/dashboard/reports/${interview.id}`))
+                        }}
+                        disabled={isPending && navigatingId === interview.id}
+                        className="flex items-center gap-1.5 bg-white text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
                       >
+                        {isPending && navigatingId === interview.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <BarChart3 className="w-3.5 h-3.5 text-indigo-600" />
+                        )}
                         Report
                       </button>
                     )}
