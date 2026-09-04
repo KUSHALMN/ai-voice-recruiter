@@ -2,19 +2,23 @@
 
 import { useState, useEffect, useCallback, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Users, FileText, BarChart3, Clock, CheckCircle, Loader2, Sparkles, ArrowRight, Copy, Check, Play, PlayCircle, RefreshCw } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { Plus, Users, FileText, BarChart3, Clock, CheckCircle, Loader2, Sparkles, ArrowRight, Copy, Check, Play, PlayCircle, RefreshCw, AlertCircle } from 'lucide-react'
 import DashboardCharts from '@/components/DashboardCharts'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import toast from 'react-hot-toast'
+import { DEMO_REPORTS } from '@/lib/demo-data'
 
 import { OptimizedButton } from '@/components/OptimizedButton'
 import { motion } from 'framer-motion'
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [isPending, startTransition] = useTransition()
   const [loading, setLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [navigatingId, setNavigatingId] = useState<string | null>(null)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
@@ -22,6 +26,7 @@ export default function DashboardPage() {
     totalInterviews: 0,
     completedInterviews: 0,
     pendingInterviews: 0,
+    inProgressInterviews: 0,
     successRate: 0
   })
   const [recentInterviews, setRecentInterviews] = useState<any[]>([])
@@ -43,11 +48,18 @@ export default function DashboardPage() {
       } else {
         setLoading(true)
       }
+      setErrorMessage(null)
 
       // Use server-side API to bypass Supabase RLS
       const res = await fetch('/api/get-interviews')
       const json = await res.json()
-      const allInterviews = json.data || []
+
+      let allInterviews = json.data || []
+
+      // Graceful fallback to demo data if the database is brand new or empty
+      if (allInterviews.length === 0) {
+        allInterviews = DEMO_REPORTS.map(r => ({ ...r, id: r.id }))
+      }
 
       setAllInterviewsData(allInterviews)
       setRecentInterviews(allInterviews.slice(0, 5))
@@ -55,15 +67,32 @@ export default function DashboardPage() {
       const total = allInterviews.length
       const completed = allInterviews.filter((i: { status: string }) => i.status === 'completed').length
       const pending = allInterviews.filter((i: { status: string }) => i.status === 'scheduled').length
+      const inProgress = allInterviews.filter((i: { status: string }) => i.status === 'in_progress').length
 
       setStats({
         totalInterviews: total,
         completedInterviews: completed,
         pendingInterviews: pending,
+        inProgressInterviews: inProgress,
         successRate: total > 0 ? Math.round((completed / total) * 100) : 0
       })
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
+      setErrorMessage('Could not connect to live database. Displaying offline demo pipeline.')
+      const fallback = DEMO_REPORTS.map(r => ({ ...r, id: r.id }))
+      setAllInterviewsData(fallback)
+      setRecentInterviews(fallback.slice(0, 5))
+      const total = fallback.length
+      const completed = fallback.filter((i: { status: string }) => i.status === 'completed').length
+      const pending = fallback.filter((i: { status: string }) => i.status === 'scheduled').length
+      const inProgress = fallback.filter((i: { status: string }) => i.status === 'in_progress').length
+      setStats({
+        totalInterviews: total,
+        completedInterviews: completed,
+        pendingInterviews: pending,
+        inProgressInterviews: inProgress,
+        successRate: total > 0 ? Math.round((completed / total) * 100) : 0
+      })
     } finally {
       setLoading(false)
       setIsRefreshing(false)
@@ -108,7 +137,7 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
-              Welcome back 👋
+              Welcome back{session?.user?.name ? `, ${session.user.name.split(' ')[0]}` : ''} 👋
             </h1>
             <p className="text-slate-500 dark:text-neutral-400">Here&apos;s what&apos;s happening with your recruitment pipeline.</p>
           </div>
@@ -120,6 +149,22 @@ export default function DashboardPage() {
             New Interview
           </OptimizedButton>
         </div>
+
+        {/* Database Status / Fallback Notice Banner */}
+        {errorMessage && (
+          <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 rounded-2xl p-4 flex items-center justify-between text-amber-800 dark:text-amber-200 text-sm">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              onClick={() => fetchDashboardData(true)}
+              className="text-xs font-semibold px-3 py-1.5 bg-white dark:bg-neutral-800 text-amber-800 dark:text-amber-200 rounded-lg border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-neutral-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -168,7 +213,14 @@ export default function DashboardPage() {
               <Clock className="w-6 h-6" />
             </div>
             <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{stats.pendingInterviews}</h3>
-            <p className="text-slate-500 dark:text-neutral-400 text-sm font-medium">Pending</p>
+            <div className="flex items-center justify-between text-slate-500 dark:text-neutral-400 text-sm font-medium">
+              <span>Scheduled</span>
+              {stats.inProgressInterviews > 0 && (
+                <span className="text-[11px] bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 font-semibold px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/50">
+                  {stats.inProgressInterviews} Active
+                </span>
+              )}
+            </div>
           </motion.div>
 
           <motion.div
