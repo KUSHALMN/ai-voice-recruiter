@@ -6,13 +6,22 @@ export const revalidate = 0
 
 export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const recruiterEmail = searchParams.get('recruiter_email')
+
     const supabase = getAdminClient()
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('interviews')
-      .select('id, candidate_name, candidate_email, job_title, interview_type, status, duration, created_at, resume_url')
+      .select('id, candidate_name, candidate_email, job_title, interview_type, candidate_type, status, duration, created_at, resume_url, parsed_resume, interview_sessions (id, scores, recommendation, evaluation, completed_at, final_score)')
       .order('created_at', { ascending: false })
       .limit(100)
+
+    if (recruiterEmail) {
+      query = query.eq('recruiter_email', recruiterEmail)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       console.error('Error fetching interviews:', error.message)
@@ -29,3 +38,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
+

@@ -101,7 +101,7 @@ async def get_interview(interview_id: str):
 async def get_interviews(recruiter_email: Optional[str] = Query(None)):
     try:
         supabase = get_supabase_client()
-        query = supabase.table("interviews").select("*").order("created_at", desc=True).limit(50)
+        query = supabase.table("interviews").select("*, interview_sessions(*)").order("created_at", desc=True).limit(50)
         
         if recruiter_email:
             query = query.eq("recruiter_email", recruiter_email)
