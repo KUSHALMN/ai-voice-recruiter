@@ -5,11 +5,14 @@ export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
     try {
-        const { currentQuestion, candidateAnswer, nextQuestion, jobTitle, candidateName, enableProbing } = await request.json()
+        const { currentQuestion, candidateAnswer, nextQuestion, jobTitle, candidateName, enableProbing, isWrapUpPhase } = await request.json()
 
         if (!currentQuestion || !candidateAnswer) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
         }
+
+        // Disable follow-up probing if in wrap-up phase or if this is the last question
+        const shouldEnableProbing = !isWrapUpPhase && Boolean(nextQuestion) && Boolean(enableProbing)
 
         const responseData = await geminiService.generateConversationalResponse(
             currentQuestion,
@@ -17,7 +20,7 @@ export async function POST(request: NextRequest) {
             nextQuestion || '',
             jobTitle,
             candidateName,
-            enableProbing
+            shouldEnableProbing
         )
 
         return NextResponse.json(responseData)

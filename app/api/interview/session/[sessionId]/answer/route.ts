@@ -3,6 +3,7 @@ import { getAdminClient } from '@/lib/supabase-admin'
 import { verifyCandidateJWT } from '@/lib/auth-candidate'
 import { evaluateAnswer } from '@/lib/ai/evaluateAnswer'
 import { AdaptiveDifficultyEngine, Question } from '@/lib/ai/adaptiveDifficulty'
+import { calculateTargetQuestions, evaluateInterviewPacing, MIN_QUESTION_TIME_BUFFER_SECONDS } from '@/lib/interview/pacingManager'
 import Groq from 'groq-sdk'
 
 export const runtime = 'nodejs'
@@ -78,7 +79,7 @@ export async function POST(
   try {
     const { sessionId } = await params
     const body = await request.json()
-    const { questionId, answer, questionIndex } = body
+    const { questionId, answer, questionIndex, timeLeft } = body
 
     // 1. Authenticate candidate using candidate JWT
     const authHeader = request.headers.get('Authorization')
@@ -110,10 +111,10 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden. Interview ID mismatch.' }, { status: 403 })
     }
 
-    // 3. Fetch interview details
+    // 3. Fetch interview details (including duration for pacing)
     const { data: interview, error: intErr } = await supabase
       .from('interviews')
-      .select('id, job_title, job_description, parsed_resume, question_set')
+      .select('id, job_title, job_description, duration, parsed_resume, question_set')
       .eq('id', session.interview_id)
       .single()
 
@@ -139,18 +140,41 @@ export async function POST(
     const engine = AdaptiveDifficultyEngine.reconstructFromHistory(scoreHistory)
     const action = engine.recordAnswer(evalResult.score)
 
-    // 7. Select or Generate next question
+    // 7. Time-Budgeted Pacing Evaluation
+    const totalDurationMinutes = interview.duration || 15
+    const pacingTargets = calculateTargetQuestions(totalDurationMinutes, interview.job_title)
+    const questionsAnsweredCount = (session.answers?.length || 0) + 1
+    const remainingSeconds = typeof timeLeft === 'number' ? timeLeft : null
+
+    let pacingEval = null
+    if (remainingSeconds !== null) {
+      pacingEval = evaluateInterviewPacing({
+        timeLeftSeconds: remainingSeconds,
+        totalDurationMinutes,
+        questionsAnsweredCount,
+        targetQuestionsCount: pacingTargets.targetQuestions
+      })
+    }
+
+    // 8. Select or Generate next question (Time-gated)
     let nextQuestionObj: Question | null = null
     
     // Find all answered question IDs so far in this session
-    // Map existing answers or questions asked to their pool IDs
     const askedQuestionsText: string[] = session.questions || []
     const answeredIds = questionPool
       .filter(q => askedQuestionsText.includes(q.text) || q.id === questionId)
       .map(q => q.id)
 
-    if (action.shouldAddBonusQuestion && action.bonusQuestionHint) {
-      console.log(`🌟 Triggering dynamic question generation: ${action.bonusQuestionHint}`)
+    // Check if time or max questions limit is reached
+    const isOutOfTime = remainingSeconds !== null && remainingSeconds < MIN_QUESTION_TIME_BUFFER_SECONDS
+    const hasExceededQuestionCap = questionsAnsweredCount >= pacingTargets.maxQuestions
+    const shouldStopAsking = isOutOfTime || hasExceededQuestionCap
+
+    if (shouldStopAsking) {
+      console.log(`⏱️ Pacing cap triggered: remaining=${remainingSeconds}s, answered=${questionsAnsweredCount}/${pacingTargets.targetQuestions} (max=${pacingTargets.maxQuestions}) -> transitioning to wrap-up`)
+      nextQuestionObj = null
+    } else if (action.shouldAddBonusQuestion && action.bonusQuestionHint && (remainingSeconds === null || remainingSeconds > 150)) {
+      console.log(`🌟 Triggering dynamic bonus question: ${action.bonusQuestionHint}`)
       nextQuestionObj = await generateDynamicQuestion(
         interview.job_title,
         interview.job_description || '',
@@ -161,7 +185,7 @@ export async function POST(
       nextQuestionObj = engine.getNextQuestion(questionPool, answeredIds)
     }
 
-    // 8. Prepare update arrays
+    // 9. Prepare update arrays
     const updatedAnswers = [...(session.answers || []), answer]
     const updatedScores = [...previousScores, {
       questionId,
@@ -181,7 +205,7 @@ export async function POST(
       updatedQuestions.push(nextQuestionObj.text)
     }
 
-    // 9. Update Database
+    // 10. Update Database
     const { error: updateErr } = await supabase
       .from('interview_sessions')
       .update({
@@ -204,7 +228,15 @@ export async function POST(
       nextQuestion: nextQuestionObj ? nextQuestionObj.text : null,
       nextQuestionId: nextQuestionObj ? nextQuestionObj.id : null,
       newDifficulty: action.newDifficulty,
-      shouldAddBonusQuestion: action.shouldAddBonusQuestion
+      shouldAddBonusQuestion: action.shouldAddBonusQuestion,
+      isWrapUp: !nextQuestionObj,
+      pacing: pacingEval ? {
+        status: pacingEval.status,
+        statusMessage: pacingEval.statusMessage,
+        isWrapUpPhase: pacingEval.isWrapUpPhase,
+        targetQuestions: pacingTargets.targetQuestions,
+        maxQuestions: pacingTargets.maxQuestions
+      } : null
     })
 
   } catch (err: any) {
