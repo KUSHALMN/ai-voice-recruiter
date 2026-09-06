@@ -13,6 +13,7 @@ import type { QuestionSet, GeneratedQuestion } from '@/types/resume'
 import ResumeModal from '@/components/interview/ResumeModal'
 import { InterviewSessionManager, InterviewState } from '@/lib/interview/sessionManager'
 import { AdaptiveDifficultyEngine } from '@/lib/ai/adaptiveDifficulty'
+import { calculateTargetQuestions, evaluateInterviewPacing, MIN_QUESTION_TIME_BUFFER_SECONDS } from '@/lib/interview/pacingManager'
 import ProgressBar from '@/components/interview/ProgressBar'
 import VoiceWave from '@/components/interview/VoiceWave'
 import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
@@ -68,6 +69,7 @@ export default function InterviewPage() {
   const answersRef = useRef<string[]>([])
   const scoresRef = useRef<InterviewScores[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const timeLeftRef = useRef(0)
 
   // References to avoid stale closure issues in speech event loop
   const sessionIdRef = useRef<string | null>(null)
@@ -197,7 +199,9 @@ export default function InterviewPage() {
 
       if (interviewData) {
         setInterview(interviewData)
-        setTimeLeft((interviewData.duration || 10) * 60)
+        const initialSeconds = (interviewData.duration || 10) * 60
+        setTimeLeft(initialSeconds)
+        timeLeftRef.current = initialSeconds
 
         // Initialize Session Manager and restore session if one exists
         const manager = new InterviewSessionManager(interviewData.id, '')
@@ -397,8 +401,8 @@ export default function InterviewPage() {
   const generateQuestions = async () => {
     if (!interview) return null;
 
-    const questionsMin = Math.max(3, Math.floor(interview.duration * 1.5))
-    const fallbackCount = Math.floor(Math.random() * (interview.duration * 2.5 - questionsMin + 1)) + questionsMin
+    const pacing = calculateTargetQuestions(interview.duration, interview.interview_type)
+    const fallbackCount = pacing.targetQuestions
 
     const fallbackQuestions = Array.from({ length: fallbackCount }, (_, i) => {
       const templates = [
@@ -506,7 +510,8 @@ export default function InterviewPage() {
         body: JSON.stringify({
           questionId,
           answer,
-          questionIndex: _questionIndex
+          questionIndex: _questionIndex,
+          timeLeft: timeLeftRef.current
         })
       }).then(r => r.json())
     ])
@@ -534,11 +539,13 @@ export default function InterviewPage() {
       scriptedDetection,
       nextQuestion: evalData?.nextQuestion || null,
       nextQuestionId: evalData?.nextQuestionId || null,
-      newDifficulty: (evalData?.newDifficulty || 'medium') as 'easy' | 'medium' | 'hard'
+      newDifficulty: (evalData?.newDifficulty || 'medium') as 'easy' | 'medium' | 'hard',
+      isWrapUp: evalData?.isWrapUp ?? !evalData?.nextQuestion,
+      pacing: evalData?.pacing || null
     }
   }
 
-  const generateConversationalResponse = async (currentQuestion: string, answer: string, nextQuestion: string) => {
+  const generateConversationalResponse = async (currentQuestion: string, answer: string, nextQuestion: string, isWrapUpPhase = false) => {
     if (!interview) return { responseText: `Thank you. ${nextQuestion}`, isFollowUp: false, followUpQuestion: null };
     
     try {
@@ -551,7 +558,8 @@ export default function InterviewPage() {
           nextQuestion,
           jobTitle: interview.job_title,
           candidateName: interview.candidate_name,
-          enableProbing: interview.enable_probing
+          enableProbing: interview.enable_probing,
+          isWrapUpPhase: isWrapUpPhase || timeLeftRef.current < MIN_QUESTION_TIME_BUFFER_SECONDS || !nextQuestion
         })
       })
       const data = await res.json()
@@ -631,11 +639,13 @@ export default function InterviewPage() {
     // Start countdown timer
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
-        if (prev <= 1 && !isEndingRef.current) {
+        const nextTime = prev <= 1 ? 0 : prev - 1
+        timeLeftRef.current = nextTime
+        if (nextTime <= 0 && !isEndingRef.current) {
           endInterview()
           return 0
         }
-        return prev - 1
+        return nextTime
       })
     }, 1000)
 
@@ -714,11 +724,13 @@ export default function InterviewPage() {
 
     timerRef.current = setInterval(() => {
       setTimeLeft(prev => {
-        if (prev <= 1 && !isEndingRef.current) {
+        const nextTime = prev <= 1 ? 0 : prev - 1
+        timeLeftRef.current = nextTime
+        if (nextTime <= 0 && !isEndingRef.current) {
           endInterview()
           return 0
         }
-        return prev - 1
+        return nextTime
       })
     }, 1000)
 
@@ -866,9 +878,13 @@ export default function InterviewPage() {
         difficultyLevelRef.current = currentDiff
         setDifficultyLevel(currentDiff)
 
+        const remainingSeconds = timeLeftRef.current
+        const isTimeShort = remainingSeconds < MIN_QUESTION_TIME_BUFFER_SECONDS
+        const shouldWrapUp = isTimeShort || evaluation.isWrapUp || !evaluation.nextQuestion
+
         let finalAudioText = ''
         let hasMoreQuestions = false
-        const nextQText = evaluation.nextQuestion
+        const nextQText = !shouldWrapUp ? evaluation.nextQuestion : null
 
         if (nextQText) {
           hasMoreQuestions = true
@@ -882,11 +898,11 @@ export default function InterviewPage() {
             usedQuestionIdsRef.current = updatedUsedIds
           }
 
-          const conversationalData = await generateConversationalResponse(question, answer, nextQText)
+          const conversationalData = await generateConversationalResponse(question, answer, nextQText, false)
           finalAudioText = conversationalData.responseText
 
-          // Dynamic Probing Injection
-          if (conversationalData.isFollowUp && conversationalData.followUpQuestion) {
+          // Dynamic Probing Injection (only when plenty of time remains)
+          if (conversationalData.isFollowUp && conversationalData.followUpQuestion && remainingSeconds > 120) {
             qs.splice(index + 1, 0, conversationalData.followUpQuestion)
             setQuestions([...qs])
             questionsRef.current = qs
@@ -894,8 +910,8 @@ export default function InterviewPage() {
             finalAudioText = conversationalData.responseText
           }
         } else {
-          const conversationalData = await generateConversationalResponse(question, answer, '')
-          finalAudioText = `${conversationalData.responseText}. We have completed all questions for this session.`
+          const conversationalData = await generateConversationalResponse(question, answer, '', true)
+          finalAudioText = conversationalData.responseText || `Thank you for completing the interview. Your responses have been saved.`
         }
 
         // Save progress to localStorage (and trigger Supabase backup sync)
