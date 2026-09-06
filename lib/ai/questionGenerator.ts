@@ -1,5 +1,6 @@
 import Groq from 'groq-sdk'
 import { ParsedResume, QuestionSet, GeneratedQuestion } from '@/types/resume'
+import { calculateTargetQuestions } from '@/lib/interview/pacingManager'
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || '',
@@ -23,8 +24,9 @@ export async function generateQuestionSet(
     throw new Error('GROQ_API_KEY is not configured in environment variables.')
   }
 
-  // 1. Determine Question Count (average 3 mins per question, min 3 questions)
-  const questionCount = Math.max(3, Math.floor(duration / 3))
+  // 1. Determine Question Count calibrated by duration (2.5 - 3.5 mins per question)
+  const pacing = calculateTargetQuestions(duration, interviewType)
+  const questionCount = pacing.targetQuestions
 
   // 2. Prepare Difficulty Distribution
   const easyCount = Math.max(1, Math.round(questionCount * 0.3))

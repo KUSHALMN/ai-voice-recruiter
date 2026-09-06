@@ -263,9 +263,22 @@ Respond ONLY with JSON:
             }
 
     async def generate_questions(self, job_title: str, job_description: str, interview_type: str, candidate_type: str, duration: int, resume_text: Optional[str] = None) -> List[str]:
-        """Generates tailored interview questions based on duration, candidate level, and resume."""
-        min_q = max(3, int(duration * 1.5))
-        max_q = max(min_q + 1, int(duration * 2.5))
+        """Generates tailored interview questions scaled realistically with interview duration (approx 2.5 - 3.5 min/question)."""
+        dur = max(1, duration or 15)
+        if dur <= 5:
+            min_q, max_q = 2, 3
+        elif dur <= 10:
+            min_q, max_q = 2, 4
+        elif dur <= 15:
+            min_q, max_q = 3, 5
+        elif dur <= 20:
+            min_q, max_q = 4, 7
+        elif dur <= 30:
+            min_q, max_q = 6, 9
+        elif dur <= 45:
+            min_q, max_q = 8, 12
+        else:
+            min_q, max_q = 10, 15
         q_count = random.randint(min_q, max_q)
 
         focus = "coding problems, algorithmic challenges, and data structure implementation" if interview_type.lower() == "technical" else "relevant domain skills and practical problem solving"

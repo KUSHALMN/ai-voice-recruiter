@@ -1,4 +1,5 @@
 import Groq from 'groq-sdk'
+import { calculateTargetQuestions } from './interview/pacingManager'
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || '',
@@ -45,10 +46,9 @@ async function callGroq(prompt: string, temperature = 0.7, retries = 1): Promise
 export class GeminiService {
   async generateInterviewQuestions(jobTitle: string, jobDescription: string, interviewType: string, candidateType: string, duration: number, resumeText?: string): Promise<string[]> {
     try {
-      // Dynamic question count based on duration
-      const questionsMin = Math.floor(duration * 1.5)
-      const questionsMax = Math.floor(duration * 2.5)
-      const questionCount = Math.floor(Math.random() * (questionsMax - questionsMin + 1)) + questionsMin
+      // Dynamic question count based on duration and interview pacing (approx 2.5 - 3.5 min/question)
+      const pacing = calculateTargetQuestions(duration, interviewType)
+      const questionCount = pacing.targetQuestions
 
 
       let focusArea = ''
