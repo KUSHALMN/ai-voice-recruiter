@@ -1234,14 +1234,30 @@ export default function InterviewPage() {
         </header>
 
         {/* Real-time Progress Tracker */}
-        <div className="max-w-6xl w-full mx-auto mb-6 shrink-0">
-          <ProgressBar
-            current={currentQ + 1}
-            total={fullQuestionPool.length || interview?.question_set?.questions?.length || Math.max(3, Math.floor(interview.duration * 1.5))}
-            difficulty={difficultyLevel}
-            timeElapsed={Math.max(0, (interview.duration * 60) - timeLeft)}
-          />
-        </div>
+        {(() => {
+          const pacingTargets = calculateTargetQuestions(interview.duration, interview.interview_type)
+          const livePacing = evaluateInterviewPacing({
+            timeLeftSeconds: timeLeft,
+            totalDurationMinutes: interview.duration || 15,
+            questionsAnsweredCount: currentQ,
+            targetQuestionsCount: pacingTargets.targetQuestions
+          })
+          const targetQTotal = pacingTargets.targetQuestions
+
+          return (
+            <div className="max-w-6xl w-full mx-auto mb-6 shrink-0">
+              <ProgressBar
+                current={Math.min(currentQ + 1, targetQTotal)}
+                total={targetQTotal}
+                difficulty={difficultyLevel}
+                timeElapsed={Math.max(0, (interview.duration * 60) - timeLeft)}
+                timeLeft={timeLeft}
+                pacingStatus={livePacing.statusMessage}
+                targetMinutesPerQuestion={Math.round(pacingTargets.estimatedSecondsPerQuestion / 60)}
+              />
+            </div>
+          )
+        })()}
 
         <main className={`flex-1 w-full gap-6 transition-all duration-500 ${showCodeEditor
           ? 'grid grid-cols-1 lg:grid-cols-12 h-[calc(100vh-140px)] overflow-hidden'
@@ -1407,7 +1423,7 @@ export default function InterviewPage() {
         <ResumeModal
           candidateName={interview.candidate_name}
           currentQuestionIndex={resumeState.answeredQuestions.length}
-          totalQuestions={interview?.question_set?.questions?.length || Math.max(3, Math.floor(interview.duration * 1.5))}
+          totalQuestions={calculateTargetQuestions(interview.duration, interview.interview_type).targetQuestions}
           onResume={handleResumeSession}
           onRestart={handleRestartSession}
         />
