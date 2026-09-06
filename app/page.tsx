@@ -609,47 +609,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ENTERPRISE VALIDATION & TESTIMONIALS */}
-      <section id="enterprise" className="py-24 px-6 max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-5 space-y-6">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
-              Recruiter Endorsement
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1D1D1F] tracking-tight leading-tight">
-              &quot;AIRA cut our technical screening time by 90%.&quot;
-            </h2>
-            <p className="text-sm text-[#6E6E73] leading-relaxed">
-              Engineering leaders use Vowels AI to conduct objective preliminary rounds before involving senior engineers, saving hundreds of engineering hours every month.
-            </p>
-            <div className="flex items-center gap-2 text-amber-400">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400" />
-              ))}
-              <span className="text-xs font-semibold text-slate-600 ml-2">
-                4.9 / 5 Average Rating across 1,200+ teams
-              </span>
-            </div>
-          </div>
-
-          <div className="lg:col-span-7">
-            <div className="bg-white/80 backdrop-blur-xl border border-white/90 p-8 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-6">
-              <p className="text-base sm:text-lg text-slate-800 font-medium leading-relaxed">
-                &quot;What previously took 3 engineering managers 25 hours per week of repetitive introductory coding phone calls is now completely automated by AIRA. The candidate quality has never been higher, and our team fatigue is zero.&quot;
-              </p>
-              <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                <div className="w-10 h-10 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-sm">
-                  W
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-slate-900">Wilian S.</h4>
-                  <p className="text-xs text-slate-500">Founder & CEO • Zabal Tech Hub</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* FINAL MONUMENTAL CALL TO ACTION */}
       <section className="py-20 px-6 max-w-5xl mx-auto">
