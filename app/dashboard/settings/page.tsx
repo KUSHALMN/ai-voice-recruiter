@@ -11,10 +11,6 @@ import ResponsiveLayout from '@/components/ResponsiveLayout'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
 
-const CONTINENTS = [
-  'North America', 'Europe', 'Asia', 'South America', 'Africa', 'Australia / Oceania', 'Antarctica'
-]
-
 const LANGUAGES = [
   'English (US)', 'English (UK)', 'English (India)', 'Spanish', 'French', 'German', 'Japanese', 'Mandarin'
 ]
@@ -403,7 +399,7 @@ export default function UserSettingsPage() {
             </div>
           </motion.div>
 
-          {/* 7 CONTINENTS & REGIONAL DEFAULTS */}
+          {/* VOICE LANGUAGE & ACCENT DEFAULTS */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -415,41 +411,24 @@ export default function UserSettingsPage() {
                 <Globe className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">7 Continents Hiring & Language Defaults</h2>
-                <p className="text-xs text-slate-500 dark:text-neutral-400">Default region and language configuration when setting up new interviews</p>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Voice & Language Defaults</h2>
+                <p className="text-xs text-slate-500 dark:text-neutral-400">Default language and speech accent configuration for new interviews</p>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-5">
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 dark:text-neutral-400 mb-1.5 tracking-wider">
-                  Default Target Continent
-                </label>
-                <select
-                  value={aiPreferences.defaultContinent}
-                  onChange={(e) => setAiPreferences({ ...aiPreferences, defaultContinent: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-neutral-800 text-sm focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-950/40 bg-slate-50/50 dark:bg-neutral-950 dark:text-white font-medium"
-                >
-                  {CONTINENTS.map(c => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 dark:text-neutral-400 mb-1.5 tracking-wider">
-                  Default Voice Accent / Language
-                </label>
-                <select
-                  value={aiPreferences.defaultLanguage}
-                  onChange={(e) => setAiPreferences({ ...aiPreferences, defaultLanguage: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-neutral-800 text-sm focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-950/40 bg-slate-50/50 dark:bg-neutral-950 dark:text-white font-medium"
-                >
-                  {LANGUAGES.map(l => (
-                    <option key={l} value={l}>{l}</option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="block text-xs font-bold uppercase text-slate-600 dark:text-neutral-400 mb-1.5 tracking-wider">
+                Default Voice Accent / Language
+              </label>
+              <select
+                value={aiPreferences.defaultLanguage}
+                onChange={(e) => setAiPreferences({ ...aiPreferences, defaultLanguage: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-neutral-800 text-sm focus:outline-none focus:border-blue-600 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-950/40 bg-slate-50/50 dark:bg-neutral-950 dark:text-white font-medium"
+              >
+                {LANGUAGES.map(l => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
+              </select>
             </div>
           </motion.div>
 

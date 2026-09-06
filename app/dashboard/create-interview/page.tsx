@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ArrowLeft, ArrowRight, Briefcase, Clock, User, Mail, Sparkles, 
   ChevronDown, Loader2, Upload, CheckCircle, FileText, BrainCircuit, 
-  ShieldAlert, Globe2, Layers, Award
+  ShieldAlert, Layers, Award
 } from 'lucide-react'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import toast from 'react-hot-toast'
@@ -25,16 +25,6 @@ const CANDIDATE_TYPES = [
   'Fresher',
   'Experienced',
   'Managerial'
-]
-
-const CONTINENTS = [
-  { id: 'North America', name: 'North America', icon: '🌎', hub: 'Silicon Valley / NY / Toronto' },
-  { id: 'Europe', name: 'Europe', icon: '🌍', hub: 'London / Berlin / Paris' },
-  { id: 'Asia', name: 'Asia', icon: '🌏', hub: 'Tokyo / Singapore / Bengaluru' },
-  { id: 'South America', name: 'South America', icon: '🌎', hub: 'São Paulo / Buenos Aires' },
-  { id: 'Africa', name: 'Africa', icon: '🌍', hub: 'Lagos / Nairobi / Cape Town' },
-  { id: 'Australia / Oceania', name: 'Australia / Oceania', icon: '🌏', hub: 'Sydney / Melbourne / Auckland' },
-  { id: 'Antarctica', name: 'Antarctica', icon: '❄️', hub: 'Research & Polar Stations' },
 ]
 
 const DURATIONS = [1, 2, 10, 20, 30, 45]
@@ -479,30 +469,6 @@ export default function CreateInterview() {
                   </div>
                 </div>
 
-                {/* 7 Continents Region Selector */}
-                <div className="md:col-span-2">
-                  <label className="block text-xs uppercase font-bold text-slate-600 mb-2 tracking-wide flex items-center gap-2">
-                    <Globe2 className="w-4 h-4 text-blue-600" />
-                    Target Region / Continent (7 Continents Supported)
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                    {CONTINENTS.map(c => (
-                      <button
-                        type="button"
-                        key={c.id}
-                        onClick={() => setFormData({ ...formData, continent: c.id })}
-                        className={`p-2.5 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 ${
-                          formData.continent === c.id
-                            ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-sm ring-2 ring-blue-100'
-                            : 'border-slate-200 hover:border-slate-300 text-slate-600 bg-slate-50/50'
-                        }`}
-                      >
-                        <span className="text-xl">{c.icon}</span>
-                        <span className="text-xs leading-tight">{c.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
                 <div className="md:col-span-2">
                   <label className="block text-xs uppercase font-bold text-slate-600 mb-2 tracking-wide flex items-center gap-2">
@@ -599,7 +565,7 @@ export default function CreateInterview() {
             <div className="space-y-8">
               <div className="flex items-center gap-3 pb-6 border-b border-slate-200">
                 <User className="w-6 h-6 text-blue-600" />
-                <h2 className="text-xl font-bold text-slate-900">Candidate Information & Region</h2>
+                <h2 className="text-xl font-bold text-slate-900">Candidate Information</h2>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
@@ -635,7 +601,7 @@ export default function CreateInterview() {
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6">
                 <h3 className="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
                   <Award className="w-5 h-5 text-blue-600" />
-                  Interview & Region Summary
+                  Interview Summary
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
                   <div className="space-y-2">
@@ -644,7 +610,6 @@ export default function CreateInterview() {
                     <p><span className="text-slate-500 font-medium">Candidate Level:</span> <span className="font-semibold text-slate-900">{formData.candidateType}</span></p>
                   </div>
                   <div className="space-y-2">
-                    <p><span className="text-slate-500 font-medium">Continent / Region:</span> <span className="font-semibold text-blue-700">{formData.continent}</span></p>
                     <p><span className="text-slate-500 font-medium">Duration:</span> <span className="font-semibold text-slate-900">{formData.duration} minutes</span></p>
                     <p><span className="text-slate-500 font-medium">Candidate:</span> <span className="font-semibold text-slate-900">{formData.candidateName || 'Pending'} ({formData.candidateEmail || 'No email'})</span></p>
                   </div>
