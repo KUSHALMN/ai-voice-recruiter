@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "concurrently -k -n \"frontend,backend\" -c \"cyan.bold,magenta.bold\" \"next dev --turbo\" \"python run_backend.py\"",
+    "dev:frontend": "next dev --turbo",
+    "dev:backend": "python run_backend.py",
     "backend": "python run_backend.py",
     "build": "next build",
-    "start": "next start",
+    "start": "concurrently -k -n \"frontend,backend\" -c \"cyan.bold,magenta.bold\" \"next start\" \"python run_backend.py\"",
     "lint": "eslint . --ext .ts,.tsx"
   },
   "dependencies": {
