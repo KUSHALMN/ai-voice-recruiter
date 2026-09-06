@@ -2,11 +2,13 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  ArrowRight, Check, Globe, Sparkles, Zap, Shield, 
+  ArrowRight, Check, Sparkles, Zap, Shield, 
   BarChart3, Users, Clock, Bot, Cpu, CheckCircle2, 
   ChevronRight, Star, Play, Award, FileText, CheckCircle,
   Activity, ShieldCheck, Mic, Code2, Terminal, Sliders,
-  Layers, Volume2, Sparkle, ArrowUpRight, Share2, Compass, PlayCircle
+  Layers, Volume2, Sparkle, ArrowUpRight, Share2, PlayCircle,
+  Workflow, FileCheck, BrainCircuit, Headphones, SparklesIcon,
+  Search, Lock, CheckCheck, RefreshCw, Smartphone
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
@@ -15,49 +17,84 @@ const LOGOS = [
   'Vercel', 'Supabase', 'Stripe', 'Linear', 'Retool', 'Ramp', 'Figma'
 ]
 
-const FEATURES_LIST = [
+const CORE_FEATURES = [
   {
     icon: Mic,
-    tag: 'Autonomous Voice Engine',
-    title: 'Adaptive interviews that sound truly human.',
-    description: 'Ultra-low latency (<20ms) speech pipeline that listens, probes deep on shallow answers, and evaluates technical depth without awkward lag.',
-    badge: '18ms Latency',
-    gradient: 'from-blue-500/10 via-indigo-500/10 to-transparent'
+    title: 'Autonomous Voice AI Interviewer',
+    category: 'Conversational Voice',
+    description: 'Sub-20ms ultra-low latency speech pipeline that speaks, listens, and responds naturally. Eliminates robotic lag and awkward pauses, conducting conversational screens that candidates genuinely enjoy.',
+    highlights: ['Natural conversational cadence', 'Adaptive speech pacing', 'Accent & dialect comprehension']
+  },
+  {
+    icon: Clock,
+    title: 'Intelligent Time-Budgeted Pacing',
+    category: 'Time Optimization',
+    description: 'Dynamically budgets questions based on total interview duration (15m, 30m, or 60m). Continuously evaluates time remaining to prevent candidate rush and ensure graceful wrap-up without abrupt cutoffs.',
+    highlights: ['Real-time time tracking', 'Prevents candidate cutoff', 'Smart wrap-up reflection phase']
+  },
+  {
+    icon: BrainCircuit,
+    title: 'Adaptive Difficulty Engine',
+    category: 'Skill Calibration',
+    description: 'Begins at calibrated medium difficulty and dynamically adjusts based on response depth. Automatically unlocks advanced architectural challenges for standout talent or supportive prompts when candidates need footing.',
+    highlights: ['Multi-tier difficulty scaling', 'Dynamic bonus challenge injection', 'Objective skill ceiling detection']
   },
   {
     icon: Code2,
-    tag: 'Live Coding & Sandboxing',
-    title: 'Real-time coding environments built-in.',
-    description: 'Candidates write and execute live code during the interview. AIRA observes algorithms, edge-case handling, and architectural choices.',
-    badge: 'Monaco Engine',
-    gradient: 'from-violet-500/10 via-purple-500/10 to-transparent'
+    title: 'Live Coding & Sandboxed Execution',
+    category: 'Technical Validation',
+    description: 'Built-in Monaco code editor supporting TypeScript, Python, and JavaScript. Automatically tests candidates against hidden test cases, edge cases, and runtime algorithmic complexity.',
+    highlights: ['Real-time code evaluation', 'Hidden unit test runner', 'Clean syntax sandboxing']
+  },
+  {
+    icon: Zap,
+    title: 'Dynamic Follow-Up Probing',
+    category: 'Deep Inspection',
+    description: 'Detects shallow, memorized, or evasive answers in real time. AIRA automatically interrupts with targeted follow-up technical questions to verify first-principles comprehension.',
+    highlights: ['Anti-surface answer detection', 'Targeted conceptual drilldowns', 'Contextual dialogue continuity']
   },
   {
     icon: ShieldCheck,
-    tag: 'Proctor & Integrity AI',
-    title: 'Enterprise-grade anti-cheat & anti-script.',
-    description: 'Detects background tab switches, window blur events, and AI-script reading patterns with high-precision entropy analysis.',
-    badge: '100% Verified',
-    gradient: 'from-emerald-500/10 via-teal-500/10 to-transparent'
+    title: 'Integrity Proctor & Anti-Cheat AI',
+    category: 'Authenticity Guard',
+    description: 'Multi-layer candidate proctoring monitors browser window focus, tab-switching events, and speech entropy to detect reading from teleprompters or scripted ChatGPT answers.',
+    highlights: ['Tab switch & focus loss logging', 'AI-script speech pattern analysis', 'Tamper-proof audit logs']
+  },
+  {
+    icon: FileText,
+    title: 'Smart Resume & Role Extraction',
+    category: 'Instant Setup',
+    description: 'Drop any PDF or Word resume. AIRA parses candidate project history, verified tech stacks, and career progression to auto-generate personalized, tailored interview questions in under 10 seconds.',
+    highlights: ['1-click PDF/DOCX resume ingestion', 'Auto-generated role descriptions', 'Tailored competency questions']
   },
   {
     icon: BarChart3,
-    tag: 'Instant Scorecards',
-    title: 'Data-driven rankings delivered instantly.',
-    description: 'Comprehensive evaluations scoring technical skill, communication, and problem-solving with full audio replays and rubrics.',
-    badge: 'Zero Bias',
-    gradient: 'from-amber-500/10 via-orange-500/10 to-transparent'
+    title: 'Executive Hiring Scorecards',
+    category: 'Decision Analytics',
+    description: 'Comprehensive candidate dossiers generated immediately after interview completion. Includes rubric breakdown, category ratings, audio replay timestamps, and definitive hiring recommendations.',
+    highlights: ['Overall score out of 10', 'Competency radar charts', 'Shareable executive summary']
   }
 ]
 
-const CONTINENTS = [
-  { name: 'North America', hub: 'SF, NYC, Toronto', latency: '18ms', active: '120k+' },
-  { name: 'Europe', hub: 'London, Berlin, Paris', latency: '22ms', active: '95k+' },
-  { name: 'Asia-Pacific', hub: 'Bengaluru, Tokyo, SG', latency: '24ms', active: '185k+' },
-  { name: 'South America', hub: 'São Paulo, Buenos Aires', latency: '35ms', active: '45k+' },
-  { name: 'Africa', hub: 'Lagos, Nairobi, Cairo', latency: '38ms', active: '38k+' },
-  { name: 'Oceania', hub: 'Sydney, Auckland', latency: '29ms', active: '28k+' },
-  { name: 'Antarctica Edge', hub: 'Polar Scientific Nodes', latency: '45ms', active: '1.2k' }
+const WORKFLOW_STEPS = [
+  {
+    step: '01',
+    title: 'Create Role or Upload Resume',
+    description: 'Upload a job description or drop a candidate resume. AIRA automatically extracts key requirements, tech stacks, and creates custom question banks.',
+    icon: FileCheck
+  },
+  {
+    step: '02',
+    title: 'Candidate Takes Voice Interview',
+    description: 'Send a link. Candidates complete their live adaptive voice & coding interview on their own time, 24/7, without scheduling bottlenecks.',
+    icon: Headphones
+  },
+  {
+    step: '03',
+    title: 'Review Verified Scorecards & Hire',
+    description: 'Access standardized rubrics, full audio replays, code execution logs, and anti-cheat audit reports to make fast, confident hiring decisions.',
+    icon: Award
+  }
 ]
 
 export default function HomePage() {
@@ -68,7 +105,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] selection:bg-indigo-500 selection:text-white relative overflow-x-hidden font-sans antialiased">
       
-      {/* Apple-style Subtle Background Grid Pattern with Radial Falloff */}
+      {/* Subtle Apple Background Pattern with Radial Falloff */}
       <div 
         className="absolute inset-0 pointer-events-none -z-10 opacity-60"
         style={{
@@ -97,12 +134,10 @@ export default function HomePage() {
 
           {/* Minimal Centered Links */}
           <div className="hidden md:flex items-center gap-8 text-[13px] font-medium text-[#86868B]">
-            <a href="#features" className="hover:text-[#1D1D1F] transition-colors">Platform</a>
+            <a href="#features" className="hover:text-[#1D1D1F] transition-colors">Features</a>
+            <a href="#workflow" className="hover:text-[#1D1D1F] transition-colors">How It Works</a>
             <a href="#preview" className="hover:text-[#1D1D1F] transition-colors">Product Studio</a>
-            <a href="#continents" className="hover:text-[#1D1D1F] transition-colors flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> 7 Continents
-            </a>
-            <a href="#testimonials" className="hover:text-[#1D1D1F] transition-colors">Enterprise</a>
+            <a href="#enterprise" className="hover:text-[#1D1D1F] transition-colors">Enterprise</a>
           </div>
 
           {/* Header Action Buttons */}
@@ -125,7 +160,7 @@ export default function HomePage() {
         </nav>
       </header>
 
-      {/* HERO SECTION — MINIMAL, CENTERED, MONUMENTAL (APPLE AESTHETIC) */}
+      {/* HERO SECTION — MINIMAL, CENTERED, MONUMENTAL */}
       <main className="pt-32 sm:pt-40 pb-20 px-6 max-w-6xl mx-auto">
         
         {/* Top Badge */}
@@ -142,7 +177,7 @@ export default function HomePage() {
             </span>
             <span>AIRA 2.0 Autonomous Hiring Engine</span>
             <span className="text-slate-300">•</span>
-            <span className="text-indigo-600 font-bold flex items-center gap-0.5">Explore <ChevronRight className="w-3.5 h-3.5" /></span>
+            <span className="text-indigo-600 font-bold flex items-center gap-0.5">Explore Features <ChevronRight className="w-3.5 h-3.5" /></span>
           </div>
         </motion.div>
 
@@ -190,11 +225,11 @@ export default function HomePage() {
           <div className="flex items-center justify-center gap-6 pt-2 text-xs text-[#86868B]">
             <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-500" /> No credit card required</span>
             <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-500" /> 60-second setup</span>
-            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-500" /> 7 Continents edge network</span>
+            <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-500" /> Automated executive reports</span>
           </div>
         </motion.div>
 
-        {/* LOGO STRIP (APPLE / SAAS STYLE) */}
+        {/* LOGO STRIP */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -213,7 +248,7 @@ export default function HomePage() {
           </div>
         </motion.div>
 
-        {/* MONUMENTAL FROSTED GLASS STUDIO CANVAS (PRODUCT SHOWCASE) */}
+        {/* MONUMENTAL FROSTED GLASS STUDIO CANVAS */}
         <motion.div 
           id="preview"
           initial={{ opacity: 0, y: 40 }}
@@ -397,7 +432,6 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Recruiter Action Strip */}
                       <button 
                         onClick={() => startTransition(() => router.push('/dashboard'))}
                         className="w-full bg-slate-900 hover:bg-black text-white text-xs font-semibold py-3 px-4 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2"
@@ -473,102 +507,120 @@ export default function HomePage() {
         </motion.div>
       </main>
 
-      {/* MINIMAL BENTO GRID FEATURES (APPLE GLASS DESIGN) */}
-      <section id="features" className="py-24 px-6 max-w-6xl mx-auto border-t border-slate-200/60">
+      {/* COMPREHENSIVE FEATURES GRID — COMPLETE DESCRIPTION OF CAPABILITIES */}
+      <section id="features" className="py-24 px-6 max-w-6xl mx-auto border-t border-slate-200/70">
         <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-            Engineered For Precision
+          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+            Platform Capabilities
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#1D1D1F]">
-            Every capability your hiring pipeline demands.
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1D1D1F]">
+            Engineered for precision hiring.
           </h2>
           <p className="text-base text-[#6E6E73]">
-            Replace fragmented phone calls, take-homes, and manual notes with one unified autonomous recruiter.
+            Explore the autonomous recruiting capabilities powering faster, bias-free engineering screens.
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-6">
-          {FEATURES_LIST.map((feat, idx) => {
+          {CORE_FEATURES.map((feat, idx) => {
             const Icon = feat.icon
             return (
               <div 
                 key={idx}
-                className="group relative bg-white/70 backdrop-blur-xl border border-white/90 p-8 rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                className="bg-white/80 backdrop-blur-xl border border-white/90 p-8 rounded-3xl shadow-[0_4px_24px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_36px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-900 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Icon className="w-5 h-5 text-indigo-600" />
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-xs">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200/60">
+                      {feat.category}
+                    </span>
                   </div>
-                  <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
-                    {feat.badge}
-                  </span>
+
+                  <div>
+                    <h3 className="text-xl font-bold text-[#1D1D1F] tracking-tight mb-2">
+                      {feat.title}
+                    </h3>
+                    <p className="text-sm text-[#6E6E73] leading-relaxed">
+                      {feat.description}
+                    </p>
+                  </div>
                 </div>
-                <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider block mb-1">
-                  {feat.tag}
-                </span>
-                <h3 className="text-xl font-bold text-[#1D1D1F] mb-2 tracking-tight">
-                  {feat.title}
-                </h3>
-                <p className="text-sm text-[#6E6E73] leading-relaxed">
-                  {feat.description}
-                </p>
+
+                <div className="mt-6 pt-5 border-t border-slate-100 space-y-2">
+                  {feat.highlights.map((item, hIdx) => (
+                    <div key={hIdx} className="flex items-center gap-2 text-xs font-medium text-slate-700">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )
           })}
         </div>
       </section>
 
-      {/* 7 CONTINENTS EDGE REACH — MINIMAL LIGHT STRIP */}
-      <section id="continents" className="py-24 px-6 bg-white/60 backdrop-blur-md border-y border-slate-200/60">
-        <div className="max-w-6xl mx-auto space-y-12">
+      {/* HOW IT WORKS SECTION — 3-STEP SEAMLESS WORKFLOW */}
+      <section id="workflow" className="py-24 px-6 bg-white/60 backdrop-blur-md border-y border-slate-200/70">
+        <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-              Global Edge Infrastructure
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+              Zero-Friction Workflow
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#1D1D1F]">
-              Deploy across all 7 Continents natively.
+            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-[#1D1D1F]">
+              From job description to top candidates in minutes.
             </h2>
             <p className="text-base text-[#6E6E73]">
-              Ultra-low latency edge routing ensures seamless conversational voice interviews from Silicon Valley to Polar research stations.
+              Automate the repetitive 30-minute introductory calls so engineering managers only meet validated top-tier candidates.
             </p>
           </div>
 
-          {/* Clean Continent Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {CONTINENTS.map((item, idx) => (
-              <div 
-                key={idx}
-                className="bg-white/80 border border-slate-200/80 p-5 rounded-2xl shadow-xs hover:border-indigo-300 transition-all"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-bold text-slate-900">{item.name}</h4>
-                  <span className="text-[10px] font-mono font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                    {item.latency}
-                  </span>
+          <div className="grid md:grid-cols-3 gap-8">
+            {WORKFLOW_STEPS.map((wf, idx) => {
+              const Icon = wf.icon
+              return (
+                <div 
+                  key={idx}
+                  className="bg-white/90 border border-slate-200/80 p-8 rounded-3xl shadow-xs hover:shadow-md transition-all space-y-5 relative"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-[#1D1D1F] text-white flex items-center justify-center font-bold shadow-xs">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <span className="text-2xl font-black text-slate-200 font-mono">
+                      {wf.step}
+                    </span>
+                  </div>
+
+                  <h3 className="text-lg font-bold text-slate-900 tracking-tight">
+                    {wf.title}
+                  </h3>
+
+                  <p className="text-sm text-slate-600 leading-relaxed">
+                    {wf.description}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500">{item.hub}</p>
-                <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>Talent Pool</span>
-                  <span className="font-bold text-slate-700">{item.active}</span>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
 
-      {/* TESTIMONIALS & ENTERPRISE PROOF */}
-      <section id="testimonials" className="py-24 px-6 max-w-6xl mx-auto">
+      {/* ENTERPRISE VALIDATION & TESTIMONIALS */}
+      <section id="enterprise" className="py-24 px-6 max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-5 space-y-6">
-            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
-              Customer Validation
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+              Recruiter Endorsement
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1D1D1F] tracking-tight leading-tight">
-              &quot;AIRA cut our screening time by 90% in 14 days.&quot;
+              &quot;AIRA cut our technical screening time by 90%.&quot;
             </h2>
             <p className="text-sm text-[#6E6E73] leading-relaxed">
-              Leading venture-backed engineering organizations use Vowels AI to conduct objective preliminary rounds before involving senior engineers.
+              Engineering leaders use Vowels AI to conduct objective preliminary rounds before involving senior engineers, saving hundreds of engineering hours every month.
             </p>
             <div className="flex items-center gap-2 text-amber-400">
               {[...Array(5)].map((_, i) => (
@@ -583,7 +635,7 @@ export default function HomePage() {
           <div className="lg:col-span-7">
             <div className="bg-white/80 backdrop-blur-xl border border-white/90 p-8 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] space-y-6">
               <p className="text-base sm:text-lg text-slate-800 font-medium leading-relaxed">
-                &quot;What previously took 3 engineering managers 25 hours per week of repetitive introductory coding phone calls is now completely automated by AIRA. The candidate quality has never been higher.&quot;
+                &quot;What previously took 3 engineering managers 25 hours per week of repetitive introductory coding phone calls is now completely automated by AIRA. The candidate quality has never been higher, and our team fatigue is zero.&quot;
               </p>
               <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
                 <div className="w-10 h-10 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-sm">
@@ -599,7 +651,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FINAL MONUMENTAL CALL TO ACTION (APPLE CLEAN MINIMAL) */}
+      {/* FINAL MONUMENTAL CALL TO ACTION */}
       <section className="py-20 px-6 max-w-5xl mx-auto">
         <div className="rounded-3xl bg-[#1D1D1F] text-white p-10 sm:p-14 text-center shadow-xl space-y-6 relative overflow-hidden">
           <div className="max-w-2xl mx-auto space-y-3">
@@ -637,8 +689,9 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-6">
-            <a href="#features" className="hover:text-[#1D1D1F] transition-colors">Platform</a>
-            <a href="#continents" className="hover:text-[#1D1D1F] transition-colors">Edge Map</a>
+            <a href="#features" className="hover:text-[#1D1D1F] transition-colors">Features</a>
+            <a href="#workflow" className="hover:text-[#1D1D1F] transition-colors">How It Works</a>
+            <a href="#preview" className="hover:text-[#1D1D1F] transition-colors">Product Studio</a>
             <a href="/login" className="hover:text-[#1D1D1F] transition-colors">Recruiter Portal</a>
             <span className="hover:text-[#1D1D1F] transition-colors cursor-pointer">Privacy</span>
             <span className="hover:text-[#1D1D1F] transition-colors cursor-pointer">Security</span>
