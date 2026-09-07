@@ -126,18 +126,40 @@ const InterviewReports = () => {
   )
 }
 
-const CountUp = ({ end, duration = 1500 }: { end: number; duration?: number }) => {
-  const [count, setCount] = useState(0)
+const CountUp = ({ end, duration = 800 }: { end: number; duration?: number }) => {
+  const [count, setCount] = useState(end === 0 ? 0 : 0)
 
   useEffect(() => {
-    let startTime: number
+    if (end === 0) {
+      setCount(0)
+      return
+    }
+    let frameId: number
+    let startTime: number | null = null
+    let lastRendered = -1
+
     const animate = (currentTime: number) => {
       if (!startTime) startTime = currentTime
-      const progress = Math.min((currentTime - startTime) / duration, 1)
-      setCount(Math.floor(progress * end))
-      if (progress < 1) requestAnimationFrame(animate)
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      // Smooth cubic ease-out: fast start, soft land
+      const easeOut = 1 - Math.pow(1 - progress, 3)
+      const currentVal = Math.round(easeOut * end)
+
+      if (currentVal !== lastRendered) {
+        lastRendered = currentVal
+        setCount(currentVal)
+      }
+
+      if (progress < 1) {
+        frameId = requestAnimationFrame(animate)
+      }
     }
-    requestAnimationFrame(animate)
+
+    frameId = requestAnimationFrame(animate)
+    return () => {
+      if (frameId) cancelAnimationFrame(frameId)
+    }
   }, [end, duration])
 
   return <span>{count}</span>
