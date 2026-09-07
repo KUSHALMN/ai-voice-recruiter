@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, Volume2, Loader2, CheckCircle, Clock, Send, Code2, Layout, Sparkles, Briefcase, Wifi, ShieldAlert, ArrowRight } from 'lucide-react'
+import { Mic, Volume2, Loader2, CheckCircle, Clock, Send, Code2, Layout, Sparkles, Briefcase, Wifi, ShieldAlert, ArrowRight, ShieldCheck, Shield, AlertTriangle, ArrowLeft, Maximize2, Minimize2 } from 'lucide-react'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import CodeEditor from '@/components/CodeEditor'
@@ -78,31 +78,109 @@ export default function InterviewPage() {
   const usedQuestionIdsRef = useRef<string[]>([])
   const fullQuestionPoolRef = useRef<any[]>([])
 
+  const startedRef = useRef(false)
+  const completedRef = useRef(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
+  // Keep refs synchronized to eliminate stale closure bugs
+  useEffect(() => {
+    startedRef.current = started
+  }, [started])
+
+  useEffect(() => {
+    completedRef.current = completed
+  }, [completed])
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {})
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {})
+    }
+  }
+
+  const logViolation = (type: string) => {
+    if (!startedRef.current || completedRef.current) return
+
+    setViolationCount(prev => {
+      const nextCount = prev + 1
+      if (nextCount === 1) {
+        toast.error('⚠️ Proctoring alert: Event recorded. Please maintain full focus on the interview.', { duration: 4500, icon: '🛡️' })
+      } else if (nextCount === 3) {
+        toast.error('🚨 Serious Warning: 3 proctoring violations recorded! This is logged in your recruiter report.', { duration: 6000, icon: '⚠️' })
+      }
+      return nextCount
+    })
+    const timestamp = new Date().toLocaleTimeString()
+    setViolationLog(prev => [...prev, `${timestamp}: ${type}`])
+  }
+
   useEffect(() => {
     loadInterview()
     initSpeech()
 
-    // Proctoring: Detect tab switching and focus loss
+    // Proctoring: Detect tab switching, focus loss, fullscreen changes, and clipboard interactions
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        logViolation('Tab switch detected')
-        toast.error('⚠️ Warning: Please stay on this tab!', { icon: '👁️' })
+      if (document.hidden && startedRef.current && !completedRef.current) {
+        logViolation('Tab switch detected (candidate left interview tab)')
+        toast.error('⚠️ Warning: Please stay on this tab! Proctoring event logged.', { icon: '👁️', duration: 4000 })
       }
     }
 
     const handleBlur = () => {
-      logViolation('Window focus lost')
-      toast.error('⚠️ Warning: Focus lost. Please stay on this window!', { icon: '👁️' })
+      if (startedRef.current && !completedRef.current) {
+        logViolation('Window focus lost (switched app or secondary monitor)')
+        toast.error('⚠️ Warning: Window focus lost. Please stay in the interview window!', { icon: '👁️', duration: 4000 })
+      }
+    }
+
+    const handleFullscreenChange = () => {
+      const isFull = !!document.fullscreenElement
+      setIsFullscreen(isFull)
+      if (!isFull && startedRef.current && !completedRef.current) {
+        logViolation('Exited fullscreen mode')
+        toast.error('⚠️ Notice: Fullscreen mode exited. Proctoring event logged.', { icon: '🖥️', duration: 4000 })
+      }
+    }
+
+    const handleCopy = () => {
+      if (startedRef.current && !completedRef.current) {
+        logViolation('Clipboard copy attempt on interview content')
+        toast.error('⚠️ Copying interview questions is flagged.', { duration: 3000 })
+      }
+    }
+
+    const handlePaste = () => {
+      if (startedRef.current && !completedRef.current) {
+        logViolation('Clipboard paste event recorded (potential external response)')
+        toast.error('⚠️ Notice: Pasting external content is logged for recruiter review.', { duration: 3000 })
+      }
+    }
+
+    const handleContextMenu = (e: MouseEvent) => {
+      if (startedRef.current && !completedRef.current) {
+        e.preventDefault()
+        logViolation('Right-click context menu attempt')
+        toast.error('⚠️ Right-click context menu is disabled during interview.', { duration: 3000 })
+      }
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     window.addEventListener('blur', handleBlur)
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    document.addEventListener('copy', handleCopy)
+    document.addEventListener('paste', handlePaste)
+    document.addEventListener('contextmenu', handleContextMenu)
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
       if (recognitionRef.current) recognitionRef.current.stop()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('blur', handleBlur)
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+      document.removeEventListener('copy', handleCopy)
+      document.removeEventListener('paste', handlePaste)
+      document.removeEventListener('contextmenu', handleContextMenu)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -112,14 +190,6 @@ export default function InterviewPage() {
       setShowCodeEditor(true)
     }
   }, [interview])
-
-  const logViolation = (type: string) => {
-    if (!started || completed) return
-
-    setViolationCount(prev => prev + 1)
-    const timestamp = new Date().toLocaleTimeString()
-    setViolationLog(prev => [...prev, `${timestamp}: ${type}`])
-  }
 
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const currentTranscriptRef = useRef<string>('')
@@ -191,13 +261,14 @@ export default function InterviewPage() {
           status: demo.status || 'scheduled',
           duration: 10,
           enable_probing: true,
-          enable_strict_proctoring: false,
+          enable_strict_proctoring: true,
           recruiter_email: demo.recruiter_email || '',
           created_at: demo.created_at || new Date().toISOString(),
         }
       }
 
       if (interviewData) {
+        interviewData.enable_strict_proctoring = interviewData.enable_strict_proctoring ?? true
         setInterview(interviewData)
         const initialSeconds = (interviewData.duration || 10) * 60
         setTimeLeft(initialSeconds)
@@ -1207,31 +1278,90 @@ export default function InterviewPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 lg:p-8 flex flex-col">
         {/* Header */}
-        <header className="flex justify-between items-center mb-8 px-4">
+        <header className="flex flex-wrap gap-4 justify-between items-center mb-6 px-2 sm:px-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/20">
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to exit the interview? Your current progress is saved.')) {
+                  router.push('/dashboard')
+                }
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white/80 hover:bg-white rounded-xl border border-slate-200 shadow-sm transition-all"
+              title="Exit Interview"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Exit</span>
+            </button>
+            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/20">
               AI
             </div>
             <div>
-              <h2 className="font-bold text-gray-900">AI Recruiter</h2>
-              <p className="text-xs text-blue-600 font-medium">{interview.job_title}</p>
+              <h2 className="font-bold text-gray-900 text-sm sm:text-base leading-none">AI Recruiter</h2>
+              <p className="text-xs text-blue-600 font-medium mt-0.5">{interview.job_title}</p>
             </div>
           </div>
-          <div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-sm border border-white/50 flex items-center gap-2 text-gray-700 font-medium">
-            <Clock className="w-4 h-4 text-blue-600" />
-            {formatTime(timeLeft)}
+
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Anti-Cheat Proctoring HUD Badge */}
+            <div className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border shadow-sm transition-colors ${
+              violationCount === 0
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : violationCount < 3
+                  ? 'bg-amber-50 text-amber-700 border-amber-300 animate-pulse'
+                  : 'bg-red-50 text-red-700 border-red-300'
+            }`}>
+              {violationCount === 0 ? (
+                <>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="hidden sm:inline">🛡️ Proctoring Active</span>
+                  <span className="sm:hidden">🛡️ Active</span>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                  <span>⚠️ {violationCount} {violationCount === 1 ? 'Warning' : 'Warnings'}</span>
+                </>
+              )}
+            </div>
+
+            {/* Fullscreen toggle */}
+            <button
+              onClick={toggleFullscreen}
+              title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+              className="p-2 bg-white/80 backdrop-blur-md hover:bg-white rounded-xl shadow-sm border border-slate-200 text-gray-700 hover:text-blue-600 transition-colors"
+            >
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            </button>
+
+            {/* Timer */}
+            <div className="bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-xl shadow-sm border border-slate-200 flex items-center gap-2 text-gray-700 font-medium text-xs sm:text-sm">
+              <Clock className="w-4 h-4 text-blue-600" />
+              {formatTime(timeLeft)}
+            </div>
+
+            {/* Code Editor toggle */}
+            <button
+              onClick={() => setShowCodeEditor(!showCodeEditor)}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-semibold text-xs sm:text-sm transition-all ${showCodeEditor
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                : 'bg-white text-gray-700 border border-slate-200 hover:bg-gray-50'
+                }`}
+            >
+              {showCodeEditor ? <Layout className="w-4 h-4" /> : <Code2 className="w-4 h-4" />}
+              <span className="hidden sm:inline">{showCodeEditor ? 'Close Editor' : 'Open Code Editor'}</span>
+            </button>
           </div>
-          <button
-            onClick={() => setShowCodeEditor(!showCodeEditor)}
-            className={`ml-4 flex items-center gap-2 px-4 py-2 rounded-xl font-semibold transition-all ${showCodeEditor
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-              : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-              }`}
-          >
-            {showCodeEditor ? <Layout className="w-4 h-4" /> : <Code2 className="w-4 h-4" />}
-            {showCodeEditor ? 'Close Editor' : 'Open Code Editor'}
-          </button>
         </header>
+
+        {/* Anti-Cheat Critical Warning Banner if multiple violations */}
+        {violationCount >= 3 && (
+          <div className="max-w-6xl w-full mx-auto mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center justify-between text-red-800 text-xs font-medium animate-pulse">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-4 h-4 text-red-600 shrink-0" />
+              <span>Proctoring Alert: {violationCount} integrity warnings recorded. Continued tab switching or window blur will lower your integrity score on the recruiter evaluation report.</span>
+            </div>
+          </div>
+        )}
 
         {/* Real-time Progress Tracker */}
         {(() => {
@@ -1418,7 +1548,7 @@ export default function InterviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 lg:p-8">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 lg:p-8">
       {showResumeModal && resumeState && (
         <ResumeModal
           candidateName={interview.candidate_name}
@@ -1428,6 +1558,22 @@ export default function InterviewPage() {
           onRestart={handleRestartSession}
         />
       )}
+
+      {/* Top Navigation / Back to Dashboard */}
+      <div className="max-w-6xl w-full mb-4 flex items-center justify-between">
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-medium text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 shadow-sm border border-slate-200 transition-all cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Dashboard</span>
+        </button>
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-200/60 rounded-full text-xs font-semibold text-blue-700">
+          <ShieldAlert className="w-3.5 h-3.5" />
+          <span>Proctored Session</span>
+        </div>
+      </div>
+
       <div className="max-w-6xl w-full grid lg:grid-cols-12 gap-8 items-start">
         {/* Left Column - Details & Prep */}
         <div className="lg:col-span-8 space-y-6">
