@@ -31,7 +31,7 @@ function TopBar() {
   }, [])
 
   return (
-    <header className={`h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 transition-colors duration-200 z-10 ${
+    <header className={`h-14 sm:h-16 flex items-center justify-between px-4 pl-12 sm:px-6 lg:pl-6 transition-colors duration-200 z-10 ${
       isAdminPath
         ? 'bg-white/95 backdrop-blur-md text-slate-800 border-b border-slate-200/80 shadow-xs'
         : 'bg-white dark:bg-black border-b border-gray-200 dark:border-neutral-900'
@@ -39,19 +39,6 @@ function TopBar() {
       <div className="flex items-center gap-2 sm:gap-4 flex-1">
         {showBackButton && (
           <BackButton fallbackUrl={fallback} variant="subtle" className="text-xs py-1.5 px-2.5" />
-        )}
-
-        {/* Portal Distinct Badge */}
-        {isAdminPath ? (
-          <div className="hidden sm:flex items-center gap-2 liquid-glass-pill px-3 py-1 rounded-full text-xs font-bold text-indigo-800">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span className="font-claude-serif text-sm">Executive Console</span>
-          </div>
-        ) : (
-          <div className="hidden sm:flex items-center gap-2 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/40 px-3 py-1 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-400">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-            <span>Recruiter Console</span>
-          </div>
         )}
 
         {/* Search */}
