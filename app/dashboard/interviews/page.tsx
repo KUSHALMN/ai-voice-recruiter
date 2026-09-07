@@ -8,6 +8,8 @@ import ResponsiveLayout from '@/components/ResponsiveLayout'
 import toast from 'react-hot-toast'
 import { DEMO_REPORTS } from '@/lib/demo-data'
 
+import BackButton from '@/components/BackButton'
+
 export default function InterviewsPage() {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -110,6 +112,9 @@ export default function InterviewsPage() {
 
   return (
     <ResponsiveLayout>
+      <div className="mb-4">
+        <BackButton fallbackUrl="/dashboard" label="Back to Dashboard" />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

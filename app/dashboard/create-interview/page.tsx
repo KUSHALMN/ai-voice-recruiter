@@ -12,6 +12,7 @@ import {
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import toast from 'react-hot-toast'
 import ResumeUpload from '@/components/interview/ResumeUpload'
+import BackButton from '@/components/BackButton'
 
 const INTERVIEW_TYPES = [
   'Technical',
@@ -238,14 +239,7 @@ export default function CreateInterview() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <button
-            onClick={() => startTransition(() => router.push('/dashboard'))}
-            disabled={isPending || isSubmitting}
-            className="flex items-center gap-2 text-slate-500 hover:text-slate-900 mb-6 transition-colors font-medium disabled:opacity-50"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back to Dashboard
-          </button>
+          <BackButton fallbackUrl="/dashboard" label="Back to Dashboard" className="mb-6" />
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-3xl font-bold text-slate-900 mb-1 flex items-center gap-3">

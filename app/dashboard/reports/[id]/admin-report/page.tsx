@@ -6,6 +6,7 @@ import { ArrowLeft, Download, CheckCircle, XCircle, AlertCircle } from 'lucide-r
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
+import BackButton from '@/components/BackButton'
 
 interface EvidenceFeedback {
   skill: string
@@ -156,13 +157,7 @@ export default function AdminReportPage() {
     <ResponsiveLayout>
       <div className="max-w-5xl mx-auto">
         <div className="mb-6 flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Back
-          </button>
+          <BackButton fallbackUrl={`/dashboard/reports/${params.id}`} label="Back to Report" />
           <button
             onClick={() => window.print()}
             className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"

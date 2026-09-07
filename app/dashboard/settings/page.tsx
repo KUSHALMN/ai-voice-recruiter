@@ -10,6 +10,7 @@ import {
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
+import BackButton from '@/components/BackButton'
 
 const LANGUAGES = [
   'English (US)', 'English (UK)', 'English (India)', 'Spanish', 'French', 'German', 'Japanese', 'Mandarin'
@@ -133,6 +134,9 @@ export default function UserSettingsPage() {
   return (
     <ResponsiveLayout>
       <div className="max-w-4xl mx-auto pb-16">
+        <div className="mb-4">
+          <BackButton fallbackUrl="/dashboard" label="Back to Dashboard" />
+        </div>
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>

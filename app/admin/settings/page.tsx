@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Settings, Save, Key, Database, Users, Shield, Bell } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
+import BackButton from '@/components/BackButton'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
@@ -80,6 +81,9 @@ export default function AdminSettingsPage() {
         <TopBar />
         <main className="flex-1 overflow-auto p-6">
           <div className="max-w-6xl mx-auto">
+            <div className="mb-4">
+              <BackButton fallbackUrl="/admin" label="Back to Admin Dashboard" />
+            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

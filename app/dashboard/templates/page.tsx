@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { FileText, Plus, Search, X } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
+import BackButton from '@/components/BackButton'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 
@@ -185,6 +186,9 @@ export default function TemplatesPage() {
         <TopBar />
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto">
+            <div className="mb-4">
+              <BackButton fallbackUrl="/dashboard" label="Back to Dashboard" />
+            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

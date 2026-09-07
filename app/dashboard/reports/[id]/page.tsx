@@ -7,6 +7,7 @@ import { ArrowLeft, Download, CheckCircle, XCircle, AlertCircle, Code2, Mail, Lo
 import toast from 'react-hot-toast'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
+import BackButton from '@/components/BackButton'
 
 import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
 
@@ -261,13 +262,7 @@ export default function ReportDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               className="mb-8 flex items-center justify-between print:hidden"
             >
-              <button
-                onClick={() => router.push('/dashboard/reports')}
-                className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                Back to Reports
-              </button>
+              <BackButton fallbackUrl="/dashboard/reports" label="Back to Reports" />
 
               <div className="flex gap-3">
                 <button

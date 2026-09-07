@@ -8,6 +8,7 @@ import { FileText, BarChart3, User, Calendar, ArrowRight, Loader2, RefreshCw, St
 import toast from 'react-hot-toast'
 
 import { DEMO_REPORTS } from '@/lib/demo-data'
+import BackButton from '@/components/BackButton'
 
 interface InterviewSession {
   id: string
@@ -173,6 +174,9 @@ export default function ReportsPage() {
 
   return (
     <ResponsiveLayout>
+      <div className="mb-4">
+        <BackButton fallbackUrl="/dashboard" label="Back to Dashboard" />
+      </div>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

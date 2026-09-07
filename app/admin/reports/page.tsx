@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Download, Filter, Search, FileText, Calendar, User } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
+import BackButton from '@/components/BackButton'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
@@ -160,6 +161,9 @@ export default function ReportsPage() {
         <TopBar />
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto">
+            <div className="mb-4">
+              <BackButton fallbackUrl="/admin" label="Back to Admin Dashboard" />
+            </div>
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-slate-800 mb-2">Interview Reports</h1>
               <p className="text-slate-600">View and analyze completed interview evaluations</p>

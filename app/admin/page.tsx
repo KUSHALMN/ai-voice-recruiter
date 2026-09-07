@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { Users, FileText, BarChart3, Settings, TrendingUp, Activity, Shield, Database, Brain, Zap, Target, Award } from 'lucide-react'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
+import BackButton from '@/components/BackButton'
 import { supabase } from '@/lib/supabase'
 import DashboardCharts from '@/components/DashboardCharts'
 
@@ -197,6 +198,9 @@ export default function AdminPage() {
         <TopBar />
         <main className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto px-8 py-6">
+            <div className="mb-4">
+              <BackButton fallbackUrl="/dashboard" label="Back to User Dashboard" />
+            </div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
