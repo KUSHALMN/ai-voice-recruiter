@@ -28,14 +28,14 @@ export async function POST(request: NextRequest) {
           problem_solving: 0,
           clarity: 0,
           professionalism: 0,
-          integrity_score: 10
+          integrity_score: Math.max(0, 10 - (proctoringLog?.length || 0))
         },
         strengths: ['Completed the interview'],
         weaknesses: ['Insufficient data to evaluate'],
         summary: `${candidateName} completed the ${interviewType} interview for ${jobTitle}. Insufficient answer data to generate a detailed evaluation.`,
         recommendation: 'Further Review Required',
         spokenSummary: `Thank you for completing the interview, ${candidateName}. Your responses are now being analyzed.`,
-        integrity_notes: 'No proctoring violations recorded.'
+        integrity_notes: (proctoringLog && proctoringLog.length > 0) ? `${proctoringLog.length} proctoring event(s) detected.` : 'No proctoring violations recorded.'
       })
     }
 
@@ -51,6 +51,8 @@ export async function POST(request: NextRequest) {
       fastOverall >= 6 ? "Strong candidate with minor gaps" :
         fastOverall >= 4 ? "Needs improvement" : "Not suitable for this role"
 
+    const fallbackIntegrity = Math.max(0, 10 - (proctoringLog?.length || 0))
+
     const buildFallback = () => ({
       candidateName,
       interviewRole: jobTitle,
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
         problem_solving: fastAvgScores.problem_solving,
         clarity: fastAvgScores.communication,
         professionalism: Math.round((fastAvgScores.confidence + fastAvgScores.communication) / 2),
-        integrity_score: 10,
+        integrity_score: fallbackIntegrity,
       },
       strengths: ['Completed the interview', 'Engaged throughout the session', 'Provided structured responses'],
       weaknesses: ['Further review recommended for technical depth'],

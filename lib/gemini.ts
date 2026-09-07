@@ -853,7 +853,9 @@ Generate a JSON report with:
           clarity: Math.round(avgScores.communication * 10) / 10,
           professionalism: Math.round((avgScores.confidence + avgScores.communication) / 2 * 10) / 10,
           overall: Math.round(overall * 10) / 10,
-          integrity_score: parsed.integrity_score || 10,
+          integrity_score: (parsed.integrity_score !== undefined && parsed.integrity_score !== null && !isNaN(Number(parsed.integrity_score)))
+            ? Math.max(0, Math.min(10, Math.round(Number(parsed.integrity_score))))
+            : Math.max(0, 10 - (proctoringLog?.length || 0)),
           code_score: avgCodeScore > 0 ? Math.round(avgCodeScore * 10) / 10 : undefined
         },
         strengths: parsed.strengths || ['Good communication', 'Clear responses'],
@@ -861,7 +863,7 @@ Generate a JSON report with:
         summary: parsed.summary || 'Candidate completed the interview successfully.',
         recommendation,
         spokenSummary: parsed.spokenSummary || `${candidateName} scored ${overall.toFixed(1)} out of 10. ${recommendation}.`,
-        integrity_notes: parsed.integrity_notes || 'No violations recorded.',
+        integrity_notes: parsed.integrity_notes || ((proctoringLog && proctoringLog.length > 0) ? `${proctoringLog.length} proctoring violation(s) recorded.` : 'No violations recorded.'),
         technicalAnalysis: technicalAnswersLog && technicalAnswersLog.length > 0 ? {
           codeSnippets: technicalAnswersLog,
           overallCodeScore: avgCodeScore
@@ -870,6 +872,7 @@ Generate a JSON report with:
     } catch (error) {
       console.error('Report generation error:', error)
       const recommendation = overall >= 7 ? "Recommended for next round" : overall >= 5 ? "Needs improvement" : "Not suitable for this role"
+      const fallbackIntegrity = Math.max(0, 10 - (proctoringLog?.length || 0))
       return {
         candidateName,
         interviewRole: jobTitle,
@@ -882,14 +885,16 @@ Generate a JSON report with:
           clarity: Math.round(avgScores.communication * 10) / 10,
           professionalism: Math.round((avgScores.confidence + avgScores.communication) / 2 * 10) / 10,
           overall: Math.round(overall * 10) / 10,
-          integrity_score: 10
+          integrity_score: fallbackIntegrity
         },
         strengths: ['Completed interview', 'Provided responses'],
         weaknesses: ['Limited evaluation data'],
         summary: `${candidateName} completed the ${interviewType} interview for ${jobTitle}. Overall performance score: ${overall.toFixed(1)}/10.`,
         recommendation,
         spokenSummary: `${candidateName} scored ${overall.toFixed(1)} out of 10. ${recommendation}.`,
-        integrity_notes: 'Fallback report generated. No integrity analysis available.'
+        integrity_notes: (proctoringLog && proctoringLog.length > 0)
+          ? `${proctoringLog.length} proctoring event(s) detected.`
+          : 'Fallback report generated. No integrity violations recorded.'
       }
     }
   }
