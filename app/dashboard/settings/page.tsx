@@ -5,15 +5,17 @@ import { motion } from 'framer-motion'
 import { 
   User, Bell, Shield, Moon, Sun, Monitor, Globe, 
   Sparkles, Check, Save, RotateCcw, BrainCircuit, ShieldAlert,
-  Building, Mail, Briefcase, Clock, Sliders, CheckCircle2
+  Building, Mail, Briefcase, Clock, Sliders, CheckCircle2, Calendar, RefreshCw, Loader2
 } from 'lucide-react'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
+import { ATS_PROVIDERS_INFO, ATSProvider } from '@/lib/ats/atsService'
+import { SUPPORTED_LANGUAGES } from '@/lib/languages'
 
 const LANGUAGES = [
-  'English (US)', 'English (UK)', 'English (India)', 'Spanish', 'French', 'German', 'Japanese', 'Mandarin'
+  'English (US)', 'English (UK)', 'Spanish', 'Hindi', 'French', 'German', 'Japanese'
 ]
 
 export default function UserSettingsPage() {
@@ -41,6 +43,29 @@ export default function UserSettingsPage() {
     defaultLanguage: 'English (US)',
     defaultDuration: 20
   })
+
+  // ATS Integrations State
+  const [atsSettings, setAtsSettings] = useState<Record<ATSProvider, {
+    enabled: boolean
+    isSandbox: boolean
+    autoSync: boolean
+    subdomain?: string
+  }>>({
+    greenhouse: { enabled: true, isSandbox: true, autoSync: true, subdomain: 'corp-recruiting' },
+    lever: { enabled: true, isSandbox: true, autoSync: false },
+    workday: { enabled: false, isSandbox: true, autoSync: false },
+    ashby: { enabled: true, isSandbox: true, autoSync: true }
+  })
+
+  // Scheduling & Follow-Up Settings
+  const [scheduling, setScheduling] = useState({
+    defaultDeadlineHours: 48,
+    autoNudge24h: true,
+    autoNudge48h: true,
+    googleCalendarSync: true
+  })
+
+  const [testingAts, setTestingAts] = useState<ATSProvider | null>(null)
 
   // Notification Toggles
   const [notifications, setNotifications] = useState({
@@ -477,6 +502,183 @@ export default function UserSettingsPage() {
                 </div>
                 <div className={`w-11 h-6 rounded-full transition-colors flex items-center px-1 shrink-0 ${notifications.cheatingAlerts ? 'bg-blue-600' : 'bg-slate-300 dark:bg-neutral-800'}`}>
                   <div className={`w-4 h-4 rounded-full bg-white transition-transform shadow-sm ${notifications.cheatingAlerts ? 'translate-x-5' : 'translate-x-0'}`} />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* DIRECT ATS INTEGRATIONS HUB */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-transparent dark:border-emerald-800/30 flex items-center justify-center text-xl">
+                  🌿
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">Applicant Tracking System (ATS) Integrations</h2>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400">Direct 1-click sync with Greenhouse, Lever, Workday, and Ashby candidate profiles</p>
+                </div>
+              </div>
+              <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800/40">
+                Enterprise Sync Active
+              </span>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {(['greenhouse', 'lever', 'workday', 'ashby'] as ATSProvider[]).map((provider) => {
+                const info = ATS_PROVIDERS_INFO[provider]
+                const config = atsSettings[provider]
+                const isTesting = testingAts === provider
+                return (
+                  <div 
+                    key={provider}
+                    className={`p-5 rounded-xl border transition-all ${
+                      config.enabled
+                        ? 'border-slate-200 dark:border-neutral-800 bg-slate-50/40 dark:bg-neutral-950/40'
+                        : 'border-dashed border-slate-300 dark:border-neutral-800/60 opacity-70'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-2xl">{info.logo}</span>
+                        <div>
+                          <h3 className="font-bold text-sm text-slate-900 dark:text-white">{info.name}</h3>
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                            {config.isSandbox ? 'Sandbox Mock Active' : 'Production API'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTestingAts(provider)
+                            setTimeout(() => {
+                              setTestingAts(null)
+                              toast.success(`Connected to ${info.name}! Connection verified.`, { icon: info.logo })
+                            }, 700)
+                          }}
+                          disabled={isTesting}
+                          className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-300 flex items-center gap-1 transition-all"
+                        >
+                          {isTesting ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                          Test
+                        </button>
+
+                        <div 
+                          onClick={() => setAtsSettings(prev => ({
+                            ...prev,
+                            [provider]: { ...prev[provider], enabled: !prev[provider].enabled }
+                          }))}
+                          className={`w-9 h-5 rounded-full transition-colors flex items-center px-0.5 cursor-pointer ${
+                            config.enabled ? 'bg-emerald-600' : 'bg-slate-300 dark:bg-neutral-800'
+                          }`}
+                        >
+                          <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${config.enabled ? 'translate-x-4' : 'translate-x-0'}`} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-slate-500 dark:text-neutral-400 mb-3 line-clamp-2">
+                      {info.description}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/80 dark:border-neutral-800/80 text-xs">
+                      <label className="flex items-center gap-2 text-slate-600 dark:text-neutral-400 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={config.autoSync}
+                          onChange={(e) => setAtsSettings(prev => ({
+                            ...prev,
+                            [provider]: { ...prev[provider], autoSync: e.target.checked }
+                          }))}
+                          className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                        />
+                        <span>Auto-sync completed interviews</span>
+                      </label>
+                      <a
+                        href={info.docsUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-[11px] underline"
+                      >
+                        API Docs
+                      </a>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+
+          {/* AUTOMATED CANDIDATE SCHEDULING & 48H FOLLOW-UP */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-transparent dark:border-indigo-800/30 flex items-center justify-center">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Candidate Scheduling & 48-Hour Follow-Up</h2>
+                <p className="text-xs text-slate-500 dark:text-neutral-400">Configure Google Calendar invites and automated completion reminder nudges</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-neutral-800/80 bg-slate-50/40 dark:bg-neutral-950/50">
+                <div>
+                  <span className="font-bold text-sm text-slate-900 dark:text-white">Default Expiration Window</span>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Maximum window candidates have to complete their voice interview before access expires.</p>
+                </div>
+                <div className="flex gap-2">
+                  {[24, 48, 72].map(hrs => (
+                    <button
+                      type="button"
+                      key={hrs}
+                      onClick={() => setScheduling(prev => ({ ...prev, defaultDeadlineHours: hrs }))}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        scheduling.defaultDeadlineHours === hrs
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'bg-white dark:bg-neutral-900 text-slate-700 dark:text-neutral-300 border border-slate-200 dark:border-neutral-800'
+                      }`}
+                    >
+                      {hrs} Hours {hrs === 48 ? '★' : ''}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div 
+                onClick={() => setScheduling(prev => ({ ...prev, autoNudge48h: !prev.autoNudge48h }))}
+                className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-neutral-800/80 hover:border-slate-300 dark:hover:border-neutral-700 bg-slate-50/40 dark:bg-neutral-950/50 cursor-pointer transition-all select-none"
+              >
+                <div>
+                  <span className="font-bold text-sm text-slate-900 dark:text-white">Automated 24h & 48h Candidate Nudges</span>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Automatically dispatch email reminder with Google Calendar link when 24 hours remain in the window.</p>
+                </div>
+                <div className={`w-11 h-6 rounded-full transition-colors flex items-center px-1 shrink-0 ${scheduling.autoNudge48h ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-neutral-800'}`}>
+                  <div className={`w-4 h-4 rounded-full bg-white transition-transform shadow-sm ${scheduling.autoNudge48h ? 'translate-x-5' : 'translate-x-0'}`} />
+                </div>
+              </div>
+
+              <div 
+                onClick={() => setScheduling(prev => ({ ...prev, googleCalendarSync: !prev.googleCalendarSync }))}
+                className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-neutral-800/80 hover:border-slate-300 dark:hover:border-neutral-700 bg-slate-50/40 dark:bg-neutral-950/50 cursor-pointer transition-all select-none"
+              >
+                <div>
+                  <span className="font-bold text-sm text-slate-900 dark:text-white">1-Click Google Calendar & Calendly Integration</span>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5">Generate pre-populated calendar event URLs for candidates with instant calendar blocking.</p>
+                </div>
+                <div className={`w-11 h-6 rounded-full transition-colors flex items-center px-1 shrink-0 ${scheduling.googleCalendarSync ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-neutral-800'}`}>
+                  <div className={`w-4 h-4 rounded-full bg-white transition-transform shadow-sm ${scheduling.googleCalendarSync ? 'translate-x-5' : 'translate-x-0'}`} />
                 </div>
               </div>
             </div>

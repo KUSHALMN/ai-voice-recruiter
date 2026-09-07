@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, Volume2, Loader2, CheckCircle, Clock, Send, Code2, Layout, Sparkles, Briefcase, Wifi, ShieldAlert, ArrowRight, ShieldCheck, Shield, AlertTriangle, ArrowLeft, Maximize2, Minimize2 } from 'lucide-react'
+import { Mic, Volume2, Loader2, CheckCircle, Clock, Send, Code2, Layout, Sparkles, Briefcase, Wifi, ShieldAlert, ArrowRight, ShieldCheck, Shield, AlertTriangle, ArrowLeft, Maximize2, Minimize2, Globe } from 'lucide-react'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import CodeEditor from '@/components/CodeEditor'
@@ -17,6 +17,7 @@ import { calculateTargetQuestions, evaluateInterviewPacing, MIN_QUESTION_TIME_BU
 import ProgressBar from '@/components/interview/ProgressBar'
 import VoiceWave from '@/components/interview/VoiceWave'
 import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
+import { SUPPORTED_LANGUAGES, getLanguageByCode } from '@/lib/languages'
 
 interface InterviewScores {
   technical: number
@@ -32,6 +33,7 @@ export default function InterviewPage() {
   const [loading, setLoading] = useState(true)
   const [started, setStarted] = useState(false)
   const [completed, setCompleted] = useState(false)
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('English (US)')
   const [currentQ, setCurrentQ] = useState(0)
   const [questions, setQuestions] = useState<string[]>([])
   const [questionsLoaded, setQuestionsLoaded] = useState(false)
@@ -204,13 +206,21 @@ export default function InterviewPage() {
         }
         const recognition = recognitionRef.current
         if (recognition) {
+          const langConfig = getLanguageByCode(selectedLanguage)
           recognition.continuous = true
           recognition.interimResults = true
-          recognition.lang = 'en-US'
+          recognition.lang = langConfig.speechRecognitionLang || 'en-US'
         }
       }
     }
   }
+
+  useEffect(() => {
+    if (recognitionRef.current) {
+      const langConfig = getLanguageByCode(selectedLanguage)
+      recognitionRef.current.lang = langConfig.speechRecognitionLang || 'en-US'
+    }
+  }, [selectedLanguage])
 
   const loadInterview = async () => {
     try {
@@ -270,6 +280,9 @@ export default function InterviewPage() {
       if (interviewData) {
         interviewData.enable_strict_proctoring = interviewData.enable_strict_proctoring ?? true
         setInterview(interviewData)
+        if (interviewData.language) {
+          setSelectedLanguage(interviewData.language)
+        }
         const initialSeconds = (interviewData.duration || 10) * 60
         setTimeLeft(initialSeconds)
         timeLeftRef.current = initialSeconds
@@ -630,6 +643,7 @@ export default function InterviewPage() {
           jobTitle: interview.job_title,
           candidateName: interview.candidate_name,
           enableProbing: interview.enable_probing,
+          language: selectedLanguage,
           isWrapUpPhase: isWrapUpPhase || timeLeftRef.current < MIN_QUESTION_TIME_BUFFER_SECONDS || !nextQuestion
         })
       })
@@ -1302,6 +1316,12 @@ export default function InterviewPage() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Spoken Language HUD Badge */}
+            <div className="px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm">
+              <span>{getLanguageByCode(selectedLanguage).flag}</span>
+              <span className="hidden sm:inline">{getLanguageByCode(selectedLanguage).label.split(' ')[0]}</span>
+            </div>
+
             {/* Anti-Cheat Proctoring HUD Badge */}
             <div className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 border shadow-sm transition-colors ${
               violationCount === 0
@@ -1650,6 +1670,42 @@ export default function InterviewPage() {
                   <h4 className="font-semibold text-slate-900">Anti-cheat is active</h4>
                   <p className="text-sm text-slate-600">Do not switch tabs or exit fullscreen mode. Proctoring events are recorded.</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Candidate Spoken Language Selector */}
+            <div className="mt-6 pt-6 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-blue-600" />
+                  Spoken Language
+                </span>
+                <span className="text-xs text-blue-600 font-semibold">
+                  {getLanguageByCode(selectedLanguage).label}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {SUPPORTED_LANGUAGES.map(lang => {
+                  const isCurrent = selectedLanguage === lang.label || selectedLanguage === lang.code
+                  return (
+                    <button
+                      type="button"
+                      key={lang.code}
+                      onClick={() => {
+                        setSelectedLanguage(lang.label)
+                        toast.success(`Language switched to ${lang.label}!`, { icon: lang.flag })
+                      }}
+                      className={`py-2 px-2 rounded-xl text-center border transition-all ${
+                        isCurrent
+                          ? 'border-blue-600 bg-blue-50 text-blue-900 font-bold shadow-sm ring-1 ring-blue-200'
+                          : 'border-slate-200 bg-slate-50 hover:bg-white text-slate-700'
+                      }`}
+                    >
+                      <div className="text-lg mb-0.5">{lang.flag}</div>
+                      <div className="text-[11px] truncate">{lang.label.split(' ')[0]}</div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </motion.div>

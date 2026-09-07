@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { interviewId, jobTitle, jobDescription, interviewType, candidateType, duration } = body
+    const { interviewId, jobTitle, jobDescription, interviewType, candidateType, duration, language } = body
 
     const supabase = getAdminClient()
 
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     if (interviewId) {
       const { data: interview, error: dbError } = await supabase
         .from('interviews')
-        .select('id, job_title, job_description, interview_type, candidate_type, duration, parsed_resume, question_set')
+        .select('*')
         .eq('id', interviewId)
         .single()
 
@@ -32,15 +32,18 @@ export async function POST(request: NextRequest) {
           })
         }
 
+        const selectedLang = (interview as any)?.language || language || 'English'
+
         // Generate tailored questions
-        console.log(`⌛ Generating new question set for interview ${interviewId} (tailored: ${!!interview.parsed_resume})...`)
+        console.log(`⌛ Generating new question set for interview ${interviewId} in ${selectedLang} (tailored: ${!!interview.parsed_resume})...`)
         const qSet = await generateQuestionSet(
           interview.job_title || jobTitle || 'Software Engineer',
           interview.job_description || jobDescription || '',
           interview.interview_type || interviewType || 'technical',
           interview.candidate_type || candidateType || 'mid',
           interview.duration || duration || 15,
-          interview.parsed_resume || undefined
+          interview.parsed_resume || undefined,
+          selectedLang
         )
 
         // Store the question set
@@ -67,7 +70,9 @@ export async function POST(request: NextRequest) {
       jobDescription || '',
       interviewType || 'technical',
       candidateType || 'mid',
-      duration || 15
+      duration || 15,
+      undefined,
+      language || 'English'
     )
 
     return NextResponse.json({

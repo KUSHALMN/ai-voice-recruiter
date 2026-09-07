@@ -44,7 +44,7 @@ async function callGroq(prompt: string, temperature = 0.7, retries = 1): Promise
 }
 
 export class GeminiService {
-  async generateInterviewQuestions(jobTitle: string, jobDescription: string, interviewType: string, candidateType: string, duration: number, resumeText?: string): Promise<string[]> {
+  async generateInterviewQuestions(jobTitle: string, jobDescription: string, interviewType: string, candidateType: string, duration: number, resumeText?: string, language: string = 'English'): Promise<string[]> {
     try {
       // Dynamic question count based on duration and interview pacing (approx 2.5 - 3.5 min/question)
       const pacing = calculateTargetQuestions(duration, interviewType)
@@ -81,6 +81,10 @@ Interview Type: ${interviewType}
 Candidate Level: ${candidateType}
 Focus Area: ${focusArea}`
 
+      if (language && language.toLowerCase() !== 'english') {
+        prompt += `\nLanguage: ${language} (CRITICAL: All generated questions must be written natively in ${language})`
+      }
+
       if (resumeText) {
         prompt += `\n\nCandidate Resume Content:
 ${resumeText.substring(0, 3000)}... (truncated)
@@ -98,6 +102,7 @@ IMPORTANT:
 - For Technical interviews, questions MUST start with phrases like "Write a function...", "Implement...", "Create a class...", etc.
 - Questions should be conversational and natural
 - Each question should be clear and specific
+${language && language.toLowerCase() !== 'english' ? `- MUST BE IN ${language.toUpperCase()} LANGUAGE with natural native terminology` : ''}
 - Return ONLY the questions, one per line, numbered 1-${questionCount}
 - Do NOT include any introductory text or explanations`
 
@@ -905,9 +910,12 @@ Generate a JSON report with:
     nextQuestion: string,
     jobTitle: string,
     candidateName: string,
-    enableProbing: boolean = false
+    enableProbing: boolean = false,
+    language: string = 'English'
   ): Promise<{ responseText: string; isFollowUp: boolean; followUpQuestion: string | null }> {
     const isLastQuestion = !nextQuestion || nextQuestion.trim() === ''
+
+    const isNonEnglish = language && language.toLowerCase() !== 'english'
 
     const prompt = `You are AIRA — Artificial Intelligent Recruitment Assistant, a Senior Technical Hiring Manager representing an Autonomous Hiring System.
 
@@ -916,6 +924,7 @@ CHARACTER IDENTITY:
 - Role: Senior Technical Hiring Manager
 - Personality: Professional, confident, calm, analytical, respectful.
 - Communication Style: Clear, concise, intelligent, neutral tone.
+${isNonEnglish ? `- LANGUAGE: Native ${language}. You must speak and respond fluently in ${language}.` : ''}
 
 Current Interview Context:
 - Candidate Name: ${candidateName}
@@ -929,8 +938,9 @@ BEHAVIOR RULES:
 - Maintain interviewer authority.
 - Do not over-explain.
 - Avoid robotic delivery.
-- Use neutral international English, medium pace, confident but friendly tone.
+- Use natural conversational ${language}, medium pace, confident but friendly tone.
 - Use slight pauses between sentences.
+${isNonEnglish ? ('- CRITICAL: Formulate all acknowledgements and questions strictly in ' + language + '.') : ''}
 
 ${isLastQuestion
         ? `CLOSING: The interview is now complete. Use this style:

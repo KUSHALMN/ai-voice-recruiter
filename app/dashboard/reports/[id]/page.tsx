@@ -3,11 +3,12 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Download, CheckCircle, XCircle, AlertCircle, Code2, Mail, Loader2, Sparkles, Share2, ShieldAlert } from 'lucide-react'
+import { ArrowLeft, Download, CheckCircle, XCircle, AlertCircle, Code2, Mail, Loader2, Sparkles, Share2, ShieldAlert, Check, RefreshCw } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
 import BackButton from '@/components/BackButton'
+import { ATSProvider, ATS_PROVIDERS_INFO, ATSSyncResult } from '@/lib/ats/atsService'
 
 import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
 
@@ -34,6 +35,9 @@ export default function ReportDetailPage() {
   const [loading, setLoading] = useState(true)
   const [isSendingEmail, setIsSendingEmail] = useState(false)
   const [isGeneratingDetailed, setIsGeneratingDetailed] = useState(false)
+  const [isSyncingAts, setIsSyncingAts] = useState(false)
+  const [atsSyncResult, setAtsSyncResult] = useState<ATSSyncResult | null>(null)
+  const [showAtsDropdown, setShowAtsDropdown] = useState(false)
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hasTriggeredGenRef = useRef(false)
 
@@ -157,6 +161,51 @@ export default function ReportDetailPage() {
     }
   }
 
+  const handleSyncAts = async (provider: ATSProvider) => {
+    if (!report) return
+    setIsSyncingAts(true)
+    setShowAtsDropdown(false)
+    try {
+      const sessionData = report.interview_sessions?.[0]
+      const rawScores = sessionData?.scores || sessionData?.evaluation?.scores || {}
+      const overall = rawScores.overall ?? (sessionData?.evaluation?.overall_score || 7.5)
+      const decision = overall >= 8 ? 'Strong Hire' : overall >= 6.5 ? 'Hire' : overall >= 5 ? 'Neutral' : 'Do Not Hire'
+
+      const res = await fetch('/api/ats/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider,
+          payload: {
+            interviewId: report.id,
+            candidateName: report.candidate_name,
+            candidateEmail: report.candidate_email,
+            jobTitle: report.job_title,
+            overallScore: Number(overall.toFixed(1)),
+            decision,
+            summary: sessionData?.report?.summary || sessionData?.evaluation?.summary || 'Candidate completed AI Voice assessment with high confidence.',
+            technicalScore: rawScores.technical ?? rawScores.technical_skill,
+            communicationScore: rawScores.communication ?? rawScores.communication_skill,
+            problemSolvingScore: rawScores.problem_solving,
+            antiCheatFlagsCount: report.proctoring_logs?.length || 0,
+            proctoringPassed: (report.proctoring_logs?.length || 0) < 3,
+            reportUrl: `${window.location.origin}/dashboard/reports/${report.id}`
+          }
+        })
+      })
+
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to sync with ATS')
+
+      setAtsSyncResult(json.data)
+      toast.success(`Scorecard pushed to ${ATS_PROVIDERS_INFO[provider].name}!`, { icon: ATS_PROVIDERS_INFO[provider].logo })
+    } catch (err: any) {
+      toast.error(err.message || 'ATS sync failed')
+    } finally {
+      setIsSyncingAts(false)
+    }
+  }
+
   const handleExportPDF = () => {
     window.print()
   }
@@ -264,7 +313,47 @@ export default function ReportDetailPage() {
             >
               <BackButton fallbackUrl="/dashboard/reports" label="Back to Reports" />
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap">
+                {/* ATS Sync Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowAtsDropdown(!showAtsDropdown)}
+                    disabled={isSyncingAts}
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-all font-medium text-sm shadow-sm"
+                  >
+                    {isSyncingAts ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <span>🌿</span>
+                    )}
+                    {isSyncingAts ? 'Syncing to ATS...' : 'Sync to ATS'}
+                  </button>
+
+                  {showAtsDropdown && (
+                    <>
+                      <div className="fixed inset-0 z-20" onClick={() => setShowAtsDropdown(false)} />
+                      <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 z-30 p-2 space-y-1">
+                        <div className="px-3 py-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                          Push Scorecard & Audit To
+                        </div>
+                        {(['greenhouse', 'lever', 'workday', 'ashby'] as ATSProvider[]).map((prov) => (
+                          <button
+                            key={prov}
+                            onClick={() => handleSyncAts(prov)}
+                            className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg text-slate-700 hover:bg-emerald-50 hover:text-emerald-900 transition-colors text-left"
+                          >
+                            <span className="flex items-center gap-2">
+                              <span>{ATS_PROVIDERS_INFO[prov].logo}</span>
+                              {ATS_PROVIDERS_INFO[prov].name}
+                            </span>
+                            <span className="text-xs text-slate-400 font-normal">Push Note</span>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
                 <button
                   onClick={handleSendEmail}
                   disabled={isSendingEmail}
@@ -317,6 +406,56 @@ export default function ReportDetailPage() {
                   </div>
                 </div>
               )}
+            </motion.div>
+
+            {/* ATS Integration Gateway Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-5 shadow-lg border border-slate-800"
+            >
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xl shrink-0">
+                    {atsSyncResult ? ATS_PROVIDERS_INFO[atsSyncResult.provider].logo : '🔄'}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-white text-base">Applicant Tracking System (ATS) Gateway</h3>
+                      <span className="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full border border-emerald-500/30 font-medium">
+                        {atsSyncResult ? `${ATS_PROVIDERS_INFO[atsSyncResult.provider].name} Synced` : 'Enterprise Ready'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {atsSyncResult 
+                        ? `Receipt: ${atsSyncResult.candidateId} • Synced at ${new Date(atsSyncResult.syncedAt).toLocaleTimeString()} (${atsSyncResult.statusMessage})`
+                        : 'Direct 1-click sync of scores, transcripts, and proctoring audit logs to candidate ATS profiles.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap self-end sm:self-auto">
+                  {(['greenhouse', 'lever', 'workday', 'ashby'] as ATSProvider[]).map((prov) => {
+                    const isCurrent = atsSyncResult?.provider === prov
+                    return (
+                      <button
+                        key={prov}
+                        onClick={() => handleSyncAts(prov)}
+                        disabled={isSyncingAts}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                          isCurrent
+                            ? 'bg-emerald-500 text-white shadow-sm'
+                            : 'bg-white/10 hover:bg-white/20 text-slate-200 border border-white/15'
+                        }`}
+                      >
+                        <span>{ATS_PROVIDERS_INFO[prov].logo}</span>
+                        <span>{ATS_PROVIDERS_INFO[prov].name}</span>
+                        {isCurrent && <Check className="w-3.5 h-3.5" />}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-6">

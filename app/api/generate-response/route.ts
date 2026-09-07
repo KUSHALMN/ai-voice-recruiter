@@ -5,7 +5,7 @@ export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
     try {
-        const { currentQuestion, candidateAnswer, nextQuestion, jobTitle, candidateName, enableProbing, isWrapUpPhase } = await request.json()
+        const { currentQuestion, candidateAnswer, nextQuestion, jobTitle, candidateName, enableProbing, isWrapUpPhase, language } = await request.json()
 
         if (!currentQuestion || !candidateAnswer) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
             nextQuestion || '',
             jobTitle,
             candidateName,
-            shouldEnableProbing
+            shouldEnableProbing,
+            language || 'English'
         )
 
         return NextResponse.json(responseData)

@@ -18,7 +18,8 @@ export async function generateQuestionSet(
   interviewType: string,
   candidateType: string,
   duration: number,
-  parsedResume?: ParsedResume
+  parsedResume?: ParsedResume,
+  language: string = 'English'
 ): Promise<QuestionSet> {
   if (!process.env.GROQ_API_KEY) {
     throw new Error('GROQ_API_KEY is not configured in environment variables.')
@@ -34,6 +35,7 @@ export async function generateQuestionSet(
   const mediumCount = Math.max(1, questionCount - easyCount - hardCount)
 
   const difficultyTargets = `${easyCount} easy, ${mediumCount} medium, and ${hardCount} hard questions`
+  const isNonEnglish = language && language.toLowerCase() !== 'english'
 
   let prompt = ''
 
@@ -45,6 +47,7 @@ Role: ${jobTitle}
 Job Description: ${jobDescription}
 Interview Type: ${interviewType}
 Candidate Level: ${candidateType}
+${isNonEnglish ? `Language: ${language} (CRITICAL: Every question "text" and "follow_up" must be written natively in ${language})` : ''}
 
 Candidate's Resume Summary:
 - Name: ${parsedResume.candidate_name}
@@ -60,6 +63,7 @@ Your questions must include a mix of:
 2. Core technical questions for the role of ${jobTitle}.
 3. Behavioral questions based on their background.
 4. At least 1 question probing any red flags or employment gaps if listed.
+${isNonEnglish ? ('5. All questions must use authentic terminology of native ' + language + '.') : ''}
 
 Return ONLY a valid JSON object matching the JSON schema below. No markdown backticks (such as \`\`\`json), no preamble, and no explanation.
 

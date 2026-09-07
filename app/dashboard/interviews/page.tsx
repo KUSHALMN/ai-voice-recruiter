@@ -3,10 +3,12 @@
 import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Filter, Search, Users, ExternalLink, Loader2, Check } from 'lucide-react'
+import { Filter, Search, Users, ExternalLink, Loader2, Check, Calendar, Bell, Globe, CheckCircle2 } from 'lucide-react'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import toast from 'react-hot-toast'
 import { DEMO_REPORTS } from '@/lib/demo-data'
+import { generateGoogleCalendarUrl, getInterviewScheduleStatus } from '@/lib/calendar'
+import { ATS_PROVIDERS_INFO, ATSProvider } from '@/lib/ats/atsService'
 
 import BackButton from '@/components/BackButton'
 
@@ -18,6 +20,7 @@ export default function InterviewsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showFilter, setShowFilter] = useState(false)
   const [statusFilter, setStatusFilter] = useState('all')
+  const [nudgingId, setNudgingId] = useState<string | null>(null)
 
   useEffect(() => {
     // Fetch interviews on load — works with both Supabase and NextAuth auth
@@ -51,6 +54,32 @@ export default function InterviewsPage() {
       toast.error('An error occurred')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleSendNudge = async (interview: any) => {
+    setNudgingId(interview.id)
+    try {
+      const schedule = getInterviewScheduleStatus(interview.created_at, interview.deadline_hours || 48)
+      const res = await fetch('/api/candidate/nudge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          candidateEmail: interview.candidate_email,
+          candidateName: interview.candidate_name,
+          jobTitle: interview.job_title,
+          interviewLink: `${window.location.origin}/interview/${interview.id}`,
+          deadlineHours: interview.deadline_hours || 48,
+          hoursRemaining: schedule.hoursRemaining
+        })
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to dispatch reminder')
+      toast.success(`48-Hour reminder nudge sent to ${interview.candidate_name}!`, { icon: '🔔' })
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to send reminder nudge')
+    } finally {
+      setNudgingId(null)
     }
   }
 
@@ -98,8 +127,6 @@ export default function InterviewsPage() {
                   </div>
                   <div className="flex items-center gap-4 self-end sm:self-auto">
                     <div className="w-32 h-9 bg-gray-200 rounded-lg"></div>
-                    <div className="w-20 h-6 bg-gray-200 rounded-full"></div>
-                    <div className="w-20 h-4 bg-gray-200 rounded hidden sm:block"></div>
                   </div>
                 </div>
               ))}
@@ -112,21 +139,16 @@ export default function InterviewsPage() {
 
   return (
     <ResponsiveLayout>
-      <div className="mb-4">
-        <BackButton fallbackUrl="/dashboard" label="Back to Dashboard" />
+      <BackButton fallbackUrl="/dashboard" label="Back to Dashboard" className="mb-6" />
+      
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Interviews</h1>
+        <p className="text-gray-600 mt-1">Manage all created interviews, track 48-hour completion windows, and push scorecards to your ATS.</p>
       </div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">All Interviews</h1>
-        <p className="text-gray-600">View and manage all interview sessions</p>
-      </motion.div>
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div className="flex gap-4 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
@@ -199,50 +221,108 @@ export default function InterviewsPage() {
         <div className="p-6">
           {filteredInterviews.length > 0 ? (
             <div className="space-y-4">
-              {filteredInterviews.map((interview) => (
-                <div key={interview.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                      <Users className="w-5 h-5 text-blue-600" />
+              {filteredInterviews.map((interview) => {
+                const schedule = getInterviewScheduleStatus(interview.created_at, interview.deadline_hours || 48)
+                const isNudging = nudgingId === interview.id
+                return (
+                  <div key={interview.id} className="flex flex-col lg:flex-row lg:items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                        <Users className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-medium text-gray-900">{interview.job_title}</h3>
+                          {interview.language && (
+                            <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Globe className="w-3 h-3" />
+                              {interview.language.split(' ')[0]}
+                            </span>
+                          )}
+                          {interview.status === 'scheduled' && (
+                            <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${schedule.statusColor}`}>
+                              {schedule.statusLabel}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 mt-0.5">{interview.candidate_name} • {interview.candidate_email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{interview.job_title}</h3>
-                      <p className="text-sm text-gray-600">{interview.candidate_name} • {interview.candidate_email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 self-end sm:self-auto">
-                    {interview.status === 'scheduled' && (
-                      <button
-                        onClick={() => startTransition(() => router.push(`/interview/${interview.id}`))}
-                        disabled={isPending}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
-                      >
-                        {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
-                        Attend Interview
-                      </button>
-                    )}
-                    {interview.status === 'completed' && (
-                      <button
-                        onClick={() => startTransition(() => router.push(`/dashboard/reports/${interview.id}`))}
-                        disabled={isPending}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors flex items-center gap-2 disabled:opacity-50"
-                      >
-                        {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
-                        View Report
-                      </button>
-                    )}
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${interview.status === 'completed' ? 'bg-green-100 text-green-800' :
+
+                    <div className="flex items-center gap-3 flex-wrap self-end lg:self-auto">
+                      {/* Schedule 48h Nudge Button */}
+                      {interview.status === 'scheduled' && (
+                        <>
+                          <button
+                            onClick={() => handleSendNudge(interview)}
+                            disabled={isNudging}
+                            className="bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                            title="Send 48-Hour reminder nudge email"
+                          >
+                            {isNudging ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Bell className="w-3.5 h-3.5 text-indigo-600" />}
+                            Send 48h Nudge
+                          </button>
+
+                          <a
+                            href={generateGoogleCalendarUrl({
+                              jobTitle: interview.job_title,
+                              candidateName: interview.candidate_name,
+                              interviewUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/interview/${interview.id}`,
+                              durationMinutes: interview.duration || 20,
+                              deadlineHours: interview.deadline_hours || 48
+                            })}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 p-2 rounded-lg text-xs transition-colors"
+                            title="Add to Google Calendar"
+                          >
+                            <Calendar className="w-4 h-4 text-slate-600" />
+                          </a>
+
+                          <button
+                            onClick={() => startTransition(() => router.push(`/interview/${interview.id}`))}
+                            disabled={isPending}
+                            className="bg-blue-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                          >
+                            {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
+                            Attend Interview
+                          </button>
+                        </>
+                      )}
+
+                      {/* Completed Interview ATS Status */}
+                      {interview.status === 'completed' && (
+                        <>
+                          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-semibold px-2.5 py-1 rounded-lg flex items-center gap-1">
+                            <span>🌿</span>
+                            ATS Ready
+                          </span>
+
+                          <button
+                            onClick={() => startTransition(() => router.push(`/dashboard/reports/${interview.id}`))}
+                            disabled={isPending}
+                            className="bg-emerald-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-1.5 disabled:opacity-50"
+                          >
+                            {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
+                            View Report
+                          </button>
+                        </>
+                      )}
+
+                      <span className={`px-2.5 py-1 rounded-full text-[11px] font-semibold ${
+                        interview.status === 'completed' ? 'bg-green-100 text-green-800' :
                         interview.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
+                        'bg-gray-100 text-gray-800'
                       }`}>
-                      {interview.status.replace('_', ' ')}
-                    </span>
-                    <span className="text-sm text-gray-500 hidden sm:inline">
-                      {new Date(interview.created_at).toLocaleDateString()}
-                    </span>
+                        {interview.status.replace('_', ' ')}
+                      </span>
+                      <span className="text-xs text-gray-500 hidden sm:inline">
+                        {new Date(interview.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <div className="text-center py-12">

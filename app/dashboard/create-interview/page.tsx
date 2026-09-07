@@ -7,12 +7,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ArrowLeft, ArrowRight, Briefcase, Clock, User, Mail, Sparkles, 
   ChevronDown, Loader2, Upload, CheckCircle, FileText, BrainCircuit, 
-  ShieldAlert, Layers, Award
+  ShieldAlert, Layers, Award, Globe, Calendar, RefreshCw
 } from 'lucide-react'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import toast from 'react-hot-toast'
 import ResumeUpload from '@/components/interview/ResumeUpload'
 import BackButton from '@/components/BackButton'
+import { SUPPORTED_LANGUAGES, getLanguageByCode } from '@/lib/languages'
+import { ATS_PROVIDERS_INFO, ATSProvider } from '@/lib/ats/atsService'
+import { generateGoogleCalendarUrl } from '@/lib/calendar'
 
 const INTERVIEW_TYPES = [
   'Technical',
@@ -51,12 +54,17 @@ export default function CreateInterview() {
     interviewType: 'Technical',
     candidateType: 'Experienced',
     continent: 'North America',
+    language: 'English (US)',
     duration: 10,
     candidateName: '',
     candidateEmail: '',
     resumeText: '',
     enableProbing: true,
     enableStrictProctoring: true,
+    atsProvider: 'greenhouse' as ATSProvider | 'none',
+    autoAtsSync: true,
+    deadlineHours: 48,
+    autoReminderNudge: true,
   })
 
   const [extractedData, setExtractedData] = useState<{
@@ -92,6 +100,10 @@ export default function CreateInterview() {
         status: 'scheduled',
         enable_probing: formData.enableProbing,
         enable_strict_proctoring: formData.enableStrictProctoring,
+        language: formData.language,
+        ats_provider: formData.atsProvider,
+        deadline_hours: formData.deadlineHours,
+        auto_reminder_nudge: formData.autoReminderNudge,
       }
 
       const response = await fetch('/api/create-interview', {
@@ -539,6 +551,141 @@ export default function CreateInterview() {
                     </div>
                   </div>
                 </div>
+
+                {/* Multi-lingual Voice Screening */}
+                <div className="md:col-span-2 pt-6 border-t border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Globe className="w-4 h-4 text-blue-600" />
+                    <label className="block text-xs uppercase font-bold text-slate-700 tracking-wide">
+                      Interview Language (Multi-lingual Voice Screening)
+                    </label>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-3">
+                    AIRA dynamically asks questions and evaluates spoken responses natively in the selected language.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                    {SUPPORTED_LANGUAGES.map(lang => {
+                      const isSelected = formData.language === lang.label || formData.language === lang.code
+                      return (
+                        <button
+                          type="button"
+                          key={lang.code}
+                          onClick={() => setFormData({ ...formData, language: lang.label })}
+                          className={`p-3 rounded-xl border text-left transition-all ${
+                            isSelected
+                              ? 'border-blue-600 bg-blue-50/60 shadow-sm ring-2 ring-blue-100'
+                              : 'border-slate-200 bg-white hover:border-slate-300'
+                          }`}
+                        >
+                          <div className="text-xl mb-1">{lang.flag}</div>
+                          <div className="font-semibold text-xs text-slate-900">{lang.label.split(' ')[0]}</div>
+                          <div className="text-[10px] text-slate-500 truncate">{lang.nativeName}</div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Direct ATS Integration Gateway */}
+                <div className="md:col-span-2 pt-6 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs uppercase font-bold text-slate-700 tracking-wide flex items-center gap-2">
+                      <span>🌿</span>
+                      Direct ATS Integration Target
+                    </label>
+                    <span className="text-[11px] text-emerald-600 font-semibold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                      1-Click Candidate Sync
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mb-3">
+                    Automatically pushes scorecard, audio transcript, and proctoring audit flags to candidate profiles.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {(['greenhouse', 'lever', 'workday', 'ashby'] as ATSProvider[]).map((prov) => {
+                      const isSelected = formData.atsProvider === prov
+                      const info = ATS_PROVIDERS_INFO[prov]
+                      return (
+                        <button
+                          type="button"
+                          key={prov}
+                          onClick={() => setFormData({ ...formData, atsProvider: prov })}
+                          className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
+                            isSelected
+                              ? 'border-emerald-500 bg-emerald-50/60 ring-2 ring-emerald-100 shadow-sm'
+                              : 'border-slate-200 bg-white hover:border-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{info.logo}</span>
+                            <div>
+                              <div className="font-bold text-xs text-slate-900">{info.name}</div>
+                              <div className="text-[10px] text-slate-400">Auto-sync</div>
+                            </div>
+                          </div>
+                          {isSelected && <CheckCircle className="w-4 h-4 text-emerald-600" />}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Automated Candidate Scheduling & 48h Follow-Up */}
+                <div className="md:col-span-2 pt-6 border-t border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4 text-indigo-600" />
+                    <label className="block text-xs uppercase font-bold text-slate-700 tracking-wide">
+                      Scheduling Window & Automated Follow-Up
+                    </label>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                      <label className="block text-xs font-semibold text-slate-700 mb-1.5">Interview Expiration Window</label>
+                      <div className="flex gap-2">
+                        {[24, 48, 72].map(hrs => (
+                          <button
+                            type="button"
+                            key={hrs}
+                            onClick={() => setFormData({ ...formData, deadlineHours: hrs })}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all ${
+                              formData.deadlineHours === hrs
+                                ? 'bg-indigo-600 text-white shadow-sm'
+                                : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            {hrs} Hours {hrs === 48 ? '★' : ''}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-2">
+                        Candidates will receive a 48-hour access token with live countdown.
+                      </p>
+                    </div>
+
+                    <div 
+                      onClick={() => setFormData(prev => ({ ...prev, autoReminderNudge: !prev.autoReminderNudge }))}
+                      className={`cursor-pointer p-3.5 rounded-xl border transition-all flex items-start gap-3 ${
+                        formData.autoReminderNudge ? 'bg-indigo-50/60 border-indigo-200' : 'bg-white border-slate-200'
+                      }`}
+                    >
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                        formData.autoReminderNudge ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-xs text-slate-900">48-Hour Email Nudge</h4>
+                          <div className={`w-7 h-3.5 rounded-full transition-colors flex items-center px-0.5 ${formData.autoReminderNudge ? 'bg-indigo-600' : 'bg-slate-300'}`}>
+                            <div className={`w-2.5 h-2.5 rounded-full bg-white transition-transform ${formData.autoReminderNudge ? 'translate-x-3' : 'translate-x-0'}`} />
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          Automatically send friendly reminder with Google Calendar link if pending at 24h & 48h.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-end pt-6 border-t border-slate-200">
@@ -659,6 +806,41 @@ export default function CreateInterview() {
                     {`${window.location.origin}/interview/${createdInterviewId}`}
                   </div>
                 </div>
+
+                {/* Integration Badges */}
+                <div className="grid grid-cols-3 gap-2.5 text-center text-xs">
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                    <div className="text-slate-400 font-medium">Language</div>
+                    <div className="font-bold text-slate-800 mt-0.5">{formData.language.split(' ')[0]}</div>
+                  </div>
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                    <div className="text-slate-400 font-medium">ATS Gateway</div>
+                    <div className="font-bold text-emerald-700 mt-0.5">
+                      {formData.atsProvider !== 'none' ? ATS_PROVIDERS_INFO[formData.atsProvider as ATSProvider]?.name : 'Direct'}
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                    <div className="text-slate-400 font-medium">Window</div>
+                    <div className="font-bold text-indigo-700 mt-0.5">{formData.deadlineHours}h Access</div>
+                  </div>
+                </div>
+
+                {/* 1-Click Google Calendar Scheduling Button */}
+                <a
+                  href={generateGoogleCalendarUrl({
+                    jobTitle: formData.jobTitle || 'Software Engineer',
+                    candidateName: formData.candidateName || 'Candidate',
+                    interviewUrl: `${window.location.origin}/interview/${createdInterviewId}`,
+                    durationMinutes: formData.duration,
+                    deadlineHours: formData.deadlineHours
+                  })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 px-4 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-sm flex items-center justify-center gap-2 transition-colors shadow-sm"
+                >
+                  <Calendar className="w-4 h-4 text-indigo-600" />
+                  Add to Google Calendar & Send Invitation
+                </a>
                 
                 <div className="border-t border-slate-200 pt-4">
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Optional: Upload or Update PDF Resume Archive</p>
