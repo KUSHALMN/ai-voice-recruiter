@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 import { OptimizedButton } from '@/components/OptimizedButton'
+import BackButton from '@/components/BackButton'
 
 export default function LoginPage() {
   const { status } = useSession()
@@ -149,7 +150,12 @@ export default function LoginPage() {
   const currentPortal = portalContent[activePortal]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 relative">
+      {/* Back to Home Button */}
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-30">
+        <BackButton fallbackUrl="/" label="Back to Home" />
+      </div>
+
       <div className="grid lg:grid-cols-[60%_40%] min-h-screen">
         {/* Left Side - Info Panel */}
         <div className={`bg-gradient-to-br ${currentPortal.gradient} p-12 flex flex-col justify-center relative overflow-hidden`}>

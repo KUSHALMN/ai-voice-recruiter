@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Calendar, Loader2, PlayCircle, Building } from 'lucide-react'
 import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
+import BackButton from '@/components/BackButton'
 
 interface SharedReportQuestion {
   question: string
@@ -85,8 +86,11 @@ export default function SharedReportPage() {
   const isHire = session_data.recommendation?.toLowerCase().includes('hire')
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <BackButton fallbackUrl="/" label="Back to Home" />
+        </div>
         {/* Header branding */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">

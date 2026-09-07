@@ -5,11 +5,18 @@ import { useSession, signOut } from 'next-auth/react'
 import { useState, memo, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
+import { usePathname } from 'next/navigation'
+import BackButton from './BackButton'
+
 function TopBar() {
+  const pathname = usePathname()
   const { data: session } = useSession()
   const [showProfile, setShowProfile] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const showBackButton = pathname !== '/dashboard' && pathname !== '/admin'
+  const fallback = pathname.startsWith('/admin') ? '/admin' : '/dashboard'
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -23,8 +30,12 @@ function TopBar() {
 
   return (
     <header className="h-14 sm:h-16 bg-white dark:bg-black border-b border-gray-200 dark:border-neutral-900 flex items-center justify-between px-4 sm:px-6 transition-colors duration-200">
-      {/* Search - Hidden on mobile */}
-      <div className="hidden md:flex flex-1 max-w-md">
+      <div className="flex items-center gap-2 sm:gap-3 flex-1">
+        {showBackButton && (
+          <BackButton fallbackUrl={fallback} variant="subtle" className="text-xs py-1.5 px-2.5" />
+        )}
+        {/* Search - Hidden on mobile */}
+        <div className="hidden md:flex flex-1 max-w-md">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-neutral-500" />
           <input
@@ -39,6 +50,7 @@ function TopBar() {
       <div className="md:hidden flex-1">
         <span className="text-base font-semibold text-gray-900 dark:text-white">AIRA</span>
         <p className="text-[10px] text-gray-400 dark:text-neutral-500 leading-none">AI Recruitment Assistant</p>
+      </div>
       </div>
 
       {/* Right side */}
