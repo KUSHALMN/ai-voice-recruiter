@@ -233,10 +233,10 @@ export default function AdminPage() {
                 <Shield className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Executive Governance & AI Telemetry</span>
               </div>
-              <h1 className="font-claude-serif text-3xl sm:text-4xl lg:text-4xl font-semibold text-slate-900 tracking-tight leading-snug">
-                Talent Intelligence & System Governance
+              <h1 className="font-claude-serif text-2xl sm:text-3xl lg:text-3xl font-semibold text-slate-900 tracking-tight leading-tight">
+                Talent Intelligence & Governance
               </h1>
-              <p className="text-slate-600 text-sm sm:text-base mt-1.5 max-w-2xl leading-relaxed font-claude-sans">
+              <p className="text-slate-600 text-xs sm:text-sm mt-1.5 max-w-2xl leading-relaxed">
                 Real-time oversight of multi-tenant recruiting operations, continuous anti-cheat proctoring, AI model latency, and candidate scoring dossiers.
               </p>
             </div>

@@ -33,7 +33,7 @@ function TopBar() {
   return (
     <header className={`h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 transition-colors duration-200 z-10 ${
       isAdminPath
-        ? 'liquid-glass-panel text-slate-800 border-b border-white/80 shadow-xs font-claude-sans'
+        ? 'bg-white/95 backdrop-blur-md text-slate-800 border-b border-slate-200/80 shadow-xs'
         : 'bg-white dark:bg-black border-b border-gray-200 dark:border-neutral-900'
     }`}>
       <div className="flex items-center gap-2 sm:gap-4 flex-1">

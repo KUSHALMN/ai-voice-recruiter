@@ -58,9 +58,9 @@ function Sidebar() {
   }, [router, settingsHref])
 
   return (
-    <aside className={`w-60 sm:w-64 lg:w-60 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200 z-10 ${
+    <aside className={`w-60 sm:w-64 lg:w-60 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200 z-20 ${
       isAdminPath
-        ? 'liquid-glass-panel border-r border-white/80 shadow-[4px_0_30px_rgba(99,102,241,0.06)] text-slate-800 font-claude-sans'
+        ? 'bg-white border-r border-slate-200/80 shadow-[1px_0_10px_rgba(0,0,0,0.03)] text-slate-800'
         : 'bg-white dark:bg-black border-r border-slate-200 dark:border-neutral-900'
     }`}>
       {/* Header */}
