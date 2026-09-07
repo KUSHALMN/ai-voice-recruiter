@@ -58,28 +58,28 @@ function Sidebar() {
   }, [router, settingsHref])
 
   return (
-    <aside className={`w-60 sm:w-64 lg:w-60 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200 ${
+    <aside className={`w-60 sm:w-64 lg:w-60 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200 z-10 ${
       isAdminPath
-        ? 'bg-white/70 backdrop-blur-xl border-r border-indigo-100/80 shadow-[4px_0_24px_rgba(99,102,241,0.04)] text-slate-800'
+        ? 'liquid-glass-panel border-r border-white/80 shadow-[4px_0_30px_rgba(99,102,241,0.06)] text-slate-800 font-claude-sans'
         : 'bg-white dark:bg-black border-r border-slate-200 dark:border-neutral-900'
     }`}>
       {/* Header */}
       <div>
         {isAdminPath ? (
-          /* Admin Brand Header - Minimal Frosted Glass */
+          /* Admin Brand Header - Claude Editorial Font & Liquid Glass */
           <div className="mb-6 sm:mb-8 px-1">
             <div className="flex items-center gap-2.5 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/20">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/20">
                 <Shield className="w-4.5 h-4.5" />
               </div>
               <div>
-                <span className="text-base sm:text-lg font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent tracking-tight">
-                  AIRA ADMIN
+                <span className="font-claude-serif text-lg sm:text-xl font-semibold tracking-tight text-slate-900 block leading-tight">
+                  AIRA Admin
                 </span>
-                <p className="text-[10px] text-slate-500 font-medium leading-none">Executive Console</p>
+                <p className="text-[10px] text-slate-500 font-medium tracking-wide uppercase">Executive Console</p>
               </div>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50/90 border border-indigo-200/70 text-[9px] font-bold text-indigo-700 tracking-wider">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full liquid-glass-pill text-[9px] font-bold text-indigo-700 tracking-wider">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
               SUPERADMIN CONSOLE
             </div>

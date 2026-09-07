@@ -31,9 +31,9 @@ function TopBar() {
   }, [])
 
   return (
-    <header className={`h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 transition-colors duration-200 ${
+    <header className={`h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 transition-colors duration-200 z-10 ${
       isAdminPath
-        ? 'bg-white/70 backdrop-blur-xl text-slate-800 border-b border-indigo-100/80 shadow-sm'
+        ? 'liquid-glass-panel text-slate-800 border-b border-white/80 shadow-xs font-claude-sans'
         : 'bg-white dark:bg-black border-b border-gray-200 dark:border-neutral-900'
     }`}>
       <div className="flex items-center gap-2 sm:gap-4 flex-1">
@@ -43,9 +43,9 @@ function TopBar() {
 
         {/* Portal Distinct Badge */}
         {isAdminPath ? (
-          <div className="hidden sm:flex items-center gap-2 bg-indigo-50/90 border border-indigo-200/70 px-3 py-1 rounded-xl text-xs font-bold text-indigo-700 shadow-sm">
+          <div className="hidden sm:flex items-center gap-2 liquid-glass-pill px-3 py-1 rounded-full text-xs font-bold text-indigo-800">
             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            <span>Executive Admin Console</span>
+            <span className="font-claude-serif text-sm">Executive Console</span>
           </div>
         ) : (
           <div className="hidden sm:flex items-center gap-2 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/40 px-3 py-1 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-400">
@@ -62,10 +62,10 @@ function TopBar() {
             }`} />
             <input
               type="text"
-              placeholder={isAdminPath ? "Search system logs, templates, recruiters..." : "Search interviews, candidates..."}
+              placeholder={isAdminPath ? "Search system logs, templates, audit rubrics..." : "Search interviews, candidates..."}
               className={`rounded-xl px-3 py-2 pl-10 w-full text-xs sm:text-sm border focus:outline-none transition-colors ${
                 isAdminPath
-                  ? 'bg-white/80 border-slate-200/80 text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:bg-white shadow-sm'
+                  ? 'bg-white/70 border-white/80 text-slate-800 placeholder-slate-400 focus:border-indigo-400 focus:bg-white shadow-xs'
                   : 'bg-gray-50 dark:bg-neutral-950 border-gray-200 dark:border-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500'
               }`}
             />
@@ -74,8 +74,8 @@ function TopBar() {
 
         {/* Mobile App Title */}
         <div className="md:hidden flex-1">
-          <span className={`text-base font-bold ${isAdminPath ? 'text-indigo-700' : 'text-gray-900 dark:text-white'}`}>
-            {isAdminPath ? 'AIRA ADMIN' : 'AIRA'}
+          <span className={`text-base font-bold ${isAdminPath ? 'font-claude-serif text-indigo-900' : 'text-gray-900 dark:text-white'}`}>
+            {isAdminPath ? 'AIRA Admin' : 'AIRA'}
           </span>
           <p className="text-[10px] text-gray-500 leading-none">
             {isAdminPath ? 'Command Center' : 'Recruitment Assistant'}
@@ -86,13 +86,13 @@ function TopBar() {
       {/* Right side telemetry & controls */}
       <div className="flex items-center gap-2 sm:gap-3">
         {isAdminPath ? (
-          /* Admin Telemetry - Minimal Glass Pills */
+          /* Admin Telemetry - Liquid Glass Pills */
           <div className="hidden lg:flex items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-emerald-50/80 border border-emerald-200/60 px-2.5 py-1 rounded-lg text-[11px] text-emerald-700 font-mono shadow-xs">
+            <div className="flex items-center gap-1.5 liquid-glass-pill px-3 py-1 rounded-full text-[11px] text-emerald-800 font-mono">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
               <span>API: 99.98%</span>
             </div>
-            <div className="flex items-center gap-1.5 bg-indigo-50/80 border border-indigo-200/60 px-2.5 py-1 rounded-lg text-[11px] text-indigo-700 font-mono shadow-xs">
+            <div className="flex items-center gap-1.5 liquid-glass-pill px-3 py-1 rounded-full text-[11px] text-indigo-800 font-mono">
               <span>AI Engine: Groq+Gemini</span>
             </div>
           </div>

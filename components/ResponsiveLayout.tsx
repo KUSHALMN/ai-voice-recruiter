@@ -16,11 +16,20 @@ export default function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
   const isAdmin = pathname.startsWith('/admin')
 
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${
+    <div className={`relative flex h-screen overflow-hidden transition-colors duration-200 ${
       isAdmin
-        ? 'bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 text-slate-800'
+        ? 'liquid-glass-canvas font-claude-sans text-slate-800'
         : 'bg-[#F9FAFB] dark:bg-black text-slate-900 dark:text-white'
     }`}>
+      {/* Ambient Liquid Glass Fluid Orbs for Admin */}
+      {isAdmin && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-gradient-to-br from-indigo-300/35 via-purple-300/25 to-pink-200/20 rounded-full blur-3xl animate-pulse duration-[6000ms]" />
+          <div className="absolute top-1/4 right-0 w-80 h-80 bg-gradient-to-bl from-amber-200/30 via-rose-200/20 to-purple-200/25 rounded-full blur-3xl animate-pulse duration-[8000ms]" />
+          <div className="absolute bottom-0 left-1/3 w-[32rem] h-[32rem] bg-gradient-to-tr from-cyan-200/25 via-indigo-200/20 to-violet-200/30 rounded-full blur-3xl" />
+        </div>
+      )}
+
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
