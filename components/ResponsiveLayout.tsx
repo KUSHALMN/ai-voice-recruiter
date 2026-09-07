@@ -17,7 +17,9 @@ export default function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
 
   return (
     <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${
-      isAdmin ? 'bg-[#0B0F19] text-slate-100' : 'bg-[#F9FAFB] dark:bg-black'
+      isAdmin
+        ? 'bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 text-slate-800'
+        : 'bg-[#F9FAFB] dark:bg-black text-slate-900 dark:text-white'
     }`}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (

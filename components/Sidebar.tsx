@@ -60,27 +60,27 @@ function Sidebar() {
   return (
     <aside className={`w-60 sm:w-64 lg:w-60 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200 ${
       isAdminPath
-        ? 'bg-slate-950 text-white border-r border-indigo-950/80 shadow-2xl'
+        ? 'bg-white/70 backdrop-blur-xl border-r border-indigo-100/80 shadow-[4px_0_24px_rgba(99,102,241,0.04)] text-slate-800'
         : 'bg-white dark:bg-black border-r border-slate-200 dark:border-neutral-900'
     }`}>
       {/* Header */}
       <div>
         {isAdminPath ? (
-          /* Admin Brand Header */
+          /* Admin Brand Header - Minimal Frosted Glass */
           <div className="mb-6 sm:mb-8 px-1">
             <div className="flex items-center gap-2.5 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/20">
                 <Shield className="w-4.5 h-4.5" />
               </div>
               <div>
-                <span className="text-base sm:text-lg font-black bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent tracking-tight">
+                <span className="text-base sm:text-lg font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent tracking-tight">
                   AIRA ADMIN
                 </span>
-                <p className="text-[10px] text-indigo-300/70 font-medium leading-none">Command Center</p>
+                <p className="text-[10px] text-slate-500 font-medium leading-none">Executive Console</p>
               </div>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-950/80 border border-indigo-700/40 text-[9px] font-bold text-indigo-300 tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-50/90 border border-indigo-200/70 text-[9px] font-bold text-indigo-700 tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
               SUPERADMIN CONSOLE
             </div>
           </div>
@@ -118,11 +118,11 @@ function Sidebar() {
                   onMouseEnter={() => router.prefetch(item.href)}
                   className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-75 cursor-pointer active:scale-[0.97] ${
                     isActive
-                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-lg shadow-indigo-900/40'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-white active:bg-slate-800'
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-md shadow-indigo-500/25'
+                      : 'text-slate-600 hover:bg-indigo-50/70 hover:text-indigo-900 active:bg-indigo-100/60'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                   <span>{item.name}</span>
                 </Link>
               )
@@ -179,13 +179,13 @@ function Sidebar() {
         {isAdminPath ? (
           <Link
             href="/dashboard"
-            className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-950 text-xs text-indigo-300 hover:text-white transition-all group"
+            className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/80 hover:bg-indigo-50/80 border border-slate-200/80 text-xs text-indigo-700 hover:text-indigo-900 transition-all shadow-sm group"
           >
             <span className="flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400 group-hover:rotate-12 transition-transform" />
-              <span>Recruiter Portal</span>
+              <Sparkles className="w-3.5 h-3.5 text-blue-500 group-hover:rotate-12 transition-transform" />
+              <span className="font-semibold">Recruiter Workspace</span>
             </span>
-            <span className="text-[10px] text-slate-500 group-hover:text-indigo-300">Switch &rarr;</span>
+            <span className="text-[10px] text-slate-400 group-hover:text-indigo-600 transition-colors">Switch &rarr;</span>
           </Link>
         ) : (
           <Link
@@ -203,7 +203,7 @@ function Sidebar() {
         {/* User Card */}
         <div className={`flex items-center gap-3 p-2.5 rounded-xl border ${
           isAdminPath
-            ? 'bg-slate-900/80 border-indigo-950/80 text-white'
+            ? 'bg-indigo-50/60 border-indigo-100/80 text-slate-800 shadow-sm'
             : 'bg-slate-50 dark:bg-neutral-950 border-slate-200/80 dark:border-neutral-900'
         }`}>
           <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
@@ -214,10 +214,10 @@ function Sidebar() {
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`text-xs font-semibold truncate ${isAdminPath ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+            <p className={`text-xs font-semibold truncate ${isAdminPath ? 'text-slate-800' : 'text-slate-900 dark:text-white'}`}>
               {session?.user?.name || (isAdminPath ? 'Administrator' : 'Recruiter')}
             </p>
-            <p className={`text-[11px] truncate ${isAdminPath ? 'text-indigo-300/60' : 'text-slate-500 dark:text-neutral-400'}`}>
+            <p className={`text-[11px] truncate ${isAdminPath ? 'text-slate-500' : 'text-slate-500 dark:text-neutral-400'}`}>
               {session?.user?.email || (isAdminPath ? 'admin@company.com' : 'recruiter@company.com')}
             </p>
           </div>
@@ -240,7 +240,7 @@ function Sidebar() {
           disabled={isLoggingOut}
           className={`flex items-center gap-2.5 w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all duration-75 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed ${
             isAdminPath
-              ? 'text-slate-400 hover:text-red-400 hover:bg-red-950/30'
+              ? 'text-slate-500 hover:text-red-600 hover:bg-red-50/80'
               : 'text-slate-600 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20'
           }`}
         >

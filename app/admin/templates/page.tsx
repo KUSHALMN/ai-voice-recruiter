@@ -64,7 +64,7 @@ export default function AdminTemplatesPage() {
   const fetchTemplates = async () => {
     try {
       setLoading(true)
-      // Attempt to load from localStorage cache first
+      // Check localStorage cache first
       if (typeof window !== 'undefined') {
         const cached = localStorage.getItem('aira_admin_templates')
         if (cached) {
@@ -88,7 +88,6 @@ export default function AdminTemplatesPage() {
         .order('created_at', { ascending: false })
 
       if (data && data.length > 0) {
-        // Map database records to InterviewTemplate format
         const mappedData: InterviewTemplate[] = data.map(item => ({
           id: item.id || `tmpl-${Math.random().toString(36).substring(2, 9)}`,
           title: item.title,
@@ -112,7 +111,6 @@ export default function AdminTemplatesPage() {
           localStorage.setItem('aira_admin_templates', JSON.stringify(mappedData))
         }
       } else {
-        // Fallback to rich factory templates
         setTemplates(DEFAULT_INTERVIEW_TEMPLATES)
         if (typeof window !== 'undefined') {
           localStorage.setItem('aira_admin_templates', JSON.stringify(DEFAULT_INTERVIEW_TEMPLATES))
@@ -215,7 +213,7 @@ export default function AdminTemplatesPage() {
       localStorage.setItem('aira_admin_templates', JSON.stringify(nextTemplates))
     }
 
-    // Try saving to Supabase in background
+    // Supabase background sync
     try {
       if (editingTemplate) {
         await supabase.from('interview_templates').update({
@@ -261,7 +259,7 @@ export default function AdminTemplatesPage() {
       console.warn('Supabase delete skipped:', e)
     }
 
-    toast.success('Template deleted from catalog')
+    toast.success('Template removed from catalog')
   }
 
   // Filtered templates
@@ -293,18 +291,18 @@ export default function AdminTemplatesPage() {
         {/* Navigation & Header */}
         <div className="flex items-center justify-between">
           <BackButton fallbackUrl="/admin" label="Back to Executive Console" />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={handleResetToDefaults}
-              className="px-3.5 py-2 text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 rounded-lg flex items-center gap-2 transition-all shadow-sm"
+              className="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white/80 hover:bg-white border border-slate-200/80 rounded-xl flex items-center gap-2 shadow-xs transition-all"
               title="Reset templates to factory defaults"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-indigo-400" />
+              <RotateCcw className="w-3.5 h-3.5 text-indigo-600" />
               Reset Defaults
             </button>
             <button
               onClick={openCreateModal}
-              className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-lg flex items-center gap-2 shadow-lg shadow-indigo-500/25 transition-all"
+              className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl flex items-center gap-2 shadow-md shadow-indigo-500/20 transition-all"
             >
               <Plus className="w-4 h-4" />
               New Blueprint
@@ -312,40 +310,41 @@ export default function AdminTemplatesPage() {
           </div>
         </div>
 
-        {/* Executive Banner */}
+        {/* Minimal Frosted Glass Executive Hero Banner */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/20 p-6 shadow-2xl backdrop-blur-xl"
+          className="relative overflow-hidden rounded-3xl bg-white/70 backdrop-blur-xl border border-white/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 lg:p-8"
         >
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-200/20 rounded-full blur-3xl pointer-events-none" />
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-mono tracking-wider mb-2">
-                <Shield className="w-3.5 h-3.5 text-indigo-400" />
-                EXECUTIVE TEMPLATE ENGINE & AI EVALUATION SCHEMAS
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50/90 border border-indigo-200/70 text-indigo-700 text-xs font-semibold tracking-wide mb-3 shadow-xs">
+                <Shield className="w-3.5 h-3.5 text-indigo-600" />
+                EXECUTIVE TEMPLATE ENGINE & RUBRIC SCHEMAS
               </div>
-              <h1 className="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">
+              <h1 className="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
                 Enterprise Interview Templates
               </h1>
-              <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-                Curate standardized assessment rubrics, candidate difficulty levels, and AI question pools used across all recruiting workflows.
+              <p className="text-slate-600 text-sm mt-1 max-w-2xl">
+                Curate standardized assessment rubrics, candidate difficulty tiers, and AI question pools used across all recruiting workflows.
               </p>
             </div>
 
             {/* Live Metrics Pills */}
             <div className="flex items-center gap-3">
-              <div className="px-4 py-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
-                <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Blueprints</p>
-                <p className="text-xl font-bold text-indigo-400">{templates.length}</p>
+              <div className="px-4 py-2.5 rounded-2xl bg-white/80 border border-indigo-100 text-center shadow-xs">
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Blueprints</p>
+                <p className="text-xl font-bold text-indigo-600">{templates.length}</p>
               </div>
-              <div className="px-4 py-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
-                <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Domains</p>
-                <p className="text-xl font-bold text-violet-400">5</p>
+              <div className="px-4 py-2.5 rounded-2xl bg-white/80 border border-purple-100 text-center shadow-xs">
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Domains</p>
+                <p className="text-xl font-bold text-purple-600">5</p>
               </div>
-              <div className="px-4 py-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-center">
-                <p className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">AI Standard</p>
-                <p className="text-xl font-bold text-emerald-400">v3.2</p>
+              <div className="px-4 py-2.5 rounded-2xl bg-white/80 border border-emerald-100 text-center shadow-xs">
+                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">AI Standard</p>
+                <p className="text-xl font-bold text-emerald-600">v3.2</p>
               </div>
             </div>
           </div>
@@ -362,15 +361,15 @@ export default function AdminTemplatesPage() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
                     active
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'bg-slate-900/60 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200 border border-slate-800'
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20'
+                      : 'bg-white/70 hover:bg-white text-slate-600 hover:text-slate-900 border border-slate-200/80 shadow-xs'
                   }`}
                 >
                   <span>{cat}</span>
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                    active ? 'bg-indigo-700 text-white' : 'bg-slate-800 text-slate-400'
+                    active ? 'bg-indigo-700/80 text-white' : 'bg-slate-100 text-slate-500'
                   }`}>
                     {count}
                   </span>
@@ -387,7 +386,7 @@ export default function AdminTemplatesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search blueprints, skills..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-900/80 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-white/80 border border-slate-200/80 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-xs"
             />
           </div>
         </div>
@@ -395,20 +394,20 @@ export default function AdminTemplatesPage() {
         {/* Templates Grid */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-slate-400 text-xs font-mono">Synchronizing template blueprints...</p>
+            <div className="w-10 h-10 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-slate-500 text-xs">Synchronizing template blueprints...</p>
           </div>
         ) : filteredTemplates.length === 0 ? (
-          <div className="rounded-2xl bg-slate-900/40 border border-slate-800 p-12 text-center">
-            <FileText className="w-12 h-12 text-slate-500 mx-auto mb-3 opacity-50" />
-            <h3 className="text-base font-semibold text-slate-300 mb-1">No Matching Templates</h3>
-            <p className="text-slate-500 text-xs mb-4">No blueprints match your filter criteria.</p>
+          <div className="rounded-3xl bg-white/70 backdrop-blur-xl border border-slate-200/80 p-12 text-center shadow-xs">
+            <FileText className="w-12 h-12 text-slate-400 mx-auto mb-3 opacity-60" />
+            <h3 className="text-base font-bold text-slate-800 mb-1">No Matching Templates</h3>
+            <p className="text-slate-500 text-xs mb-4">No blueprints match your search filters.</p>
             <button
               onClick={() => {
                 setSelectedCategory('All')
                 setSearchQuery('')
               }}
-              className="px-4 py-2 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors"
+              className="px-4 py-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-xs transition-colors"
             >
               Clear Filters
             </button>
@@ -421,20 +420,20 @@ export default function AdminTemplatesPage() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="group relative flex flex-col justify-between rounded-2xl bg-slate-900/70 hover:bg-slate-900/90 border border-slate-800 hover:border-indigo-500/40 p-5 backdrop-blur-md shadow-xl transition-all duration-200"
+                className="group flex flex-col justify-between rounded-3xl bg-white/75 backdrop-blur-xl border border-white/80 hover:border-indigo-300 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(99,102,241,0.08)] transition-all duration-200"
               >
                 <div>
-                  {/* Top bar with icon, category & actions */}
+                  {/* Top Bar */}
                   <div className="flex items-start justify-between mb-3.5">
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center text-2xl shadow-inner">
+                      <div className="w-11 h-11 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl shadow-xs">
                         {template.icon}
                       </div>
                       <div>
-                        <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-medium tracking-wide uppercase bg-slate-800 text-indigo-300 border border-indigo-500/20 mb-0.5">
+                        <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase bg-indigo-50 text-indigo-700 border border-indigo-100 mb-0.5">
                           {template.category}
                         </span>
-                        <h3 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">
+                        <h3 className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1">
                           {template.title}
                         </h3>
                       </div>
@@ -443,14 +442,14 @@ export default function AdminTemplatesPage() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => openEditModal(template)}
-                        className="p-1.5 text-slate-400 hover:text-indigo-300 hover:bg-slate-800/80 rounded-md transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                         title="Edit Blueprint"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => deleteTemplate(template.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800/80 rounded-md transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                         title="Decommission Blueprint"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -459,10 +458,10 @@ export default function AdminTemplatesPage() {
                   </div>
 
                   {/* Target Role & Description */}
-                  <p className="text-xs text-indigo-400/90 font-medium mb-1.5">
+                  <p className="text-xs text-indigo-600 font-semibold mb-1.5">
                     Role: {template.role}
                   </p>
-                  <p className="text-xs text-slate-400 line-clamp-3 mb-4 leading-relaxed">
+                  <p className="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed">
                     {template.description}
                   </p>
 
@@ -472,13 +471,13 @@ export default function AdminTemplatesPage() {
                       {template.skills.slice(0, 4).map((skill, sIdx) => (
                         <span
                           key={sIdx}
-                          className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-950/60 text-slate-300 border border-slate-800"
+                          className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200/60"
                         >
                           {skill}
                         </span>
                       ))}
                       {template.skills.length > 4 && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-400 bg-slate-950/40">
+                        <span className="px-1.5 py-0.5 rounded-md text-[10px] text-slate-500 bg-slate-50">
                           +{template.skills.length - 4}
                         </span>
                       )}
@@ -488,23 +487,23 @@ export default function AdminTemplatesPage() {
 
                 {/* Bottom Meta & Action */}
                 <div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 pt-3 border-t border-slate-800/80 mb-3 font-mono">
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <HelpCircle className="w-3 h-3 text-indigo-400" />
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-3 border-t border-slate-100 mb-3 font-medium">
+                    <span className="flex items-center gap-1">
+                      <HelpCircle className="w-3 h-3 text-indigo-600" />
                       {template.questions} Questions
                     </span>
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <Clock className="w-3 h-3 text-violet-400" />
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-purple-600" />
                       {template.duration} Mins
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-sans font-medium bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
                       {template.candidateType}
                     </span>
                   </div>
 
                   <button
                     onClick={() => setPreviewTemplate(template)}
-                    className="w-full py-2 px-3 rounded-lg text-xs font-medium text-slate-200 bg-slate-800/80 hover:bg-indigo-600 hover:text-white border border-slate-700/80 hover:border-transparent transition-all flex items-center justify-center gap-2 group-hover:shadow-md"
+                    className="w-full py-2 px-3 rounded-xl text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-indigo-600 hover:text-white border border-slate-200/70 hover:border-transparent transition-all flex items-center justify-center gap-2 group-hover:shadow-sm"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     Inspect Questions & Rubric
@@ -519,31 +518,31 @@ export default function AdminTemplatesPage() {
       {/* Template Preview Drawer / Modal */}
       <AnimatePresence>
         {previewTemplate && (
-          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-slate-900 border border-indigo-500/30 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl text-slate-200"
+              className="bg-white/95 backdrop-blur-2xl border border-slate-200/80 rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-6 shadow-2xl text-slate-900"
             >
-              <div className="flex items-start justify-between pb-4 border-b border-slate-800 mb-5">
+              <div className="flex items-start justify-between pb-4 border-b border-slate-100 mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-3xl">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-3xl">
                     {previewTemplate.icon}
                   </div>
                   <div>
-                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    <span className="text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
                       {previewTemplate.category}
                     </span>
-                    <h2 className="text-lg font-bold text-white mt-1">
+                    <h2 className="text-lg font-bold text-slate-900 mt-1">
                       {previewTemplate.title}
                     </h2>
-                    <p className="text-xs text-indigo-300">{previewTemplate.role}</p>
+                    <p className="text-xs text-indigo-600 font-semibold">{previewTemplate.role}</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setPreviewTemplate(null)}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                  className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -552,35 +551,35 @@ export default function AdminTemplatesPage() {
               {/* Blueprint Details */}
               <div className="space-y-4 text-xs">
                 <div>
-                  <h4 className="text-[11px] font-mono uppercase text-slate-400 mb-1">Blueprint Scope</h4>
-                  <p className="text-slate-300 leading-relaxed bg-slate-950/60 p-3 rounded-lg border border-slate-800">
+                  <h4 className="text-[11px] font-semibold uppercase text-slate-500 mb-1">Blueprint Scope</h4>
+                  <p className="text-slate-700 leading-relaxed bg-slate-50/80 p-3.5 rounded-xl border border-slate-100">
                     {previewTemplate.description}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 py-2">
-                  <div className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <p className="text-slate-400 text-[10px]">Expected Duration</p>
-                    <p className="text-sm font-bold text-indigo-300">{previewTemplate.duration} Minutes</p>
+                <div className="grid grid-cols-3 gap-2.5 py-1">
+                  <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100 text-center">
+                    <p className="text-slate-500 text-[10px] font-medium">Expected Duration</p>
+                    <p className="text-sm font-bold text-indigo-600">{previewTemplate.duration} Minutes</p>
                   </div>
-                  <div className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <p className="text-slate-400 text-[10px]">Target Seniority</p>
-                    <p className="text-sm font-bold text-violet-300">{previewTemplate.candidateType}</p>
+                  <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100 text-center">
+                    <p className="text-slate-500 text-[10px] font-medium">Target Seniority</p>
+                    <p className="text-sm font-bold text-purple-600">{previewTemplate.candidateType}</p>
                   </div>
-                  <div className="bg-slate-950/60 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <p className="text-slate-400 text-[10px]">Interview Schema</p>
-                    <p className="text-sm font-bold text-emerald-300">{previewTemplate.interviewType}</p>
+                  <div className="bg-slate-50/80 p-3 rounded-xl border border-slate-100 text-center">
+                    <p className="text-slate-500 text-[10px] font-medium">Interview Schema</p>
+                    <p className="text-sm font-bold text-emerald-600">{previewTemplate.interviewType}</p>
                   </div>
                 </div>
 
                 {/* Skills Evaluated */}
                 <div>
-                  <h4 className="text-[11px] font-mono uppercase text-slate-400 mb-2">Evaluated Competencies</h4>
+                  <h4 className="text-[11px] font-semibold uppercase text-slate-500 mb-2">Evaluated Competencies</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {previewTemplate.skills?.map((skill, sIdx) => (
                       <span
                         key={sIdx}
-                        className="px-2.5 py-1 rounded-md text-[11px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100"
                       >
                         {skill}
                       </span>
@@ -590,14 +589,14 @@ export default function AdminTemplatesPage() {
 
                 {/* Question Bank Preview */}
                 <div>
-                  <h4 className="text-[11px] font-mono uppercase text-slate-400 mb-2">Standard AI Question Pool</h4>
+                  <h4 className="text-[11px] font-semibold uppercase text-slate-500 mb-2">Standard AI Question Pool</h4>
                   <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                     {previewTemplate.sampleQuestions?.map((q, qIdx) => (
                       <div
                         key={qIdx}
-                        className="flex items-start gap-2.5 p-3 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300"
+                        className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50/80 border border-slate-100 text-slate-800"
                       >
-                        <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-400 font-mono text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-[10px] flex items-center justify-center flex-shrink-0 mt-0.5">
                           {qIdx + 1}
                         </span>
                         <p className="leading-relaxed">{q}</p>
@@ -607,21 +606,21 @@ export default function AdminTemplatesPage() {
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-slate-800 flex justify-end gap-2">
+              <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-2">
                 <button
                   onClick={() => {
                     const target = previewTemplate
                     setPreviewTemplate(null)
                     openEditModal(target)
                   }}
-                  className="px-4 py-2 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors flex items-center gap-1.5"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
                   Edit Blueprint
                 </button>
                 <button
                   onClick={() => setPreviewTemplate(null)}
-                  className="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors"
+                  className="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors"
                 >
                   Close
                 </button>
@@ -634,25 +633,25 @@ export default function AdminTemplatesPage() {
       {/* Create / Edit Template Modal */}
       <AnimatePresence>
         {showModal && (
-          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-slate-900 border border-indigo-500/30 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl text-slate-200"
+              className="bg-white/95 backdrop-blur-2xl border border-slate-200/80 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl text-slate-900"
             >
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
                 <div>
-                  <h2 className="text-lg font-bold text-white">
+                  <h2 className="text-lg font-bold text-slate-900">
                     {editingTemplate ? 'Edit Blueprint Schema' : 'Publish New Interview Blueprint'}
                   </h2>
-                  <p className="text-xs text-slate-400">
-                    Define the role title, skills taxonomy, and sample questions for AI interview generation.
+                  <p className="text-xs text-slate-500">
+                    Define the role title, skills taxonomy, and sample questions for automated AI interview generation.
                   </p>
                 </div>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="p-1.5 text-slate-400 hover:text-white rounded-lg"
+                  className="p-1.5 text-slate-400 hover:text-slate-700 rounded-xl"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -661,35 +660,35 @@ export default function AdminTemplatesPage() {
               <div className="space-y-4 text-xs">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1.5">Blueprint Title</label>
+                    <label className="block text-slate-600 font-semibold mb-1.5">Blueprint Title</label>
                     <input
                       type="text"
                       value={formData.title || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="e.g. Distributed Backend Architect"
-                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1.5">Target Job Role</label>
+                    <label className="block text-slate-600 font-semibold mb-1.5">Target Job Role</label>
                     <input
                       type="text"
                       value={formData.role || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
                       placeholder="e.g. Senior Backend Engineer"
-                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1.5">Category Domain</label>
+                    <label className="block text-slate-600 font-semibold mb-1.5">Category Domain</label>
                     <select
                       value={formData.category || 'Engineering'}
                       onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as any }))}
-                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                     >
                       <option value="Engineering">Engineering</option>
                       <option value="AI & ML">AI & ML</option>
@@ -700,11 +699,11 @@ export default function AdminTemplatesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1.5">Seniority Level</label>
+                    <label className="block text-slate-600 font-semibold mb-1.5">Seniority Level</label>
                     <select
                       value={formData.candidateType || 'Mid-level'}
                       onChange={(e) => setFormData(prev => ({ ...prev, candidateType: e.target.value as any }))}
-                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                     >
                       <option value="Fresher">Fresher / Graduate</option>
                       <option value="Mid-level">Mid-level (2-5 yrs)</option>
@@ -714,56 +713,56 @@ export default function AdminTemplatesPage() {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1.5">Emoji Icon</label>
+                    <label className="block text-slate-600 font-semibold mb-1.5">Emoji Icon</label>
                     <input
                       type="text"
                       value={formData.icon || '💼'}
                       onChange={(e) => setFormData(prev => ({ ...prev, icon: e.target.value }))}
                       placeholder="e.g. 💻, ⚛️, 🔒"
-                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1.5">Duration (Minutes)</label>
+                    <label className="block text-slate-600 font-semibold mb-1.5">Duration (Minutes)</label>
                     <input
                       type="number"
                       min={10}
                       max={90}
                       value={formData.duration || 30}
                       onChange={(e) => setFormData(prev => ({ ...prev, duration: parseInt(e.target.value) || 30 }))}
-                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1.5">Number of Questions</label>
+                    <label className="block text-slate-600 font-semibold mb-1.5">Number of Questions</label>
                     <input
                       type="number"
                       min={3}
                       max={15}
                       value={formData.questions || 6}
                       onChange={(e) => setFormData(prev => ({ ...prev, questions: parseInt(e.target.value) || 6 }))}
-                      className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1.5">Description & Evaluation Focus</label>
+                  <label className="block text-slate-600 font-semibold mb-1.5">Description & Evaluation Scope</label>
                   <textarea
                     rows={3}
                     value={formData.description || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder="Describe the assessment objectives, architecture scope, and candidate prerequisites..."
-                    className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500 leading-relaxed"
+                    placeholder="Describe assessment objectives, architecture focus, and candidate prerequisites..."
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white leading-relaxed"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1.5">
+                  <label className="block text-slate-600 font-semibold mb-1.5">
                     Skills (comma separated)
                   </label>
                   <input
@@ -771,34 +770,34 @@ export default function AdminTemplatesPage() {
                     value={skillsInput}
                     onChange={(e) => setSkillsInput(e.target.value)}
                     placeholder="e.g. Next.js, TypeScript, PostgreSQL, Distributed Systems"
-                    className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1.5">
+                  <label className="block text-slate-600 font-semibold mb-1.5">
                     Standard AI Question Bank (one per line)
                   </label>
                   <textarea
                     rows={4}
                     value={questionsInput}
                     onChange={(e) => setQuestionsInput(e.target.value)}
-                    placeholder="Describe how you prevent race conditions in distributed transactions...&#10;How do you optimize system performance under 50k RPS?"
-                    className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500 font-mono text-[11px] leading-relaxed"
+                    placeholder="Describe how you handle state consistency in microservices...&#10;How do you profile bottlenecks under heavy traffic?"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-indigo-500 focus:bg-white font-mono text-[11px] leading-relaxed"
                   />
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-slate-800 flex justify-end gap-2">
+              <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-2">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-slate-200 bg-slate-800 rounded-lg transition-colors"
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={saveTemplate}
-                  className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg shadow-lg shadow-indigo-600/30 transition-all"
+                  className="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md shadow-indigo-500/20 transition-all"
                 >
                   {editingTemplate ? 'Save Changes' : 'Publish Blueprint'}
                 </button>
