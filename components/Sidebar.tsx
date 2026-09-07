@@ -11,7 +11,10 @@ import {
   Settings,
   LogOut,
   Sparkles,
-  Loader2
+  Loader2,
+  Zap,
+  PlusCircle,
+  Shield
 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import { supabase } from '@/lib/supabase'
@@ -26,18 +29,21 @@ function Sidebar() {
 
   const navigation = isAdminPath
     ? [
-        { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-        { name: 'Templates', href: '/admin/templates', icon: FileText },
-        { name: 'Reports', href: '/admin/reports', icon: BarChart3 },
+        { name: 'Command Center', href: '/admin', icon: Zap },
+        { name: 'Template Engine', href: '/admin/templates', icon: FileText },
+        { name: 'Global Reports', href: '/admin/reports', icon: BarChart3 },
       ]
     : [
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Templates', href: '/dashboard/templates', icon: FileText },
+        { name: 'Create Interview', href: '/dashboard/create-interview', icon: PlusCircle },
         { name: 'Interviews', href: '/dashboard/interviews', icon: Users },
+        { name: 'Job Templates', href: '/dashboard/templates', icon: FileText },
         { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
       ]
 
   const settingsHref = isAdminPath ? '/admin/settings' : '/dashboard/settings'
+  const settingsLabel = isAdminPath ? 'System Governance' : 'Settings'
+  const SettingsIcon = isAdminPath ? Shield : Settings
 
   // Preload all sidebar routes immediately on mount for zero-latency instant transitions
   useEffect(() => {
@@ -52,24 +58,75 @@ function Sidebar() {
   }, [router, settingsHref])
 
   return (
-    <aside className="w-60 sm:w-64 lg:w-60 bg-white dark:bg-black border-r border-slate-200 dark:border-neutral-900 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200">
+    <aside className={`w-60 sm:w-64 lg:w-60 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200 ${
+      isAdminPath
+        ? 'bg-slate-950 text-white border-r border-indigo-950/80 shadow-2xl'
+        : 'bg-white dark:bg-black border-r border-slate-200 dark:border-neutral-900'
+    }`}>
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2.5 mb-6 sm:mb-8 px-1">
-          <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 flex items-center justify-center border border-transparent dark:border-blue-800/40">
-            <Sparkles className="w-4.5 h-4.5" />
+        {isAdminPath ? (
+          /* Admin Brand Header */
+          <div className="mb-6 sm:mb-8 px-1">
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md shadow-indigo-500/25">
+                <Shield className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <span className="text-base sm:text-lg font-black bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent tracking-tight">
+                  AIRA ADMIN
+                </span>
+                <p className="text-[10px] text-indigo-300/70 font-medium leading-none">Command Center</p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-indigo-950/80 border border-indigo-700/40 text-[9px] font-bold text-indigo-300 tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+              SUPERADMIN CONSOLE
+            </div>
           </div>
-          <div>
-            <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">AIRA</span>
-            <p className="text-[10px] text-slate-500 dark:text-neutral-400 leading-none">AI Recruitment Assistant</p>
+        ) : (
+          /* Recruiter Brand Header */
+          <div className="mb-6 sm:mb-8 px-1">
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 flex items-center justify-center border border-transparent dark:border-blue-800/40">
+                <Sparkles className="w-4.5 h-4.5" />
+              </div>
+              <div>
+                <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">AIRA TALENT</span>
+                <p className="text-[10px] text-slate-500 dark:text-neutral-400 leading-none">Recruiter Workspace</p>
+              </div>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/40 text-[9px] font-bold text-blue-700 dark:text-blue-400 tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              RECRUITER WORKSPACE
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Navigation */}
         <nav className="space-y-1.5" aria-label="Sidebar Navigation">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             const Icon = item.icon
+
+            if (isAdminPath) {
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  prefetch={true}
+                  onMouseEnter={() => router.prefetch(item.href)}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-75 cursor-pointer active:scale-[0.97] ${
+                    isActive
+                      ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-lg shadow-indigo-900/40'
+                      : 'text-slate-400 hover:bg-slate-900 hover:text-white active:bg-slate-800'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                  <span>{item.name}</span>
+                </Link>
+              )
+            }
 
             return (
               <Link
@@ -91,40 +148,82 @@ function Sidebar() {
         </nav>
 
         {/* Divider */}
-        <div className="border-t border-slate-200 dark:border-neutral-900 mt-6 pt-6">
+        <div className={`mt-6 pt-6 ${isAdminPath ? 'border-t border-indigo-950/60' : 'border-t border-slate-200 dark:border-neutral-900'}`}>
           <Link
             href={settingsHref}
             prefetch={true}
             onMouseEnter={() => router.prefetch(settingsHref)}
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-75 cursor-pointer active:scale-[0.97] ${
-              pathname === settingsHref
-                ? 'bg-blue-50 text-blue-600 font-bold shadow-sm shadow-blue-100 dark:bg-blue-600/15 dark:text-blue-400 dark:border dark:border-blue-500/25 dark:shadow-none'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-neutral-400 dark:hover:bg-neutral-900/80 dark:hover:text-white active:bg-slate-200 dark:active:bg-neutral-800'
+              isAdminPath
+                ? pathname === settingsHref
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-lg shadow-indigo-900/40'
+                  : 'text-slate-400 hover:bg-slate-900 hover:text-white'
+                : pathname === settingsHref
+                  ? 'bg-blue-50 text-blue-600 font-bold shadow-sm shadow-blue-100 dark:bg-blue-600/15 dark:text-blue-400 dark:border dark:border-blue-500/25 dark:shadow-none'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-neutral-400 dark:hover:bg-neutral-900/80 dark:hover:text-white'
             }`}
           >
-            <Settings className={`w-5 h-5 shrink-0 ${pathname === settingsHref ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-neutral-500'}`} />
-            <span>Settings</span>
+            <SettingsIcon className={`w-5 h-5 shrink-0 ${
+              isAdminPath
+                ? pathname === settingsHref ? 'text-white' : 'text-slate-400'
+                : pathname === settingsHref ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-neutral-500'
+            }`} />
+            <span>{settingsLabel}</span>
           </Link>
         </div>
       </div>
 
-      {/* Footer / User Profile & Signout */}
-      <div>
-        <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-neutral-950 border border-slate-200/80 dark:border-neutral-900 mb-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+      {/* Footer / Portal Switcher, User Profile & Signout */}
+      <div className="space-y-3">
+        {/* 1-Click Portal Switcher Button */}
+        {isAdminPath ? (
+          <Link
+            href="/dashboard"
+            className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-indigo-950 text-xs text-indigo-300 hover:text-white transition-all group"
+          >
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400 group-hover:rotate-12 transition-transform" />
+              <span>Recruiter Portal</span>
+            </span>
+            <span className="text-[10px] text-slate-500 group-hover:text-indigo-300">Switch &rarr;</span>
+          </Link>
+        ) : (
+          <Link
+            href="/admin"
+            className="flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/40 hover:bg-indigo-100/80 dark:hover:bg-indigo-900/50 border border-indigo-200/60 dark:border-indigo-800/40 text-xs text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 transition-all group"
+          >
+            <span className="flex items-center gap-2">
+              <Shield className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+              <span className="font-semibold">Admin Console</span>
+            </span>
+            <span className="text-[10px] text-indigo-500 dark:text-indigo-400 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+          </Link>
+        )}
+
+        {/* User Card */}
+        <div className={`flex items-center gap-3 p-2.5 rounded-xl border ${
+          isAdminPath
+            ? 'bg-slate-900/80 border-indigo-950/80 text-white'
+            : 'bg-slate-50 dark:bg-neutral-950 border-slate-200/80 dark:border-neutral-900'
+        }`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
+            isAdminPath ? 'bg-gradient-to-br from-indigo-600 to-purple-600' : 'bg-blue-600'
+          }`}>
             <span className="text-white text-xs font-bold">
-              {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              {session?.user?.name?.charAt(0)?.toUpperCase() || (isAdminPath ? 'A' : 'U')}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">
-              {session?.user?.name || 'User'}
+            <p className={`text-xs font-semibold truncate ${isAdminPath ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
+              {session?.user?.name || (isAdminPath ? 'Administrator' : 'Recruiter')}
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-neutral-400 truncate">
-              {session?.user?.email}
+            <p className={`text-[11px] truncate ${isAdminPath ? 'text-indigo-300/60' : 'text-slate-500 dark:text-neutral-400'}`}>
+              {session?.user?.email || (isAdminPath ? 'admin@company.com' : 'recruiter@company.com')}
             </p>
           </div>
         </div>
+
+        {/* Sign Out */}
         <button
           type="button"
           onClick={async () => {
@@ -139,7 +238,11 @@ function Sidebar() {
             }
           }}
           disabled={isLoggingOut}
-          className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-xs font-semibold text-slate-600 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all duration-75 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`flex items-center gap-2.5 w-full px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all duration-75 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed ${
+            isAdminPath
+              ? 'text-slate-400 hover:text-red-400 hover:bg-red-950/30'
+              : 'text-slate-600 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20'
+          }`}
         >
           {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
           {isLoggingOut ? 'Signing out...' : 'Sign Out'}

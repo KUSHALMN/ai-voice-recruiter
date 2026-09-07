@@ -5,18 +5,20 @@ import { useSession, signOut } from 'next-auth/react'
 import { useState, memo, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import BackButton from './BackButton'
 
 function TopBar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { data: session } = useSession()
   const [showProfile, setShowProfile] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
+  const isAdminPath = pathname.startsWith('/admin')
   const showBackButton = pathname !== '/dashboard' && pathname !== '/admin'
-  const fallback = pathname.startsWith('/admin') ? '/admin' : '/dashboard'
+  const fallback = isAdminPath ? '/admin' : '/dashboard'
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -29,51 +31,140 @@ function TopBar() {
   }, [])
 
   return (
-    <header className="h-14 sm:h-16 bg-white dark:bg-black border-b border-gray-200 dark:border-neutral-900 flex items-center justify-between px-4 sm:px-6 transition-colors duration-200">
-      <div className="flex items-center gap-2 sm:gap-3 flex-1">
+    <header className={`h-14 sm:h-16 flex items-center justify-between px-4 sm:px-6 transition-colors duration-200 ${
+      isAdminPath
+        ? 'bg-slate-950 text-white border-b border-indigo-950/80 shadow-sm'
+        : 'bg-white dark:bg-black border-b border-gray-200 dark:border-neutral-900'
+    }`}>
+      <div className="flex items-center gap-2 sm:gap-4 flex-1">
         {showBackButton && (
           <BackButton fallbackUrl={fallback} variant="subtle" className="text-xs py-1.5 px-2.5" />
         )}
-        {/* Search - Hidden on mobile */}
+
+        {/* Portal Distinct Badge */}
+        {isAdminPath ? (
+          <div className="hidden sm:flex items-center gap-2 bg-indigo-950/60 border border-indigo-800/40 px-3 py-1 rounded-xl text-xs font-semibold text-indigo-300">
+            <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+            <span>Admin Executive Portal</span>
+          </div>
+        ) : (
+          <div className="hidden sm:flex items-center gap-2 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800/40 px-3 py-1 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-400">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+            <span>Recruiter Console</span>
+          </div>
+        )}
+
+        {/* Search */}
         <div className="hidden md:flex flex-1 max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-neutral-500" />
-          <input
-            type="text"
-            placeholder="Search interviews, candidates..."
-            className="bg-gray-50 dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-xl px-3 py-2 pl-10 w-full text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-colors"
-          />
+          <div className="relative w-full">
+            <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+              isAdminPath ? 'text-slate-500' : 'text-gray-400 dark:text-neutral-500'
+            }`} />
+            <input
+              type="text"
+              placeholder={isAdminPath ? "Search system logs, templates, recruiters..." : "Search interviews, candidates..."}
+              className={`rounded-xl px-3 py-2 pl-10 w-full text-xs sm:text-sm border focus:outline-none transition-colors ${
+                isAdminPath
+                  ? 'bg-slate-900 border-indigo-950 text-white placeholder-slate-500 focus:border-indigo-500'
+                  : 'bg-gray-50 dark:bg-neutral-950 border-gray-200 dark:border-neutral-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500'
+              }`}
+            />
+          </div>
+        </div>
+
+        {/* Mobile App Title */}
+        <div className="md:hidden flex-1">
+          <span className={`text-base font-bold ${isAdminPath ? 'text-indigo-300' : 'text-gray-900 dark:text-white'}`}>
+            {isAdminPath ? 'AIRA ADMIN' : 'AIRA'}
+          </span>
+          <p className="text-[10px] text-gray-400 dark:text-neutral-500 leading-none">
+            {isAdminPath ? 'Command Center' : 'Recruitment Assistant'}
+          </p>
         </div>
       </div>
 
-      {/* Mobile: Show app name */}
-      <div className="md:hidden flex-1">
-        <span className="text-base font-semibold text-gray-900 dark:text-white">AIRA</span>
-        <p className="text-[10px] text-gray-400 dark:text-neutral-500 leading-none">AI Recruitment Assistant</p>
-      </div>
-      </div>
+      {/* Right side telemetry & controls */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {isAdminPath ? (
+          /* Admin Telemetry */
+          <div className="hidden lg:flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-[11px] text-emerald-400 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span>API: 99.98%</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-lg text-[11px] text-indigo-300 font-mono">
+              <span>AI Engine: Groq+Gemini</span>
+            </div>
+          </div>
+        ) : (
+          /* Recruiter Quick Action */
+          <button
+            onClick={() => router.push('/dashboard/create-interview')}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer"
+          >
+            <span>+ Create Interview</span>
+          </button>
+        )}
 
-      {/* Right side */}
-      <div className="flex items-center gap-2 sm:gap-4">
-        {/* Notifications - Hidden on small mobile */}
-        <button className="hidden sm:block p-2 hover:bg-gray-100 dark:hover:bg-neutral-900 rounded-xl transition-colors">
-          <Bell className="w-5 h-5 text-gray-500 dark:text-neutral-400" />
+        {/* Notifications */}
+        <button className={`p-2 rounded-xl transition-colors ${
+          isAdminPath
+            ? 'hover:bg-slate-900 text-slate-400 hover:text-white'
+            : 'hover:bg-gray-100 dark:hover:bg-neutral-900 text-gray-500 dark:text-neutral-400'
+        }`}>
+          <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
         {/* Profile */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setShowProfile(!showProfile)}
-            className="flex items-center gap-2 p-1.5 sm:p-2 hover:bg-gray-100 dark:hover:bg-neutral-900 rounded-xl transition-colors"
+            className={`flex items-center gap-2 p-1.5 sm:p-2 rounded-xl transition-colors ${
+              isAdminPath ? 'hover:bg-slate-900' : 'hover:bg-gray-100 dark:hover:bg-neutral-900'
+            }`}
           >
-            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center shadow-sm">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${
+              isAdminPath ? 'bg-gradient-to-br from-indigo-600 to-purple-600' : 'bg-blue-600'
+            }`}>
               <User className="w-4 h-4 text-white" />
             </div>
-            <span className="hidden sm:block text-sm font-medium text-gray-900 dark:text-white">{session?.user?.name}</span>
+            <span className={`hidden sm:block text-sm font-medium ${isAdminPath ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+              {session?.user?.name || (isAdminPath ? 'Admin' : 'Recruiter')}
+            </span>
           </button>
 
           {showProfile && (
-            <div className="absolute right-0 top-12 w-48 bg-white dark:bg-neutral-950 border border-gray-200 dark:border-neutral-800 rounded-2xl shadow-xl p-2 z-50">
+            <div className={`absolute right-0 top-12 w-52 rounded-2xl shadow-2xl p-2 z-50 border ${
+              isAdminPath
+                ? 'bg-slate-900 border-indigo-950 text-white'
+                : 'bg-white dark:bg-neutral-950 border-gray-200 dark:border-neutral-800 text-gray-900 dark:text-white'
+            }`}>
+              <div className="p-2 border-b border-slate-200/20 mb-1">
+                <p className="text-xs font-bold truncate">{session?.user?.name || (isAdminPath ? 'System Administrator' : 'Recruiter')}</p>
+                <p className="text-[10px] text-slate-400 truncate">{session?.user?.email}</p>
+                <span className={`inline-block text-[9px] px-2 py-0.5 rounded-full mt-1 font-bold ${
+                  isAdminPath ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/50' : 'bg-blue-50 text-blue-700'
+                }`}>
+                  {isAdminPath ? 'SUPERADMIN' : 'RECRUITER'}
+                </span>
+              </div>
+
+              {/* Portal Switch Option in Dropdown */}
+              <button
+                onClick={() => {
+                  setShowProfile(false)
+                  router.push(isAdminPath ? '/dashboard' : '/admin')
+                }}
+                className={`w-full text-left px-3 py-2 text-xs rounded-xl transition-colors flex items-center justify-between ${
+                  isAdminPath
+                    ? 'text-indigo-300 hover:bg-slate-800 hover:text-white'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                <span>{isAdminPath ? 'Switch to Recruiter Portal' : 'Switch to Admin Console'}</span>
+                <span>&rarr;</span>
+              </button>
+
               <button
                 onClick={async () => {
                   if (isLoggingOut) return
@@ -88,9 +179,9 @@ function TopBar() {
                   }
                 }}
                 disabled={isLoggingOut}
-                className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-neutral-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-neutral-900 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="w-full text-left px-3 py-2 text-xs text-red-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 mt-1"
               >
-                {isLoggingOut && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isLoggingOut && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 {isLoggingOut ? 'Signing out...' : 'Sign out'}
               </button>
             </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import Sidebar from './Sidebar'
 import TopBar from './TopBar'
 import { Menu, X } from 'lucide-react'
@@ -11,9 +12,13 @@ interface ResponsiveLayoutProps {
 
 export default function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const pathname = usePathname()
+  const isAdmin = pathname.startsWith('/admin')
 
   return (
-    <div className="flex h-screen bg-[#F9FAFB] dark:bg-black overflow-hidden transition-colors duration-200">
+    <div className={`flex h-screen overflow-hidden transition-colors duration-200 ${
+      isAdmin ? 'bg-[#0B0F19] text-slate-100' : 'bg-[#F9FAFB] dark:bg-black'
+    }`}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
