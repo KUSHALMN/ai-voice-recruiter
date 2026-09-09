@@ -161,9 +161,9 @@ export default function LoginPage() {
         <div className={`bg-gradient-to-br ${currentPortal.gradient} p-12 flex flex-col justify-center relative overflow-hidden`}>
           <motion.div
             key={activePortal}
-            initial={{ opacity: 0, x: -30 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="relative z-10"
           >
             <div className="mb-8">
@@ -176,9 +176,9 @@ export default function LoginPage() {
               {currentPortal.features.map((feature, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={false}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 + 0.2 }}
+                  transition={{ delay: index * 0.05 }}
                   className="flex items-center gap-4"
                 >
                   <div className={`p-3 bg-white rounded-lg shadow-sm text-${currentPortal.accent}`}>
@@ -233,9 +233,9 @@ export default function LoginPage() {
 
             <motion.div
               key={activePortal}
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
             >
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-primary mb-2">{isSignUp ? 'Create Account' : 'Welcome Back'}</h2>

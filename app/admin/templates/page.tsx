@@ -310,7 +310,7 @@ export default function AdminTemplatesPage() {
 
         {/* Premium Claude Editorial Hero Banner with Liquid Glass Effect */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden rounded-3xl liquid-glass-panel p-7 lg:p-9"
         >
@@ -413,9 +413,9 @@ export default function AdminTemplatesPage() {
             {filteredTemplates.map((template, idx) => (
               <motion.div
                 key={template.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
+                transition={{ delay: idx * 0.03 }}
                 className="group flex flex-col justify-between rounded-3xl liquid-glass-card p-5 hover:border-indigo-300 transition-all duration-200"
               >
                 <div>

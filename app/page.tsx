@@ -11,11 +11,21 @@ import {
   Search, Lock, CheckCheck, RefreshCw, Smartphone
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 
 const LOGOS = [
   'Vercel', 'Supabase', 'Stripe', 'Linear', 'Retool', 'Ramp', 'Figma'
 ]
+
+const TYPING_PHRASES = [
+  'high-velocity hiring teams.',
+  'engineering leaders.',
+  'modern talent teams.',
+  'fast-growing startups.',
+  'global tech recruiters.'
+]
+
+const FULL_TRANSCRIPTION = "I implemented a Change Data Capture (CDC) pipeline using Debezium and Redis Streams to stream database modifications directly into our search cache with sub-millisecond propagation and zero cache staleness."
 
 const CORE_FEATURES = [
   {
@@ -102,6 +112,54 @@ export default function HomePage() {
   const [isPending, startTransition] = useTransition()
   const [activeTab, setActiveTab] = useState<'interview' | 'code' | 'scorecard'>('interview')
 
+  // Headline typewriter effect
+  const [phraseIndex, setPhraseIndex] = useState(0)
+  const [charIndex, setCharIndex] = useState(TYPING_PHRASES[0].length)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const currentPhrase = TYPING_PHRASES[phraseIndex]
+    const typingSpeed = isDeleting ? 30 : 60
+
+    const timer = setTimeout(() => {
+      if (!isDeleting && charIndex < currentPhrase.length) {
+        setCharIndex(prev => prev + 1)
+      } else if (!isDeleting && charIndex === currentPhrase.length) {
+        // Pause at full phrase before deleting
+        const pauseTimer = setTimeout(() => setIsDeleting(true), 2500)
+        return () => clearTimeout(pauseTimer)
+      } else if (isDeleting && charIndex > 0) {
+        setCharIndex(prev => prev - 1)
+      } else if (isDeleting && charIndex === 0) {
+        setIsDeleting(false)
+        setPhraseIndex(prev => (prev + 1) % TYPING_PHRASES.length)
+      }
+    }, typingSpeed)
+
+    return () => clearTimeout(timer)
+  }, [charIndex, isDeleting, phraseIndex])
+
+  // Candidate Live Transcription Typing Visualization
+  const [candidateStream, setCandidateStream] = useState(FULL_TRANSCRIPTION)
+
+  useEffect(() => {
+    let currentIdx = 0
+    setCandidateStream('')
+    const interval = setInterval(() => {
+      currentIdx++
+      if (currentIdx <= FULL_TRANSCRIPTION.length) {
+        setCandidateStream(FULL_TRANSCRIPTION.slice(0, currentIdx))
+      } else {
+        clearInterval(interval)
+        setTimeout(() => {
+          setCandidateStream('')
+          currentIdx = 0
+        }, 6000)
+      }
+    }, 40)
+    return () => clearInterval(interval)
+  }, [activeTab])
+
   return (
     <div className="min-h-screen bg-[#F5F5F7] text-[#1D1D1F] selection:bg-indigo-500 selection:text-white relative overflow-x-hidden font-sans antialiased">
       
@@ -165,9 +223,9 @@ export default function HomePage() {
         
         {/* Top Badge */}
         <motion.div 
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
           className="flex justify-center mb-6"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-slate-200/80 shadow-xs text-xs font-semibold text-slate-700 hover:border-slate-300 transition-colors cursor-pointer">
@@ -183,15 +241,16 @@ export default function HomePage() {
 
         {/* Hero Headlines */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.4 }}
           className="text-center max-w-4xl mx-auto space-y-5"
         >
           <h1 className="text-4xl sm:text-6xl lg:text-[72px] font-extrabold tracking-[-0.035em] text-[#1D1D1F] leading-[1.08]">
             Autonomous Voice Interviews.
-            <span className="block text-[#86868B] font-semibold text-3xl sm:text-5xl lg:text-[58px] mt-2 tracking-[-0.03em]">
-              For high-velocity hiring teams.
+            <span className="block text-[#86868B] font-semibold text-3xl sm:text-5xl lg:text-[58px] mt-2 tracking-[-0.03em] min-h-[1.3em]">
+              For <span className="text-[#1D1D1F] border-b-2 border-indigo-600 pb-0.5">{TYPING_PHRASES[phraseIndex].slice(0, charIndex)}</span>
+              <span className="inline-block w-[3px] h-[0.8em] bg-indigo-600 animate-pulse ml-1 align-baseline" />
             </span>
           </h1>
 
@@ -231,9 +290,9 @@ export default function HomePage() {
 
         {/* LOGO STRIP */}
         <motion.div 
-          initial={{ opacity: 0 }}
+          initial={false}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
+          transition={{ duration: 0.4 }}
           className="pt-16 pb-12 text-center"
         >
           <span className="text-[11px] uppercase tracking-widest font-semibold text-[#86868B]">
@@ -251,9 +310,9 @@ export default function HomePage() {
         {/* MONUMENTAL FROSTED GLASS STUDIO CANVAS */}
         <motion.div 
           id="preview"
-          initial={{ opacity: 0, y: 40 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
           className="relative mt-4"
         >
           {/* Ambient Glass Glow Layer */}
@@ -312,7 +371,7 @@ export default function HomePage() {
 
             {/* Studio Body */}
             <div className="p-6 sm:p-8 space-y-6">
-              <AnimatePresence mode="wait">
+              <AnimatePresence initial={false} mode="wait">
                 {activeTab === 'interview' && (
                   <motion.div 
                     key="interview"
@@ -370,8 +429,20 @@ export default function HomePage() {
                             &quot;Walk me through your strategy for handling distributed state and cache invalidation under peak throughput.&quot;
                           </div>
                           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/70 text-slate-700">
-                            <span className="font-bold text-slate-900 block mb-0.5">Candidate (Live Transcription):</span>
-                            &quot;I implemented a CDC (Change Data Capture) pipeline using Debezium and Redis Streams to publish events with sub-millisecond propagation...&quot;
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Candidate (Live Speech Transcription):
+                              </span>
+                              <span className="text-[10px] font-mono text-indigo-600 font-semibold bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100/80 flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-ping" />
+                                Streaming...
+                              </span>
+                            </div>
+                            <p className="leading-relaxed">
+                              &quot;{candidateStream}&quot;
+                              <span className="inline-block w-1.5 h-3 bg-indigo-600 animate-pulse ml-0.5 align-middle" />
+                            </p>
                           </div>
                         </div>
                       </div>

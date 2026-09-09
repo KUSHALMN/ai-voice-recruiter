@@ -26,7 +26,7 @@
   h4,
   h5,
   h6 {
-    font-family: 'Outfit', sans-serif;
+    font-family: var(--font-outfit), 'Outfit', var(--font-claude-sans), system-ui, -apple-system, sans-serif;
   }
 }
 
@@ -269,25 +269,36 @@ html.dark .border-gray-200 {
   border-color: #222222 !important;
 }
 
-/* Headings and body texts in dark mode */
+/* Headings and body texts in dark mode - High Contrast Legibility */
 html.dark [class*="text-[#111827]"],
+html.dark [class*="text-[#1D1D1F]"],
+html.dark [class*="text-[#1a1a1a]"],
 html.dark .text-slate-900,
 html.dark .text-slate-800,
 html.dark .text-gray-900,
+html.dark .text-neutral-900,
 html.dark h1,
 html.dark h2,
 html.dark h3,
-html.dark h4 {
+html.dark h4,
+html.dark h5,
+html.dark h6 {
   color: #FFFFFF !important;
 }
 
 html.dark [class*="text-[#6B7280]"],
 html.dark [class*="text-[#4B5563]"],
+html.dark [class*="text-[#6E6E73]"],
+html.dark [class*="text-[#86868B]"],
+html.dark .text-slate-700,
 html.dark .text-slate-600,
 html.dark .text-slate-500,
+html.dark .text-gray-700,
 html.dark .text-gray-600,
-html.dark .text-gray-500 {
-  color: #A1A1AA !important;
+html.dark .text-gray-500,
+html.dark .text-neutral-700,
+html.dark .text-neutral-600 {
+  color: #D1D5DB !important;
 }
 
 /* Form inputs, textareas, selects - Pure Black with crisp border */
@@ -296,6 +307,11 @@ html.dark select,
 html.dark textarea {
   background-color: #050505 !important;
   border-color: #262626 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark select option {
+  background-color: #121212 !important;
   color: #FFFFFF !important;
 }
 

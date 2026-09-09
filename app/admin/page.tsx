@@ -245,7 +245,7 @@ export default function AdminPage() {
 
         {/* Premium Claude Editorial Hero Banner with Liquid Glass Effect */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden rounded-3xl liquid-glass-panel p-7 lg:p-9"
         >
@@ -305,7 +305,7 @@ export default function AdminPage() {
 
         {/* 5 Liquid Glass KPI Metric Cards */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"
@@ -411,7 +411,7 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Completed Reports Stream */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="lg:col-span-2 liquid-glass-panel rounded-3xl p-6 sm:p-7"
@@ -428,7 +428,7 @@ export default function AdminPage() {
 
           {/* Governance Controls & Security Watchdog */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25 }}
             className="liquid-glass-panel rounded-3xl p-6 sm:p-7 space-y-4"

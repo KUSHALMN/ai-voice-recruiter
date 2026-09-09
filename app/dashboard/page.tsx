@@ -169,7 +169,7 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
@@ -185,7 +185,7 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
@@ -201,7 +201,7 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
@@ -224,7 +224,7 @@ export default function DashboardPage() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="glass-card p-6 rounded-2xl relative overflow-hidden group border border-slate-200/60 dark:border-neutral-800"
@@ -247,7 +247,7 @@ export default function DashboardPage() {
 
         {/* Recent Interviews */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           className="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-200/60 dark:border-neutral-800"
@@ -283,7 +283,7 @@ export default function DashboardPage() {
               {recentInterviews.map((interview, i) => (
                 <motion.div
                   key={interview.id}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={false}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 * i }}
                   className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/50 dark:bg-neutral-900/40 hover:bg-white dark:hover:bg-neutral-900 border border-slate-100 dark:border-neutral-800 rounded-xl transition-all duration-300 hover:shadow-md hover:border-indigo-100 dark:hover:border-neutral-700 gap-4"

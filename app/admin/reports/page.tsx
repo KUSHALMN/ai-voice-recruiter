@@ -222,7 +222,7 @@ export default function ReportsPage() {
               {filteredReports.map((report) => (
                 <motion.div
                   key={report.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={false}
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl shadow-xl p-6 hover:shadow-2xl "
                 >

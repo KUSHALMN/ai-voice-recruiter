@@ -69,7 +69,7 @@ export default function DashboardCharts({ interviews }: DashboardChartsProps) {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Score Distribution Chart */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           className="bg-white dark:bg-[#0A0A0A] p-6 rounded-2xl border border-slate-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all"
@@ -116,7 +116,7 @@ export default function DashboardCharts({ interviews }: DashboardChartsProps) {
 
         {/* Interview Type Distribution */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
           className="bg-white dark:bg-[#0A0A0A] p-6 rounded-2xl border border-slate-200 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all"

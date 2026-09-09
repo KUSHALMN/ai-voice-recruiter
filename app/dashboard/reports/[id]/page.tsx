@@ -307,7 +307,7 @@ export default function ReportDetailPage() {
         <main className="flex-1 p-6 overflow-auto print:p-0 print:overflow-visible print:block">
           <div className="max-w-5xl mx-auto print:max-w-full">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               className="mb-8 flex items-center justify-between print:hidden"
             >
@@ -386,7 +386,7 @@ export default function ReportDetailPage() {
             {/* This wrapper is what gets exported to PDF */}
             <div className="pdf-content pb-10 print:pb-0">
               <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               className="mb-6"
             >
@@ -410,7 +410,7 @@ export default function ReportDetailPage() {
 
             {/* ATS Integration Gateway Card */}
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               className="mb-6 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-5 shadow-lg border border-slate-800"
             >
@@ -460,7 +460,7 @@ export default function ReportDetailPage() {
 
             <div className="grid md:grid-cols-2 gap-6 mb-6">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
                 className="bg-white border border-gray-200 rounded-xl shadow-sm p-6"
@@ -499,7 +499,7 @@ export default function ReportDetailPage() {
               </motion.div>
 
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl shadow-sm p-6 text-white"
@@ -531,7 +531,7 @@ export default function ReportDetailPage() {
             {/* Technical Analysis Section */}
             {session_data.technical_analysis && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-6"
@@ -599,7 +599,7 @@ export default function ReportDetailPage() {
             )}
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="bg-white border border-gray-200 rounded-xl shadow-sm p-6"
@@ -710,7 +710,7 @@ export default function ReportDetailPage() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="mt-6 bg-white border border-gray-200 rounded-xl shadow-sm p-6"

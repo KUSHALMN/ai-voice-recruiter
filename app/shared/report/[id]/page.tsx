@@ -101,7 +101,7 @@ export default function SharedReportPage() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100"
         >

@@ -196,7 +196,7 @@ export default function UserSettingsPage() {
         <div className="space-y-8">
           {/* THEME SWITCHER CARD */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
           >
@@ -266,7 +266,7 @@ export default function UserSettingsPage() {
 
           {/* RECRUITER PROFILE */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
             className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
@@ -340,7 +340,7 @@ export default function UserSettingsPage() {
 
           {/* AI INTERVIEW CONTROLS & AUTOMATION */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
@@ -430,7 +430,7 @@ export default function UserSettingsPage() {
 
           {/* VOICE LANGUAGE & ACCENT DEFAULTS */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
             className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
@@ -463,7 +463,7 @@ export default function UserSettingsPage() {
 
           {/* NOTIFICATION CHANNELS */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
@@ -509,7 +509,7 @@ export default function UserSettingsPage() {
 
           {/* DIRECT ATS INTEGRATIONS HUB */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
           >
@@ -618,7 +618,7 @@ export default function UserSettingsPage() {
 
           {/* AUTOMATED CANDIDATE SCHEDULING & 48H FOLLOW-UP */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={false}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white dark:bg-[#0A0A0A] rounded-2xl border border-slate-200/90 dark:border-neutral-800/90 shadow-sm p-6 sm:p-8 transition-colors duration-200"
           >

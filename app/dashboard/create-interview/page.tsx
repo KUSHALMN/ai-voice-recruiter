@@ -247,7 +247,7 @@ export default function CreateInterview() {
       <div className="max-w-4xl mx-auto pb-12">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
@@ -267,7 +267,7 @@ export default function CreateInterview() {
 
         {/* Step Indicator */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           className="mb-8"
@@ -298,7 +298,7 @@ export default function CreateInterview() {
 
         {/* Form Card */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="bg-white border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-100/80 p-8"

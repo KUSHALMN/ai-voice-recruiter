@@ -85,7 +85,7 @@ export default function AdminSettingsPage() {
               <BackButton fallbackUrl="/admin" label="Back to Admin Dashboard" />
             </div>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               className="mb-8"
             >
@@ -99,7 +99,7 @@ export default function AdminSettingsPage() {
             <div className="grid lg:grid-cols-2 gap-6">
               {/* General Settings */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
                 className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl shadow-xl p-6"
@@ -180,7 +180,7 @@ export default function AdminSettingsPage() {
 
               {/* API Configuration */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl shadow-xl p-6"
@@ -233,7 +233,7 @@ export default function AdminSettingsPage() {
 
               {/* User Management */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="lg:col-span-2 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-2xl shadow-xl p-6"
@@ -296,7 +296,7 @@ export default function AdminSettingsPage() {
 
             {/* Save Button */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="mt-8 flex justify-end"

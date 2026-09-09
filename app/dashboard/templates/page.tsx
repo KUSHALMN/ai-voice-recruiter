@@ -279,7 +279,7 @@ export default function RecruiterTemplatesPage() {
 
         {/* Recruiter Workspace Hero */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white p-6 md:p-8 shadow-xl"
         >
@@ -377,9 +377,9 @@ export default function RecruiterTemplatesPage() {
             {filteredTemplates.map((template, idx) => (
               <motion.div
                 key={template.id}
-                initial={{ opacity: 0, y: 15 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
+                transition={{ delay: idx * 0.03 }}
                 className="group flex flex-col justify-between rounded-2xl bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 hover:border-blue-400 dark:hover:border-blue-500 p-5 shadow-sm hover:shadow-md transition-all duration-200"
               >
                 <div>

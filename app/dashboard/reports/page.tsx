@@ -179,7 +179,7 @@ export default function ReportsPage() {
       </div>
       {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center justify-between mb-8"
       >
@@ -249,7 +249,7 @@ export default function ReportsPage() {
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
@@ -264,7 +264,7 @@ export default function ReportsPage() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
@@ -279,7 +279,7 @@ export default function ReportsPage() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm"
@@ -296,7 +296,7 @@ export default function ReportsPage() {
 
       {/* Search Bar */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className="mb-8 relative"
@@ -350,7 +350,7 @@ export default function ReportsPage() {
             return (
               <motion.div
                 key={report.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(index * 0.03, 0.5) }}
                 className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group"
