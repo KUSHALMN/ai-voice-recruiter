@@ -1,8 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { syncToATS, ATSProvider, ATSSyncPayload } from '@/lib/ats/atsService'
+import { getToken } from 'next-auth/jwt'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
   try {
+    // 1. Authenticate Request
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    })
+
+    if (!token || !token.email) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Please sign in to synchronize candidates with ATS.' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const { provider, payload, config } = body
 
