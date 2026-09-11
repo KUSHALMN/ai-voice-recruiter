@@ -21,6 +21,7 @@ class Settings:
     SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     
     JWT_SECRET: str = os.getenv("JWT_SECRET", os.getenv("NEXTAUTH_SECRET", "default-jwt-secret-key-recruiter-ai"))
+    CORS_ALLOWED_ORIGINS: str = os.getenv("CORS_ALLOWED_ORIGINS", "")
     PORT: int = int(os.getenv("FASTAPI_PORT", "8000"))
     HOST: str = os.getenv("FASTAPI_HOST", "127.0.0.1")
 
