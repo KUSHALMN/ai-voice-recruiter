@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { memo, useState, useEffect } from 'react'
+import { memo, useState, useEffect, useMemo } from 'react'
 import {
   LayoutDashboard,
   FileText,
@@ -27,19 +27,21 @@ function Sidebar() {
 
   const isAdminPath = pathname.startsWith('/admin') || (session?.user?.email?.includes('admin') && !pathname.startsWith('/dashboard'))
 
-  const navigation = isAdminPath
-    ? [
-        { name: 'Command Center', href: '/admin', icon: Zap },
-        { name: 'Template Engine', href: '/admin/templates', icon: FileText },
-        { name: 'Global Reports', href: '/admin/reports', icon: BarChart3 },
-      ]
-    : [
-        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Create Interview', href: '/dashboard/create-interview', icon: PlusCircle },
-        { name: 'Interviews', href: '/dashboard/interviews', icon: Users },
-        { name: 'Job Templates', href: '/dashboard/templates', icon: FileText },
-        { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
-      ]
+  const navigation = useMemo(() => {
+    return isAdminPath
+      ? [
+          { name: 'Command Center', href: '/admin', icon: Zap },
+          { name: 'Template Engine', href: '/admin/templates', icon: FileText },
+          { name: 'Global Reports', href: '/admin/reports', icon: BarChart3 },
+        ]
+      : [
+          { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+          { name: 'Create Interview', href: '/dashboard/create-interview', icon: PlusCircle },
+          { name: 'Interviews', href: '/dashboard/interviews', icon: Users },
+          { name: 'Job Templates', href: '/dashboard/templates', icon: FileText },
+          { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
+        ]
+  }, [isAdminPath])
 
   const settingsHref = isAdminPath ? '/admin/settings' : '/dashboard/settings'
   const settingsLabel = isAdminPath ? 'System Governance' : 'Settings'
@@ -55,7 +57,7 @@ function Sidebar() {
     try {
       router.prefetch(settingsHref)
     } catch {}
-  }, [router, settingsHref])
+  }, [router, navigation, settingsHref])
 
   return (
     <aside className={`w-60 sm:w-64 lg:w-60 h-screen flex flex-col justify-between p-4 overflow-y-auto scrollbar-hide select-none transition-colors duration-200 z-20 ${
