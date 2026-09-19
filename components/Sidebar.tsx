@@ -13,6 +13,7 @@ import {
   Sparkles,
   Loader2,
   Zap,
+  Search,
   PlusCircle,
   Shield
 } from 'lucide-react'
@@ -38,6 +39,7 @@ function Sidebar() {
           { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
           { name: 'Create Interview', href: '/dashboard/create-interview', icon: PlusCircle },
           { name: 'Interviews', href: '/dashboard/interviews', icon: Users },
+          { name: 'AI Talent Match', href: '/dashboard/talent-search', icon: Search },
           { name: 'Job Templates', href: '/dashboard/templates', icon: FileText },
           { name: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
         ]
