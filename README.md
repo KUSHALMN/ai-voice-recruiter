@@ -2,19 +2,19 @@
 
 <div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js%2014-black?style=for-the-badge&logo=next.js&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js%2016-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![pgvector](https://img.shields.io/badge/pgvector-Enterprise_RAG-blueviolet?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Groq](https://img.shields.io/badge/Groq%20LLaMA%203.3-F55036?style=for-the-badge&logo=groq&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![ElevenLabs](https://img.shields.io/badge/ElevenLabs_Voice-FF5722?style=for-the-badge&logo=soundcharts&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
 
-**Next-Generation Autonomous Voice AI Recruiter & Technical Interview Intelligence Platform**
+**Next-Generation Autonomous Voice AI Recruiter with Enterprise RAG & Technical Interview Intelligence**
 
-*Conduct real-time voice interviews, evaluate coding challenges on the fly, detect cheating, and generate deep hiring scorecards instantly.*
+*Conduct real-time voice interviews, evaluate coding challenges on the fly, ground scoring in standard rubrics, search talent semantically via RAG, and detect cheating.*
 
-[Live Demo](#-quick-start) • [Architecture](#-architecture) • [Candidate Experience](#-candidate-interview-room) • [Recruiter Suite](#-recruiter--admin-intelligence)
+[Live Demo](#-quick-start) • [RAG Architecture](#-enterprise-rag-architecture) • [Candidate Experience](#-candidate-interview-room) • [Recruiter Suite](#-recruiter--admin-intelligence)
 
 </div>
 
@@ -22,10 +22,18 @@
 
 ## ⚡ What is AI Voice Recruiter?
 
-**AI Voice Recruiter** transforms the traditional hiring funnel into an autonomous, voice-first AI evaluation pipeline. Candidates converse naturally with an AI interviewer that listens, asks contextual follow-up questions tailored to their resume, evaluates live coding submissions in real-time, and generates multi-dimensional scoring reports with zero human bias.
+**AI Voice Recruiter** transforms the traditional hiring funnel into an autonomous, voice-first AI evaluation pipeline powered by **Enterprise RAG (Retrieval-Augmented Generation)**. Candidates converse naturally with an AI interviewer that listens, retrieves verified evidence chunks from their uploaded resume, evaluates live coding submissions in real-time, grades answers objectively against gold-standard rubrics, and enables recruiters to search candidates using natural language.
 
 ```
        [ 📄 Job Description + Resume ]
+                     │
+                     ▼
+         ┌─────────────────────────┐
+         │ Enterprise RAG Pipeline │ ◄─── (Supabase pgvector 768-dim)
+         │ • Resume Evidence Chunks│
+         │ • Gold-Standard Rubrics │
+         │ • ATS Semantic Matching │
+         └───────────┬─────────────┘
                      │
                      ▼
           ┌─────────────────────┐
@@ -89,6 +97,43 @@ sequenceDiagram
 | 🛡️ **Anti-Cheat Proctoring** | Active tab-switch detection, webcam presence monitoring, and speech cadence analysis to flag scripted reading. |
 | 📊 **Multi-Metric Rubric** | Scores candidates across **Technical Depth**, **Communication**, **Problem Solving**, and **Professionalism**. |
 | 👑 **Enterprise Admin Suite** | Aggregated hiring funnels, recruiter leaderboards, score distributions, and reusable template libraries. |
+
+---
+
+## 🧠 Enterprise RAG Architecture (Retrieval-Augmented Generation)
+
+AIRA integrates full-stack vector search powered by **Supabase PostgreSQL (`pgvector`)** and 768-dimensional normalized embeddings:
+
+```
+[Candidate PDF Resume] ──► [Semantic Chunker] ──► [768-dim Embeddings] ──► [Supabase pgvector (HNSW)]
+                                                                                   │
+    ┌──────────────────────────────────────────────────────────────────────────────┴─────────────────────────┐
+    ▼                                              ▼                                                         ▼
+[Option A: Resume RAG]                 [Option B: Rubric RAG]                                   [Option C: ATS Talent Match]
+Live Interview Deep-Dive               Objective Answer Scoring                                 Natural Language Candidate Discovery
+"On your resume you deployed           Grading grounded against                                 Recruiters query:
+Kubernetes with Helm; how did          gold-standard engineering criteria                       "Senior React engineer with
+you configure zero-downtime?"          (React, Databases, DevOps, STAR)                         WebSockets & Docker experience"
+```
+
+### Core RAG Capabilities:
+1. **Option A: Resume RAG (Live Targeted Questioning)**
+   - Automatically chunks candidate resumes on upload by semantic section (Experience, Projects, Education, Skills).
+   - Dynamically retrieves real candidate evidence during live interview pacing to challenge architectural decisions, metrics, and trade-offs.
+   - Detects vague answers and fires dynamic follow-up verification probes.
+
+2. **Option B: Evaluation Rubric RAG (Objective Answer Scoring)**
+   - Pre-seeds official gold-standard answer benchmarks and criteria rubrics in `evaluation_rubrics`.
+   - Replaces subjective LLM grading with verifiable criteria satisfaction (`criteria_met`) on a calibrated 1–10 scale.
+
+3. **Option C: ATS Smart Resume Matching (Vector Search across Candidates)**
+   - Indexes applicant profiles into `candidate_profiles` for sub-millisecond semantic search.
+   - Recruiters search candidates in natural language via the glassmorphic **AI Talent Matcher** console (`/dashboard/talent-search`).
+
+4. **Option D: All-in-One Shared Architecture (TypeScript & Python FastAPI)**
+   - Dual-runtime embedding services in TypeScript (`lib/rag/embeddings.ts`) and Python (`backend/services/embedding_service.py`).
+   - Resilient semantic projection fallback guaranteeing 100% uptime even without external API credits.
+   - High-throughput Python FastAPI microservice endpoints (`/api/rag/embed`, `/api/rag/similarity`, `/api/rag/status`).
 
 ---
 
