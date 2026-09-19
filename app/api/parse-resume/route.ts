@@ -179,6 +179,23 @@ Respond ONLY with a valid JSON object matching the following structure:
         ]
         const continent = validContinents.includes(parsed.continent) ? parsed.continent : 'North America'
 
+        // RAG Automation: Index parsed candidate profile for ATS smart matching
+        if (parsed.candidateEmail) {
+          try {
+            const { storeCandidateProfile } = await import('@/lib/rag/vectorStore')
+            await storeCandidateProfile({
+              candidateName: parsed.candidateName || 'Candidate',
+              candidateEmail: parsed.candidateEmail,
+              headline: parsed.suggestedJobTitle || 'Software Professional',
+              skills: Array.isArray(parsed.keySkills) ? parsed.keySkills : [],
+              experienceSummary: parsed.summary || cleanText.slice(0, 500),
+              fullProfileText: cleanText,
+            })
+          } catch (profileErr) {
+            console.warn('Could not index candidate profile during resume parse:', profileErr)
+          }
+        }
+
         return NextResponse.json({
           text: cleanText,
           candidateName: parsed.candidateName || 'Candidate',

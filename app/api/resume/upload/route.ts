@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     // 5. Check if the interview exists and belongs to the recruiter
     const { data: interview, error: dbCheckError } = await supabase
       .from('interviews')
-      .select('id, recruiter_email')
+      .select('id, recruiter_email, candidate_name, candidate_email, job_title')
       .eq('id', interviewId)
       .single()
 
@@ -124,7 +124,45 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ url: urlData.signedUrl })
+    // 9. RAG Automation: Chunk, Embed, and Index into Supabase Vector Store
+    let chunksIndexed = 0
+    try {
+      const pdf = require('pdf-parse/lib/pdf-parse.js')
+      const data = await pdf(buffer)
+      const rawText = data.text || ''
+      const cleanText = rawText.replace(/\r\n/g, '\n').trim()
+
+      if (cleanText.length > 50) {
+        const { chunkResumeText } = await import('@/lib/rag/chunker')
+        const { storeResumeChunks, storeCandidateProfile } = await import('@/lib/rag/vectorStore')
+
+        const chunks = chunkResumeText(cleanText)
+        const candName = interview.candidate_name || 'Candidate'
+        const candEmail = interview.candidate_email || `candidate_${interviewId}@hire.ai`
+
+        const storeResult = await storeResumeChunks(interviewId, candName, candEmail, chunks)
+        chunksIndexed = storeResult.count
+
+        // Also index candidate profile for ATS smart matching
+        await storeCandidateProfile({
+          candidateName: candName,
+          candidateEmail: candEmail,
+          resumeUrl: urlData.signedUrl,
+          headline: interview.job_title ? `${interview.job_title} Candidate` : 'Software Professional',
+          skills: [],
+          experienceSummary: cleanText.slice(0, 500),
+          fullProfileText: cleanText,
+        })
+      }
+    } catch (ragErr) {
+      console.warn('RAG indexing error during resume upload (continuing without failure):', ragErr)
+    }
+
+    return NextResponse.json({
+      url: urlData.signedUrl,
+      ragIndexed: chunksIndexed > 0,
+      chunksCount: chunksIndexed,
+    })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('Resume upload route error:', message)
