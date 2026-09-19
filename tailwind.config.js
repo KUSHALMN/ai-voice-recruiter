@@ -22,7 +22,11 @@ module.exports = {
         'gradient-end': '#F0FDF4',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'sans-serif'],
+        sans: ['var(--font-claude-sans)', 'var(--font-inter)', 'Plus Jakarta Sans', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['var(--font-claude-serif)', 'Newsreader', 'Georgia', 'Iowan Old Style', 'serif'],
+        display: ['var(--font-claude-serif)', 'Newsreader', 'Georgia', 'serif'],
+        heading: ['var(--font-claude-serif)', 'Newsreader', 'Outfit', 'serif'],
+        outfit: ['var(--font-outfit)', 'Outfit', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out',
