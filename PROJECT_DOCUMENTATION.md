@@ -132,3 +132,29 @@ Requires configuration of:
 - NextAuth (`NEXTAUTH_URL`, `NEXTAUTH_SECRET`, Google Client ID/Secret)
 - Supabase (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
 - AI Providers (`GEMINI_API_KEY`, `ELEVENLABS_API_KEY`, Vapi, Groq)
+
+---
+
+## 8. Enterprise RAG (Retrieval-Augmented Generation) System Architecture
+
+AIRA includes an enterprise-grade vector search and RAG architecture powered by Supabase `pgvector` and 768-dimensional embeddings:
+
+### Core RAG Pillars
+1. **Option A: Resume RAG (Targeted Live Interview Questions)**
+   - Candidate resumes are semantically chunked by section (Experience, Skills, Projects, Education) and stored in `resume_embeddings`.
+   - During question generation and live interview pacing, relevant resume evidence chunks are dynamically retrieved and injected into the prompt.
+   - The AI interviewer challenges candidates directly on their claimed metrics, architectural choices, and technical trade-offs.
+
+2. **Option B: Evaluation Rubric RAG (Objective Answer Scoring)**
+   - Industry-standard gold benchmarks and evaluation rubrics are indexed in `evaluation_rubrics`.
+   - Candidate verbal responses are evaluated against retrieved reference answers and multi-point criteria rather than subjective LLM estimations.
+
+3. **Option C: ATS Smart Resume Matching (Vector Search across Candidates)**
+   - Consolidated candidate profiles and resumes are indexed in `candidate_profiles`.
+   - Recruiters can search across applicants using natural language queries (e.g., *"Senior React engineer with WebSockets and Docker experience"*) via the Glassmorphic **AI Talent Matcher** console (`/dashboard/talent-search`).
+
+4. **Option D: All-in-One Shared Architecture (TypeScript & Python FastAPI)**
+   - Unified 768-dimensional embedding services in both TypeScript (`lib/rag/embeddings.ts`) and Python (`backend/services/embedding_service.py`).
+   - Shared Supabase PostgreSQL vector tables with HNSW cosine distance indexing (`rag-migration.sql`).
+   - High-throughput Python FastAPI endpoints (`/api/rag/embed`, `/api/rag/similarity`, `/api/rag/status`).
+

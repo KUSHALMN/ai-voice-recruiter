@@ -2,7 +2,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.config import settings
-from backend.routers import resume, interview, session, evaluation, reports
+from backend.routers import resume, interview, session, evaluation, reports, rag
 
 logging.basicConfig(
     level=logging.INFO,
@@ -43,6 +43,7 @@ app.include_router(interview.router)
 app.include_router(session.router)
 app.include_router(evaluation.router)
 app.include_router(reports.router)
+app.include_router(rag.router)
 
 @app.get("/")
 async def root():

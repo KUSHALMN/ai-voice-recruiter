@@ -83,7 +83,9 @@ sequenceDiagram
 | :--- | :--- |
 | 🎙️ **Voice-to-Voice AI** | Human-like conversational flow using ElevenLabs voice synthesis & browser-native speech recognition. |
 | 💻 **Integrated Monaco Code Editor** | Live coding challenges with syntax highlighting (JS, Python, C++, Java, Go) and automated AI evaluation. |
-| 📄 **Smart Resume Parsing** | Automatically extracts skills, experience, and past projects from PDF resumes to tailor ~50% of the interview questions. |
+| 📄 **Smart Resume Parsing & RAG** | Automatically extracts skills, experience, and past projects from PDF resumes; chunks and indexes in pgvector for deep-dive questioning. |
+| 🔍 **AI Talent Matcher (ATS RAG)** | Recruiter natural language candidate search (e.g. "Senior React engineer with WebSockets") powered by 768-dim vector embeddings. |
+| 🎯 **Evaluation Rubric RAG** | Objective candidate scoring grounded against indexed gold-standard technical benchmarks and criteria rubrics. |
 | 🛡️ **Anti-Cheat Proctoring** | Active tab-switch detection, webcam presence monitoring, and speech cadence analysis to flag scripted reading. |
 | 📊 **Multi-Metric Rubric** | Scores candidates across **Technical Depth**, **Communication**, **Problem Solving**, and **Professionalism**. |
 | 👑 **Enterprise Admin Suite** | Aggregated hiring funnels, recruiter leaderboards, score distributions, and reusable template libraries. |

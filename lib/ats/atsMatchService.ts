@@ -100,7 +100,7 @@ export async function searchCandidatesSemantic(
     const matchScore = Math.round(Math.min(99, Math.max(45, (rawScore * 100) + 15)))
 
     const highlights: string[] = []
-    const summaryLower = (m.experienceSummary || '').toLowerCase()
+    const summaryLower = (m.experience_summary || '').toLowerCase()
     const headlineLower = (m.headline || '').toLowerCase()
 
     for (const word of queryWords) {
@@ -116,7 +116,7 @@ export async function searchCandidatesSemantic(
       resumeUrl: m.resume_url,
       headline: m.headline || 'Software Professional',
       skills: m.skills && m.skills.length > 0 ? m.skills : ['React', 'TypeScript', 'Problem Solving'],
-      experienceSummary: m.experienceSummary || 'Candidate profile on file.',
+      experienceSummary: m.experience_summary || 'Candidate profile on file.',
       matchScore,
       highlightKeywords: Array.from(new Set(highlights)),
     }
