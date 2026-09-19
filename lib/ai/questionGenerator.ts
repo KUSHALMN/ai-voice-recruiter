@@ -19,10 +19,28 @@ export async function generateQuestionSet(
   candidateType: string,
   duration: number,
   parsedResume?: ParsedResume,
-  language: string = 'English'
+  language: string = 'English',
+  interviewId?: string
 ): Promise<QuestionSet> {
   if (!process.env.GROQ_API_KEY) {
     throw new Error('GROQ_API_KEY is not configured in environment variables.')
+  }
+
+  // Retrieve RAG resume context if interviewId is available
+  let ragContextBlock = ''
+  if (interviewId) {
+    try {
+      const { retrieveRelevantResumeContext } = await import('@/lib/rag/resumeRetriever')
+      const rag = await retrieveRelevantResumeContext(
+        interviewId,
+        [jobTitle, interviewType, 'key projects and architecture', 'metrics and accomplishments']
+      )
+      if (rag.hasEvidence) {
+        ragContextBlock = `\n\n${rag.formattedContext}\n`
+      }
+    } catch (ragErr) {
+      console.warn('RAG resume retrieval fallback in questionGenerator:', ragErr)
+    }
   }
 
   // 1. Determine Question Count calibrated by duration (2.5 - 3.5 mins per question)
@@ -56,7 +74,7 @@ Candidate's Resume Summary:
 - Primary Skills: ${parsedResume.skills?.primary?.join(', ') || 'Not specified'}
 - Key Projects: ${parsedResume.projects?.map(p => `${p.name}: ${p.description}`).join(' | ') || 'None specified'}
 - Red Flags to probe: ${parsedResume.gaps_or_flags?.join(', ') || 'None'}
-
+${ragContextBlock}
 Generate exactly ${questionCount} questions. The target difficulty distribution is: ${difficultyTargets}.
 Your questions must include a mix of:
 1. Questions that reference their SPECIFIC projects/experience (most impactful).
