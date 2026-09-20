@@ -54,8 +54,8 @@ export function InterviewHeader({
             className="bg-transparent border-none text-slate-200 text-xs focus:outline-none cursor-pointer"
           >
             {SUPPORTED_LANGUAGES.map((l) => (
-              <option key={l.code} value={l.name} className="bg-slate-900 text-white">
-                {l.name}
+              <option key={l.code} value={l.label} className="bg-slate-900 text-white">
+                {l.label}
               </option>
             ))}
           </select>

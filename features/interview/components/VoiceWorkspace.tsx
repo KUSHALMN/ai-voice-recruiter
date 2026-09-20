@@ -26,7 +26,7 @@ export function VoiceWorkspace({
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
             Speech & Audio Stream
           </span>
-          <VoiceWave isSpeaking={isSpeaking} isListening={isListening} />
+          <VoiceWave isAISpeaking={isSpeaking} isCandidateSpeaking={isListening} />
         </div>
 
         {/* Live speech transcription */}

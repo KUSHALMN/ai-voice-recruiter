@@ -1,2 +1,6 @@
 export * from './Container'
 export * from './PageHeader'
+export { default as Sidebar } from './Sidebar'
+export { default as TopBar } from './TopBar'
+export { default as BackButton } from './BackButton'
+export { default as ResponsiveLayout } from './ResponsiveLayout'
