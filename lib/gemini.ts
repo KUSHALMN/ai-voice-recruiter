@@ -9,35 +9,31 @@ if (!process.env.GROQ_API_KEY) {
   console.warn('⚠️ GROQ_API_KEY not set')
 }
 
-const GROQ_MODEL = 'llama-3.3-70b-versatile'
+const GROQ_MODELS = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b']
 
 async function callGroq(prompt: string, temperature = 0.7, retries = 1): Promise<string> {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
+  for (const model of GROQ_MODELS) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
 
-      const completion = await groq.chat.completions.create({
-        model: GROQ_MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        temperature,
-      }, { signal: controller.signal })
+        const completion = await groq.chat.completions.create({
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          temperature,
+        }, { signal: controller.signal })
 
-      clearTimeout(timeoutId)
-      const content = completion.choices[0]?.message?.content || ''
-      if (!content && attempt < retries) {
-        console.warn(`Groq returned empty response, retrying (attempt ${attempt + 1})...`)
-        continue
+        clearTimeout(timeoutId)
+        const content = completion.choices[0]?.message?.content || ''
+        if (content) return content
+      } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error)
+        console.warn(`Groq API error on ${model} (attempt ${attempt + 1}):`, errMsg)
+        if (attempt < retries) {
+          await new Promise(r => setTimeout(r, 1000))
+        }
       }
-      return content
-    } catch (error: unknown) {
-      const errMsg = error instanceof Error ? error.message : String(error)
-      if (attempt < retries) {
-        console.warn(`Groq API error (attempt ${attempt + 1}), retrying:`, errMsg)
-        await new Promise(r => setTimeout(r, 1000)) // 1s backoff
-        continue
-      }
-      throw error
     }
   }
   return ''
