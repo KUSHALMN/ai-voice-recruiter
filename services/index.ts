@@ -1,5 +1,8 @@
 /**
- * Business Logic Service Layer
- * Decouples database, AI models, and background services from Next.js route controllers
+ * Centralized Service Layer Exports
  */
-export const SERVICE_LAYER_VERSION = '2.0.0'
+
+export * from './interview.service'
+export * from './report.service'
+export * from './resume.service'
+export * from './ai.service'
