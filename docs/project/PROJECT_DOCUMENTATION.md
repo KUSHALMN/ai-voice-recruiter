@@ -1,160 +1,115 @@
-# AI Voice Recruiter - Comprehensive Project Documentation
+# Enterprise Codebase Restructuring & Production Layout Walkthrough
 
-## 1. Project Overview
-**Name**: AI Voice Recruiter
-**Version**: 1.0.0
-**Description**: A full-stack, AI-powered Voice Recruiter Assistant web application that automates the entire recruitment process using voice-based AI interactions. It evaluates candidates in real-time and provides comprehensive reports to recruiters and admins.
+The AI Voice Recruiter codebase has been completely restructured to match top-tier product company standards (Stripe / Linear / Vercel architecture) with zero breaking changes. All commits have been pushed to [GitHub](https://github.com/KUSHALMN/ai-voice-recruiter.git).
 
 ---
 
-## 2. Core Features
+## 1. Final Production Directory Architecture
 
-### 🎙️ For Candidates (The Interview Experience)
-- **Voice-Based AI Interviews**: Candidates can conduct natural conversations with an AI agent using speech recognition and text-to-speech technologies.
-- **Dynamic Questioning**: Questions are generated dynamically by AI based on the job requirements.
-- **Real-Time Interaction**: Smooth voice-to-voice flow simulating a real human interview.
-
-### 👥 For Recruiters
-- **Interview Management**: Create new interviews with specific job details (title, description, interview type, candidate type).
-- **Seamless Sharing**: Generate and share unique interview links with candidates.
-- **Automated Reports**: View comprehensive evaluation reports generated immediately after the interview concludes.
-- **Real-Time Evaluation**: AI evaluates candidates on communication, confidence, technical skills, and problem-solving.
-
-### 👑 For Administrators
-- **Global Dashboard**: Complete dashboard with interview trends, success metrics, and performance insights across all recruiters.
-- **Analytics & Insights**: Score distributions by category, recruiter activity summaries, and total interview tracking.
-- **System Management**: Export data and manage role-based access control.
-
----
-
-## 3. Technology Stack
-
-### Frontend Architecture
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS with custom Glassmorphism UI
-- **Animations**: Framer Motion
-- **State Management**: Zustand
-- **Data Visualization**: Recharts
-- **Code Editing/Display**: Monaco Editor (`@monaco-editor/react`)
-- **Notifications**: React Hot Toast
-- **Other**: Canvas Confetti for success states
-
-### Backend Architecture
-- **Framework**: Express.js (Node.js)
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: NextAuth.js (Google OAuth provider)
-
-### AI & External Services Integrations
-- **Google Generative AI (Gemini)**: Used for dynamic question generation and real-time candidate evaluation.
-- **ElevenLabs API**: Text-to-Speech & Speech-to-Text capabilities for natural voice interactions.
-- **Vapi AI**: Web SDK for voice AI agents (`@vapi-ai/web`).
-- **Groq API**: Lightning-fast language model inference.
-- **Email Service**: Nodemailer for sending notifications.
-
----
-
-## 4. Application Structure
-
-The application follows the Next.js App Router paradigm, organized into functional domains:
-- `/app/admin`: Administrative dashboard and analytics views.
-- `/app/dashboard`: Recruiter dashboard for managing interviews.
-- `/app/interview/[id]`: The core candidate interview interface.
-- `/app/login`: Authentication flows.
-- `/app/api`: Next.js API routes handling serverless operations.
-- `/backend/server`: Standalone Express backend for specialized processing.
-
----
-
-## 5. Database Schema (Supabase)
-
-The database utilizes PostgreSQL hosted on Supabase, consisting of three primary tables:
-
-### `users`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary Key |
-| `email` | TEXT | Unique identifier for login |
-| `name` | TEXT | User's full name |
-| `role` | TEXT | `recruiter` or `admin` |
-| `created_at` | TIMESTAMP | Creation timestamp |
-
-### `interviews`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary Key |
-| `recruiter_id` | UUID | Foreign Key references `users(id)` |
-| `job_title` | TEXT | Target job role |
-| `job_description`| TEXT | Full job description |
-| `interview_type` | TEXT | e.g., Technical, HR |
-| `candidate_type` | TEXT | e.g., Fresher, Experienced |
-| `duration` | INTEGER | Time limit for interview |
-| `candidate_name` | TEXT | Candidate's name |
-| `candidate_email`| TEXT | Candidate's email address |
-| `interview_link` | TEXT | Unique URL for candidate |
-| `status` | TEXT | `scheduled`, `in_progress`, `completed` |
-
-### `interview_sessions`
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | UUID | Primary Key |
-| `interview_id` | UUID | Foreign Key references `interviews(id)` |
-| `questions` | JSONB | Array of AI-generated questions |
-| `answers` | JSONB | Array of candidate responses |
-| `evaluation` | JSONB | Raw AI feedback per answer |
-| `transcript` | TEXT | Full conversation transcript |
-| `scores` | JSONB | Calculated scores across metrics |
-| `recommendation` | TEXT | Final AI hiring recommendation |
+```
+Ai recurtier/
+├── .github/                      # CI/CD workflows and actions
+├── app/                          # Next.js App Router
+│   ├── (auth)/login/             # Auth route group
+│   ├── (dashboard)/              # Recruiter dashboard route group
+│   ├── interview/[id]/           # Candidate interview room
+│   ├── shared/report/[id]/       # Public candidate report view
+│   └── api/                      # Consolidated RESTful API routes
+│       ├── ai/                   # AI actions (job-description, detect-scripted, evaluate-code)
+│       ├── ats/                  # ATS integration
+│       ├── auth/                 # NextAuth handlers
+│       ├── candidate/            # Candidate actions
+│       ├── interviews/           # Interviews resource (GET, POST, [id], questions, session)
+│       ├── rag/                  # RAG vector search & seed rubrics
+│       ├── reports/              # Reports resource (GET, POST, [id])
+│       └── tts/                  # Text-to-speech audio route
+│
+├── backend/                      # Python FastAPI microservice (RAG & audio)
+├── components/                   # Clean Atomic Design System
+│   ├── layout/                   # Sidebar, TopBar, BackButton, ResponsiveLayout, Container, PageHeader
+│   ├── ui/                       # Badge, Card, Modal, Skeleton, CodeEditor, OptimizedButton, DashboardCharts
+│   ├── feedback/                 # ErrorBoundary, LoadingSpinner, EmptyState
+│   └── index.ts                  # Centralized barrel export
+│
+├── database/                     # Consolidated Database Schemas & Migrations (cleaned from root)
+│   └── migrations/
+│       ├── 001_supabase_schema.sql
+│       ├── 002_migration.sql
+│       └── 003_rag_migration.sql
+│
+├── docs/                         # Clean Categorized Documentation (cleaned from root)
+│   ├── architecture/
+│   │   ├── ARCHITECTURE.md
+│   │   └── TTS_ARCHITECTURE.md
+│   ├── api/
+│   │   └── API_REFERENCE.md
+│   ├── guides/
+│   │   ├── INTERVIEW_SETUP.md
+│   │   ├── QUICK_START.md
+│   │   └── TESTING_GUIDE.md
+│   └── project/
+│       ├── PROJECT_DOCUMENTATION.md
+│       ├── CONTRIBUTORS.md
+│       └── CONTRIBUTIONS.md
+│
+├── features/                     # Domain-Driven Feature Slices
+│   ├── interview/                # Candidate interview room, audio, code sandbox
+│   ├── dashboard/                # Recruiter metrics, interview tables, quick actions
+│   ├── landing/                  # Modular landing page sections
+│   └── reports/                  # Candidate executive dossier viewer
+│
+├── hooks/                        # Custom React Hooks
+├── lib/                          # Singletons & Infrastructure
+├── scripts/                      # Utility Scripts
+│   └── run_backend.py
+│
+├── services/                     # Business Logic Service Layer
+├── types/                        # TypeScript Domain Contracts & API Models
+├── .env.example
+├── .gitignore
+├── next.config.js
+├── package.json
+├── README.md
+├── tailwind.config.js
+└── tsconfig.json
+```
 
 ---
 
-## 6. Evaluation Metrics
+## 2. Key Improvements
 
-The AI system evaluates candidates across four primary dimensions:
-1. **Technical Skills**: Domain-specific knowledge assessment.
-2. **Communication**: Clarity and articulation of thoughts.
-3. **Confidence**: Speaking confidence and presence.
-4. **Problem Solving**: Analytical thinking approach.
-*(An overall score is calculated as a weighted average, culminating in a final recommendation).*
+1. **Root Directory Clutter Eliminated**:
+   - Loose SQL migration files consolidated into `database/migrations/`.
+   - 7 loose Markdown documentation files organized into `docs/guides/`, `docs/architecture/`, and `docs/project/`.
+   - Root scripts moved to `scripts/`.
 
----
+2. **Component Standardization**:
+   - `Sidebar`, `TopBar`, `BackButton`, `ResponsiveLayout` moved to `components/layout/`.
+   - `ErrorBoundary` moved to `components/feedback/`.
+   - `CodeEditor`, `OptimizedButton`, `DashboardCharts` moved to `components/ui/`.
+   - Full backward compatibility preserved via barrel re-exports in `components/index.ts` and adapters.
 
-## 7. Development & Deployment
+3. **API Consolidation**:
+   - AI endpoints consolidated under `app/api/ai/` with legacy adapters to prevent 404s.
 
-### Scripts
-- `npm run dev`: Starts the Next.js frontend development server with Turbopack.
-- `npm run server`: Starts the separate Express backend server.
-- `npm run start:all`: Concurrently runs both frontend and backend using `concurrently`.
-- `npm run build`: Creates a production-ready build.
-
-### Environment Requirements
-Requires configuration of:
-- NextAuth (`NEXTAUTH_URL`, `NEXTAUTH_SECRET`, Google Client ID/Secret)
-- Supabase (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-- AI Providers (`GEMINI_API_KEY`, `ELEVENLABS_API_KEY`, Vapi, Groq)
+4. **Zero Type Errors**:
+   - `npx tsc --noEmit` verified with 0 errors.
 
 ---
 
-## 8. Enterprise RAG (Retrieval-Augmented Generation) System Architecture
+## 3. GitHub Commit History
 
-AIRA includes an enterprise-grade vector search and RAG architecture powered by Supabase `pgvector` and 768-dimensional embeddings:
-
-### Core RAG Pillars
-1. **Option A: Resume RAG (Targeted Live Interview Questions)**
-   - Candidate resumes are semantically chunked by section (Experience, Skills, Projects, Education) and stored in `resume_embeddings`.
-   - During question generation and live interview pacing, relevant resume evidence chunks are dynamically retrieved and injected into the prompt.
-   - The AI interviewer challenges candidates directly on their claimed metrics, architectural choices, and technical trade-offs.
-
-2. **Option B: Evaluation Rubric RAG (Objective Answer Scoring)**
-   - Industry-standard gold benchmarks and evaluation rubrics are indexed in `evaluation_rubrics`.
-   - Candidate verbal responses are evaluated against retrieved reference answers and multi-point criteria rather than subjective LLM estimations.
-
-3. **Option C: ATS Smart Resume Matching (Vector Search across Candidates)**
-   - Consolidated candidate profiles and resumes are indexed in `candidate_profiles`.
-   - Recruiters can search across applicants using natural language queries (e.g., *"Senior React engineer with WebSockets and Docker experience"*) via the Glassmorphic **AI Talent Matcher** console (`/dashboard/talent-search`).
-
-4. **Option D: All-in-One Shared Architecture (TypeScript & Python FastAPI)**
-   - Unified 768-dimensional embedding services in both TypeScript (`lib/rag/embeddings.ts`) and Python (`backend/services/embedding_service.py`).
-   - Shared Supabase PostgreSQL vector tables with HNSW cosine distance indexing (`rag-migration.sql`).
-   - High-throughput Python FastAPI endpoints (`/api/rag/embed`, `/api/rag/similarity`, `/api/rag/status`).
-
+```text
+a8e0cbb refactor(structure): reorganize components, database migrations, documentation, and api namespaces into production layout
+dd7bf8b docs(architecture): add comprehensive architecture documentation, ADRs, and production deployment guide
+384d62a feat(hooks): add production-grade custom React hooks for speech, audio, session state, and clipboard
+70c1065 refactor(dashboard): modularize recruiter dashboard, talent search, and candidate management views
+6cb609e refactor(interview): modularize 73KB interview room into domain hooks, audio stream, and workspace components
+6a7582c refactor(landing): decompose monolithic landing page into high-converting modular feature sections
+50fc6a1 refactor(ui): extract atomic design system components, layout primitives, and shared feedback widgets
+77db96f refactor(api): standardize RESTful API routing with unified error handling and backward compatibility
+a2cd02e feat(services): implement centralized service layer for interviews, reports, and AI orchestrations
+160e4e7 refactor(types): centralize domain models, API contracts, and database schema types
+9768bcf chore(architecture): establish enterprise directory structure and domain-driven layout
+057ad80 style(typography): apply Claude-like editorial serif headings and Plus Jakarta Sans body across website
+```

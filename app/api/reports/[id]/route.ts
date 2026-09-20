@@ -9,10 +9,11 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const report = await reportService.getReportById(params.id)
+    const { id } = await params
+    const report = await reportService.getReportById(id)
     if (!report) {
       return NextResponse.json(
         { success: false, error: 'Report not found', timestamp: new Date().toISOString() },
@@ -39,10 +40,11 @@ export async function GET(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const deleted = await reportService.deleteReport(params.id)
+    const { id } = await params
+    const deleted = await reportService.deleteReport(id)
     return NextResponse.json({
       success: deleted,
       message: deleted ? 'Report deleted' : 'Deletion failed',

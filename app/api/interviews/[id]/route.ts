@@ -9,10 +9,11 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const interview = await interviewService.getInterviewById(params.id)
+    const { id } = await params
+    const interview = await interviewService.getInterviewById(id)
     if (!interview) {
       return NextResponse.json(
         { success: false, error: 'Interview not found', timestamp: new Date().toISOString() },
@@ -39,9 +40,10 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     if (!body.status) {
       return NextResponse.json(
@@ -50,7 +52,7 @@ export async function PATCH(
       )
     }
 
-    const updated = await interviewService.updateStatus(params.id, body.status)
+    const updated = await interviewService.updateStatus(id, body.status)
 
     return NextResponse.json({
       success: updated,

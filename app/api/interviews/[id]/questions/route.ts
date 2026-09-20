@@ -7,11 +7,12 @@ import { interviewService } from '@/services/interview.service'
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
-    const interview = await interviewService.getInterviewById(params.id)
+    const interview = await interviewService.getInterviewById(id)
 
     const questions = await interviewService.generateQuestions({
       role: body.role || interview?.role || 'Software Engineer',

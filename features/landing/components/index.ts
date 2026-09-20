@@ -1,5 +1,0 @@
-export * from './HeroSection'
-export * from './FeaturesSection'
-export * from './WorkflowSection'
-export * from './PricingSection'
-export * from './LandingFooter'
