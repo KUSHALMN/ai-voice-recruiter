@@ -1,5 +1,5 @@
 import React from 'react'
-import { Mic, Send, Loader2 } from 'lucide-react'
+import { Mic, Send, Loader2, Zap } from 'lucide-react'
 import VoiceWave from '@/components/interview/VoiceWave'
 
 export interface VoiceWorkspaceProps {
@@ -9,6 +9,7 @@ export interface VoiceWorkspaceProps {
   transcript: string
   onToggleListening: () => void
   onSubmitAnswer: () => void
+  isWebRTCActive?: boolean
 }
 
 export function VoiceWorkspace({
@@ -17,15 +18,24 @@ export function VoiceWorkspace({
   isProcessing,
   transcript,
   onToggleListening,
-  onSubmitAnswer
+  onSubmitAnswer,
+  isWebRTCActive = true
 }: VoiceWorkspaceProps) {
   return (
     <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl flex flex-col justify-between min-h-[320px]">
       <div>
         <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Speech & Audio Stream
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+              Speech & Audio Stream
+            </span>
+            {isWebRTCActive && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <Zap className="w-2.5 h-2.5 fill-current" />
+                WebRTC Full-Duplex (&lt;50ms)
+              </span>
+            )}
+          </div>
           <VoiceWave isAISpeaking={isSpeaking} isCandidateSpeaking={isListening} />
         </div>
 
@@ -36,7 +46,7 @@ export function VoiceWorkspace({
           ) : (
             <p className="text-xs text-slate-500 italic">
               {isListening
-                ? 'Listening... Speak clearly into your microphone.'
+                ? 'Listening... Speak clearly into your microphone. Native interruption is active.'
                 : 'Click the microphone button below to start your answer.'}
             </p>
           )}

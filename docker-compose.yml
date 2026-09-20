@@ -1,0 +1,66 @@
+services:
+  # 1. PostgreSQL with pgvector extension for RAG semantic search
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: aira-postgres-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ai_recruiter}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ai_recruiter}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Python FastAPI Backend (RAG vector embeddings, TTS & scoring)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: aira-fastapi-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-ai_recruiter}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # 3. Next.js 14+ App Router Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: aira-nextjs-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-supersecretdevelopmenttoken_change_in_prod}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - FASTAPI_BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+      - db
+
+volumes:
+  pgdata:
+    driver: local

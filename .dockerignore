@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.env*.local
+*.log
+npm-debug.log*
+__pycache__
+*.pyc
+.vscode
+.idea
+build
+dist
+out
+pgdata

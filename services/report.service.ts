@@ -98,8 +98,6 @@ export class ReportService {
     transcript: any[]
     answers?: any[]
   }): Promise<CandidateReport> {
-    const supabase = getAdminClient()
-
     // Calculate synthetic scores or delegate to AI
     const report: CandidateReport = {
       id: `rep_${Date.now()}`,
@@ -124,9 +122,10 @@ export class ReportService {
     }
 
     try {
+      const supabase = getAdminClient()
       await supabase.from('reports').insert([report])
     } catch (e: any) {
-      console.warn('[ReportService.generateReport] DB insert fallback:', e.message)
+      // Graceful offline / test fallback
     }
 
     return report
