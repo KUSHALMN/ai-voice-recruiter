@@ -1,4 +1,2 @@
-/**
- * Shared Layout Components
- */
-export const LAYOUT_SYSTEM_VERSION = '2.0.0'
+export * from './Container'
+export * from './PageHeader'
