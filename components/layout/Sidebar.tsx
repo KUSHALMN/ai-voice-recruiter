@@ -258,7 +258,7 @@ function Sidebar() {
           <span>&bull;</span>
           <Link href="/terms" className="hover:text-primary-500 hover:underline transition-colors">Terms</Link>
           <span>&bull;</span>
-          <a href="https://github.com/KUSHALMN/ai-voice-recruiter/blob/main/docs/SECURITY.md" target="_blank" rel="noopener noreferrer" className="hover:text-primary-500 hover:underline transition-colors">Security</a>
+          <Link href="/security" className="hover:text-primary-500 hover:underline transition-colors">Security</Link>
         </div>
       </div>
     </aside>
