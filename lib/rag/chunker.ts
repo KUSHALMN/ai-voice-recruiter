@@ -5,8 +5,11 @@ export interface TextChunk {
   metadata: {
     characterCount: number
     wordCount: number
+    tokenEstimate: number
     hasMetrics: boolean
     hasSkills: boolean
+    parentSection: string
+    detectedSkills: string[]
   }
 }
 
@@ -32,6 +35,51 @@ const SECTION_HEADERS = [
   'professional summary',
   'about me',
 ]
+
+const KNOWN_SKILL_PATTERNS = [
+  'react', 'next.js', 'vue', 'angular', 'node', 'node.js', 'typescript', 'javascript',
+  'python', 'fastapi', 'django', 'flask', 'go', 'golang', 'rust', 'c++', 'c#', 'java',
+  'spring', 'aws', 'gcp', 'azure', 'docker', 'kubernetes', 'terraform', 'ci/cd',
+  'postgresql', 'postgres', 'sql', 'mysql', 'mongodb', 'redis', 'graphql', 'rest',
+  'microservices', 'tailwind', 'kafka', 'rabbitmq', 'elasticsearch'
+]
+
+function detectSkills(text: string): string[] {
+  const lower = text.toLowerCase()
+  const found: string[] = []
+  for (const skill of KNOWN_SKILL_PATTERNS) {
+    const escaped = skill.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i')
+    if (regex.test(lower)) {
+      found.push(skill)
+    }
+  }
+  return found
+}
+
+function createChunk(index: number, content: string, section: string): TextChunk {
+  const wordCount = content.split(/\s+/).filter(Boolean).length
+  const characterCount = content.length
+  const tokenEstimate = Math.ceil(characterCount / 4)
+  const hasMetrics = /\d+[%$kKmMbB]?|\b\d{1,4}\b/.test(content)
+  const detectedSkills = detectSkills(content)
+  const hasSkills = detectedSkills.length > 0
+
+  return {
+    index,
+    content,
+    section,
+    metadata: {
+      characterCount,
+      wordCount,
+      tokenEstimate,
+      hasMetrics,
+      hasSkills,
+      parentSection: section,
+      detectedSkills,
+    },
+  }
+}
 
 /**
  * Parses resume text into semantic chunks respecting section boundaries,
@@ -134,22 +182,4 @@ export function chunkResumeText(text: string, options: ChunkOptions = {}): TextC
   }
 
   return chunks
-}
-
-function createChunk(index: number, content: string, section: string): TextChunk {
-  const wordCount = content.split(/\s+/).filter(Boolean).length
-  const hasMetrics = /\d+[%$kKmMbB]?|\b\d{1,4}\b/.test(content)
-  const hasSkills = /(?:react|next\.js|node|typescript|python|aws|docker|kubernetes|sql|postgres|mongodb)/i.test(content)
-
-  return {
-    index,
-    content,
-    section,
-    metadata: {
-      characterCount: content.length,
-      wordCount,
-      hasMetrics,
-      hasSkills,
-    },
-  }
 }

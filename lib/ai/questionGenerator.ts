@@ -6,7 +6,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || '',
 })
 
-const GROQ_MODEL = 'llama-3.3-70b-versatile'
+const ACTIVE_GROQ_MODELS = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b']
 
 /**
  * Generates structured interview questions tailored to the candidate's resume (if provided)
@@ -98,7 +98,8 @@ JSON Schema:
       "follow_up": "<optional follow-up question if they give a shallow answer>"
     }
   ]
-}`
+}
+`
   } else {
     // Mode 2: Without Resume Prompt (Generic)
     prompt = `You are a senior technical interviewer. Generate a structured set of generic interview questions for:
@@ -128,34 +129,42 @@ JSON Schema:
       "follow_up": "<optional follow-up question if they give a shallow answer>"
     }
   ]
-}`
+}
+`
   }
 
-  // 3. Call Groq with JSON Mode
-  try {
-    const response = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model: GROQ_MODEL,
-      temperature: 0.7,
-      response_format: { type: 'json_object' }
-    })
+  // 3. Call Groq with JSON Mode and multi-model fallback
+  let lastError: unknown = null
 
-    const rawJson = response.choices[0]?.message?.content || '{}'
-    const questionSet = JSON.parse(rawJson) as QuestionSet
+  for (const model of ACTIVE_GROQ_MODELS) {
+    try {
+      const response = await groq.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model,
+        temperature: 0.7,
+        response_format: { type: 'json_object' }
+      })
 
-    // 4. Fill in dynamic IDs if the model didn't generate valid UUIDs
-    if (questionSet.questions && Array.isArray(questionSet.questions)) {
-      questionSet.questions = questionSet.questions.map((q, idx) => ({
-        ...q,
-        id: q.id && q.id.length > 10 ? q.id : crypto.randomUUID()
-      }))
-    } else {
-      questionSet.questions = []
+      const rawJson = response.choices[0]?.message?.content || '{}'
+      const questionSet = JSON.parse(rawJson) as QuestionSet
+
+      // 4. Fill in dynamic IDs if the model didn't generate valid UUIDs
+      if (questionSet.questions && Array.isArray(questionSet.questions)) {
+        questionSet.questions = questionSet.questions.map((q, idx) => ({
+          ...q,
+          id: q.id && q.id.length > 10 ? q.id : crypto.randomUUID()
+        }))
+      } else {
+        questionSet.questions = []
+      }
+
+      return questionSet
+    } catch (error: any) {
+      lastError = error
+      console.warn(`Groq question generation fallback from ${model}:`, error?.message || error)
     }
-
-    return questionSet
-  } catch (error: any) {
-    console.error('Error generating question set via Groq:', error)
-    throw new Error(`Failed to generate question set: ${error.message || error}`)
   }
+
+  console.error('Error generating question set via Groq:', lastError)
+  throw new Error(`Failed to generate question set: ${lastError instanceof Error ? lastError.message : String(lastError)}`)
 }
