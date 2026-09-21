@@ -3,6 +3,7 @@ import { Inter, Newsreader, Plus_Jakarta_Sans, Outfit } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { CookieConsent } from '@/components/compliance'
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -64,6 +65,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <Providers>
             {children}
+            <CookieConsent />
           </Providers>
         </ErrorBoundary>
       </body>
