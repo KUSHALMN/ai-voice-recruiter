@@ -1,12 +1,9 @@
-import { Loader2 } from 'lucide-react'
+import { SkeletonDashboard } from '@/components/ui/Skeleton'
 
-export default function Loading() {
+export default function DashboardLoading() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center bg-transparent">
-      <div className="flex flex-col items-center gap-4 p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-        <p className="text-gray-600 font-medium animate-pulse">Loading dashboard data...</p>
-      </div>
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+      <SkeletonDashboard />
     </div>
   )
 }

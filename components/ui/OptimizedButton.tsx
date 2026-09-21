@@ -1,5 +1,4 @@
 import { ButtonHTMLAttributes, ReactNode, useState } from 'react'
-import { Loader2 } from 'lucide-react'
 
 interface OptimizedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
@@ -54,7 +53,13 @@ export function OptimizedButton({
       `}
       {...props}
     >
-      {loading && <Loader2 className="w-5 h-5 animate-spin" />}
+      {loading && (
+        <span className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" style={{ animationDelay: '150ms' }} />
+          <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" style={{ animationDelay: '300ms' }} />
+        </span>
+      )}
       {loading ? loadingText : children}
     </button>
   )

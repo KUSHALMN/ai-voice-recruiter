@@ -168,7 +168,12 @@ function TopBar() {
                 disabled={isLoggingOut}
                 className="w-full text-left px-3 py-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 mt-1"
               >
-                {isLoggingOut && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                {isLoggingOut && (
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" style={{ animationDelay: '150ms' }} />
+                  </span>
+                )}
                 {isLoggingOut ? 'Signing out...' : 'Sign out'}
               </button>
             </div>

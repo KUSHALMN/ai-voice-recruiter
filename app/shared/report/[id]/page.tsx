@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Calendar, Loader2, PlayCircle, Building } from 'lucide-react'
 import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
 import BackButton from '@/components/BackButton'
+import { SkeletonReport } from '@/components/ui/Skeleton'
 
 interface SharedReportQuestion {
   question: string
@@ -49,8 +50,8 @@ export default function SharedReportPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className="min-h-screen bg-slate-50 p-4 sm:p-6">
+        <SkeletonReport />
       </div>
     )
   }
@@ -72,9 +73,14 @@ export default function SharedReportPage() {
   }
   if (!session_data) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-indigo-600 mx-auto mb-4" />
+          <div className="flex justify-center mb-4">
+            <span className="relative flex h-8 w-8">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-8 w-8 bg-indigo-600"></span>
+            </span>
+          </div>
           <p className="text-slate-700 text-lg font-semibold">Report is being generated...</p>
         </div>
       </div>

@@ -54,7 +54,10 @@ export default function CodeEditor({
                         className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (
-                            <span className="animate-spin">⏳</span>
+                            <span className="flex items-center gap-1 px-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                            </span>
                         ) : (
                             <Send className="w-4 h-4" />
                         )}

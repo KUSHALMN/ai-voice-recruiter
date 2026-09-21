@@ -266,7 +266,7 @@ export default function DashboardPage() {
                 disabled={isRefreshing}
                 className="text-slate-600 dark:text-neutral-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium text-sm px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-neutral-800 transition-colors flex items-center gap-1.5 disabled:opacity-50"
               >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-indigo-600 dark:text-indigo-400' : ''}`} />
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-pulse text-indigo-600 dark:text-indigo-400' : ''}`} />
                 <span>Refresh</span>
               </button>
               <button
@@ -354,7 +354,10 @@ export default function DashboardPage() {
                         className="flex items-center gap-1.5 bg-indigo-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-500/20 disabled:opacity-50"
                       >
                         {isPending && navigatingId === interview.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span className="flex items-center gap-0.5">
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                          </span>
                         ) : (
                           <Play className="w-3.5 h-3.5 fill-current" />
                         )}
@@ -376,7 +379,10 @@ export default function DashboardPage() {
                         className="flex items-center gap-1.5 bg-amber-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-amber-700 transition-all shadow-md shadow-amber-500/20 disabled:opacity-50"
                       >
                         {isPending && navigatingId === interview.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span className="flex items-center gap-0.5">
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                            <span className="w-1 h-1 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                          </span>
                         ) : (
                           <PlayCircle className="w-3.5 h-3.5" />
                         )}
@@ -394,7 +400,10 @@ export default function DashboardPage() {
                         className="flex items-center gap-1.5 bg-white dark:bg-neutral-800 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-700 px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-slate-50 dark:hover:bg-neutral-700 transition-all shadow-sm disabled:opacity-50"
                       >
                         {isPending && navigatingId === interview.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span className="flex items-center gap-0.5">
+                            <span className="w-1 h-1 rounded-full bg-indigo-600 animate-pulse" />
+                            <span className="w-1 h-1 rounded-full bg-indigo-600 animate-pulse" style={{ animationDelay: '150ms' }} />
+                          </span>
                         ) : (
                           <BarChart3 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                         )}

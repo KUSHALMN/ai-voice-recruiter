@@ -238,7 +238,14 @@ export default function ReportsPage() {
                 disabled={clearingAll}
                 className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {clearingAll ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                {clearingAll ? (
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                  </span>
+                ) : (
+                  <Trash2 className="w-4 h-4" />
+                )}
                 {clearingAll ? 'Clearing...' : 'Yes, Clear All'}
               </button>
             </div>
@@ -451,7 +458,12 @@ export default function ReportsPage() {
                             disabled={deletingId === report.id}
                             className="px-2 py-1 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-700 disabled:opacity-50 flex items-center gap-1"
                           >
-                            {deletingId === report.id ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                            {deletingId === report.id ? (
+                              <span className="flex items-center gap-0.5">
+                                <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                                <span className="w-1 h-1 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                              </span>
+                            ) : null}
                             Yes
                           </button>
                           <button

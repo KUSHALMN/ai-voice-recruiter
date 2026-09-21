@@ -248,7 +248,14 @@ function Sidebar() {
               : 'text-slate-600 dark:text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20'
           }`}
         >
-          {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+          {isLoggingOut ? (
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" style={{ animationDelay: '150ms' }} />
+            </span>
+          ) : (
+            <LogOut className="w-4 h-4" />
+          )}
           {isLoggingOut ? 'Signing out...' : 'Sign Out'}
         </button>
 

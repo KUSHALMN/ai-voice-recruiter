@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
 import { OptimizedButton } from '@/components/OptimizedButton'
 import BackButton from '@/components/BackButton'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export default function LoginPage() {
   const { status } = useSession()
@@ -113,10 +114,18 @@ export default function LoginPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-green-50">
-        <div className="text-center">
-          <Loader2 className="animate-spin h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#F5F5F7] p-4">
+        <div className="w-full max-w-md p-8 rounded-3xl bg-white border border-[#E5E5EA] shadow-xl shadow-black/5 space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-2 text-center flex flex-col items-center">
+            <Skeleton className="h-12 w-12 rounded-2xl" />
+            <Skeleton className="h-6 w-36 rounded-lg mt-2" />
+            <Skeleton className="h-4 w-52 rounded" />
+          </div>
+          <div className="space-y-4 pt-2">
+            <Skeleton className="h-11 w-full rounded-xl" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+          </div>
         </div>
       </div>
     )
@@ -249,7 +258,11 @@ export default function LoginPage() {
                 className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-3 rounded-lg font-medium flex items-center justify-center gap-3 mb-6 shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="flex items-center gap-1.5 py-1">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" style={{ animationDelay: '300ms' }} />
+                  </span>
                 ) : (
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

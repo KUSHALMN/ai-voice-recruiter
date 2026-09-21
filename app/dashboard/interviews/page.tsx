@@ -259,7 +259,14 @@ export default function InterviewsPage() {
                             className="bg-white border border-indigo-200 text-indigo-700 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
                             title="Send 48-Hour reminder nudge email"
                           >
-                            {isNudging ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Bell className="w-3.5 h-3.5 text-indigo-600" />}
+                            {isNudging ? (
+                              <span className="flex items-center gap-0.5">
+                                <span className="w-1 h-1 rounded-full bg-indigo-600 animate-pulse" />
+                                <span className="w-1 h-1 rounded-full bg-indigo-600 animate-pulse" style={{ animationDelay: '150ms' }} />
+                              </span>
+                            ) : (
+                              <Bell className="w-3.5 h-3.5 text-indigo-600" />
+                            )}
                             Send 48h Nudge
                           </button>
 
@@ -284,7 +291,14 @@ export default function InterviewsPage() {
                             disabled={isPending}
                             className="bg-blue-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors flex items-center gap-1.5 disabled:opacity-50"
                           >
-                            {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
+                            {isPending ? (
+                              <span className="flex items-center gap-0.5">
+                                <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                                <span className="w-1 h-1 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                              </span>
+                            ) : (
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            )}
                             Attend Interview
                           </button>
                         </>
@@ -303,7 +317,14 @@ export default function InterviewsPage() {
                             disabled={isPending}
                             className="bg-emerald-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-1.5 disabled:opacity-50"
                           >
-                            {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ExternalLink className="w-3.5 h-3.5" />}
+                            {isPending ? (
+                              <span className="flex items-center gap-0.5">
+                                <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                                <span className="w-1 h-1 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                              </span>
+                            ) : (
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            )}
                             View Report
                           </button>
                         </>

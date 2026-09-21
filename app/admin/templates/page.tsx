@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import ResponsiveLayout from '@/components/ResponsiveLayout'
 import BackButton from '@/components/BackButton'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 import { DEFAULT_INTERVIEW_TEMPLATES, InterviewTemplate } from '@/lib/templates-data'
@@ -389,9 +390,22 @@ export default function AdminTemplatesPage() {
 
         {/* Templates Grid */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-10 h-10 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-slate-500 text-xs font-medium">Synchronizing assessment blueprints...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 animate-in fade-in duration-300">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                  <Skeleton className="h-4 w-12 rounded" />
+                </div>
+                <Skeleton className="h-5 w-44 rounded-lg" />
+                <Skeleton className="h-4 w-full rounded" />
+                <Skeleton className="h-4 w-3/4 rounded" />
+                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800 flex justify-between items-center">
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-8 w-24 rounded-xl" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredTemplates.length === 0 ? (
           <div className="rounded-3xl liquid-glass-panel p-12 text-center shadow-xs">

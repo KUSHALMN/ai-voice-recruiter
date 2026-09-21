@@ -566,7 +566,14 @@ export default function UserSettingsPage() {
                           disabled={isTesting}
                           className="px-2.5 py-1 text-xs font-semibold rounded-lg border border-slate-200 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-300 flex items-center gap-1 transition-all"
                         >
-                          {isTesting ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                          {isTesting ? (
+                            <span className="flex items-center gap-0.5">
+                              <span className="w-1 h-1 rounded-full bg-current animate-pulse" />
+                              <span className="w-1 h-1 rounded-full bg-current animate-pulse" style={{ animationDelay: '150ms' }} />
+                            </span>
+                          ) : (
+                            <RefreshCw className="w-3 h-3" />
+                          )}
                           Test
                         </button>
 

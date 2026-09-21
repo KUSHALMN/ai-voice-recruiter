@@ -7,6 +7,7 @@ import ResponsiveLayout from '@/components/ResponsiveLayout'
 import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
+import { SkeletonReport } from '@/components/ui/Skeleton'
 
 interface EvidenceFeedback {
   skill: string
@@ -136,8 +137,8 @@ export default function AdminReportPage() {
   if (loading) {
     return (
       <ResponsiveLayout>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="p-4 sm:p-6 max-w-6xl mx-auto">
+          <SkeletonReport />
         </div>
       </ResponsiveLayout>
     )

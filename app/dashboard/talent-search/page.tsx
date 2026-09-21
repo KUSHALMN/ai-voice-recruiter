@@ -147,7 +147,14 @@ export default function TalentSearchPage() {
                 disabled={loading || !query.trim()}
                 className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium flex items-center gap-1.5 transition-all shadow-sm"
               >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                {loading ? (
+                  <span className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                  </span>
+                ) : (
+                  <Search className="w-4 h-4" />
+                )}
                 <span>Search</span>
               </button>
             </div>

@@ -9,6 +9,7 @@ import Sidebar from '@/components/Sidebar'
 import TopBar from '@/components/TopBar'
 import BackButton from '@/components/BackButton'
 import { ATSProvider, ATS_PROVIDERS_INFO, ATSSyncResult } from '@/lib/ats/atsService'
+import { SkeletonReport } from '@/components/ui/Skeleton'
 
 import { DEMO_REPORTS_MAP } from '@/lib/demo-data'
 
@@ -214,10 +215,10 @@ export default function ReportDetailPage() {
     return (
       <div className="flex h-screen bg-gray-50">
         <Sidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col overflow-hidden">
           <TopBar />
-          <main className="flex-1 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+            <SkeletonReport />
           </main>
         </div>
       </div>
@@ -255,7 +256,12 @@ export default function ReportDetailPage() {
           <TopBar />
           <main className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <Loader2 className="w-10 h-10 animate-spin text-blue-600 mx-auto mb-4" />
+              <div className="flex justify-center mb-4">
+                <span className="relative flex h-8 w-8">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-8 w-8 bg-blue-600"></span>
+                </span>
+              </div>
               <p className="text-gray-700 text-lg font-semibold mb-2">Report is being generated...</p>
               <p className="text-gray-500 text-sm mb-6">This may take a few moments. Please wait.</p>
               <button
@@ -322,7 +328,10 @@ export default function ReportDetailPage() {
                     className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-all font-medium text-sm shadow-sm"
                   >
                     {isSyncingAts ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" style={{ animationDelay: '150ms' }} />
+                      </span>
                     ) : (
                       <span>🌿</span>
                     )}
@@ -360,7 +369,10 @@ export default function ReportDetailPage() {
                   className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
                 >
                   {isSendingEmail ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-pulse" style={{ animationDelay: '150ms' }} />
+                    </span>
                   ) : (
                     <Mail className="w-4 h-4" />
                   )}
@@ -397,7 +409,11 @@ export default function ReportDetailPage() {
 
               {isGeneratingDetailed && (
                 <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
-                  <Loader2 className="w-5 h-5 text-blue-600 animate-spin mt-0.5" />
+                  <div className="flex gap-1 items-center mt-1.5">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" style={{ animationDelay: '300ms' }} />
+                  </div>
                   <div>
                     <h4 className="text-blue-900 font-medium">Generating Detailed AI Analysis</h4>
                     <p className="text-sm text-blue-700 mt-1">
