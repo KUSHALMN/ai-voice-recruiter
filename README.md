@@ -333,6 +333,19 @@ ai-voice-recruiter/
 
 ---
 
+## 🔒 Security & Enterprise Compliance
+
+AI Voice Recruiter is engineered with multi-tier defense-in-depth protection:
+- **Strict Content Security Policy (CSP)**: Nonce-ready frame-ancestors locking, HSTS preload, zero clickjacking (`X-Frame-Options: DENY`).
+- **Edge Attack Shield**: IP burst rate-limiting, scanner probe blocking (`.env`, `.git`, `/wp-admin`), and path-traversal prevention in edge middleware.
+- **Candidate Anti-Tamper**: DevTools detection, tab-switch monitoring, and copy/paste locking during live technical assessments.
+- **Input Sanitization & CSRF Protection**: Recursive HTML entity escaping, SQL injection guards, and cryptographic double-submit cookie tokens.
+- **GDPR & CCPA Compliant**: Full candidate Right-to-be-Forgotten data erasure endpoint (`/api/compliance/delete-data`), granular cookie consent banner, and transparent [Privacy Policy](/privacy) & [Terms of Service](/terms).
+
+For full details and vulnerability disclosure guidelines, see [docs/SECURITY.md](docs/SECURITY.md).
+
+---
+
 ## 🛡️ License
 
 Distributed under the **MIT License**. See `LICENSE` for details.

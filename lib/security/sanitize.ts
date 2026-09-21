@@ -36,6 +36,14 @@ export function stripHtml(str: unknown): string {
 }
 
 /**
+ * Sanitizes a single string by stripping null bytes and HTML tags
+ */
+export function sanitizeString(str: unknown): string {
+  if (typeof str !== 'string') return ''
+  return str.replace(/\0/g, '').replace(/<[^>]*>?/gm, '').trim()
+}
+
+/**
  * Validates that a string is a safe HTTP or HTTPS URL, preventing
  * javascript: or data: URI injection attacks.
  */

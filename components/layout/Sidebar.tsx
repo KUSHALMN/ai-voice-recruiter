@@ -251,6 +251,15 @@ function Sidebar() {
           {isLoggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
           {isLoggingOut ? 'Signing out...' : 'Sign Out'}
         </button>
+
+        {/* Legal & Security Links */}
+        <div className="flex items-center justify-center gap-2 pt-1 text-[10px] text-slate-400 dark:text-neutral-500">
+          <Link href="/privacy" className="hover:text-primary-500 hover:underline transition-colors">Privacy</Link>
+          <span>&bull;</span>
+          <Link href="/terms" className="hover:text-primary-500 hover:underline transition-colors">Terms</Link>
+          <span>&bull;</span>
+          <a href="https://github.com/KUSHALMN/ai-voice-recruiter/blob/main/docs/SECURITY.md" target="_blank" rel="noopener noreferrer" className="hover:text-primary-500 hover:underline transition-colors">Security</a>
+        </div>
       </div>
     </aside>
   )
