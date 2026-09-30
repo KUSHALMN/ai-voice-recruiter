@@ -220,24 +220,6 @@ export default function HomePage() {
 
       {/* HERO SECTION — MINIMAL, CENTERED, MONUMENTAL */}
       <main className="pt-32 sm:pt-40 pb-20 px-6 max-w-6xl mx-auto">
-        
-        {/* Top Badge */}
-        <motion.div 
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="flex justify-center mb-6"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-slate-200/80 shadow-xs text-xs font-semibold text-slate-700 hover:border-slate-300 transition-colors cursor-pointer">
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600" />
-            </span>
-            <span>AIRA 2.0 Autonomous Hiring Engine</span>
-            <span className="text-slate-300">•</span>
-            <span className="text-indigo-600 font-bold flex items-center gap-0.5">Explore Features <ChevronRight className="w-3.5 h-3.5" /></span>
-          </div>
-        </motion.div>
 
         {/* Hero Headlines */}
         <motion.div 
