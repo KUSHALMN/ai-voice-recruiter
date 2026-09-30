@@ -176,7 +176,10 @@ export default function LoginPage() {
             className="relative z-10"
           >
             <div className="mb-8">
-              <Sparkles className={`w-16 h-16 text-${currentPortal.accent} mb-6`} />
+              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg mb-6 border border-white/60 bg-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.webp" alt="AIRA" width={64} height={64} className="w-full h-full object-cover" />
+              </div>
               <h1 className="text-4xl font-bold text-primary mb-4">{currentPortal.title}</h1>
               <p className="text-xl text-secondary mb-8">{currentPortal.subtitle}</p>
             </div>

@@ -182,8 +182,9 @@ export default function HomePage() {
             onClick={() => router.push('/')}
             className="flex items-center gap-2.5 cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-full bg-[#1D1D1F] text-white flex items-center justify-center font-semibold text-sm shadow-xs group-hover:scale-105 transition-transform">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform bg-[#1D1D1F]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.webp" alt="Vowels.ai logo" width={32} height={32} className="w-full h-full object-cover" />
             </div>
             <span className="text-base font-bold tracking-tight text-[#1D1D1F]">
               Vowels<span className="text-indigo-600">.ai</span>
@@ -696,6 +697,8 @@ export default function HomePage() {
       <footer className="border-t border-slate-200/80 py-12 px-6 text-xs text-[#86868B]">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.webp" alt="Vowels.ai logo" width={20} height={20} className="w-5 h-5 rounded-md object-cover shadow-xs" />
             <span className="font-bold text-[#1D1D1F]">Vowels.ai</span>
             <span>© {new Date().getFullYear()} Vowels Technologies Inc. All rights reserved.</span>
           </div>

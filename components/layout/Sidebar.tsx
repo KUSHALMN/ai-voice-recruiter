@@ -92,8 +92,9 @@ function Sidebar() {
           /* Recruiter Brand Header */
           <div className="mb-6 sm:mb-8 px-1">
             <div className="flex items-center gap-2.5 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 flex items-center justify-center border border-transparent dark:border-blue-800/40">
-                <Sparkles className="w-4.5 h-4.5" />
+              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center shadow-xs">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.webp" alt="AIRA" width={32} height={32} className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">AIRA TALENT</span>
