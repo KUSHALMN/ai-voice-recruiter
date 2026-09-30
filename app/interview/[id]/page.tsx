@@ -1436,7 +1436,10 @@ export default function InterviewPage() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/aira-avatar.png"
+                    src="/aira-avatar.webp"
+                    srcSet="/aira-avatar.webp 1x, /aira-avatar.png 1x"
+                    width={640}
+                    height={640}
                     alt="AIRA — AI Hiring Interviewer"
                     className="w-full h-full object-cover object-top"
                     onError={(e) => {
@@ -1729,7 +1732,10 @@ export default function InterviewPage() {
             <div className="aspect-[4/5] rounded-2xl overflow-hidden relative mb-6 border border-slate-700">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/aira-avatar.png"
+                src="/aira-avatar.webp"
+                srcSet="/aira-avatar.webp 1x, /aira-avatar.png 1x"
+                width={640}
+                height={640}
                 alt="AIRA — AI Hiring Interviewer"
                 className="w-full h-full object-cover object-top"
                 onError={(e) => {
