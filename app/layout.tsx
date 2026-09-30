@@ -5,6 +5,8 @@ import { Providers } from './providers'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { CookieConsent } from '@/components/compliance'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { FaqJsonLd } from '@/components/seo/FaqJsonLd'
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd'
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -105,6 +107,8 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${outfit.variable} ${newsreader.variable} ${plusJakartaSans.variable}`} suppressHydrationWarning>
       <head>
         <JsonLd />
+        <FaqJsonLd />
+        <BreadcrumbJsonLd />
         <script
           dangerouslySetInnerHTML={{
             __html: `
