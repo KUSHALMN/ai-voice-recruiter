@@ -31,9 +31,68 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   fallback: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'] 
 })
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://vowels.ai'
+
 export const metadata: Metadata = {
-  title: 'AI Voice Recruiter',
-  description: 'AI-powered voice recruitment platform',
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: 'Vowels.ai | Autonomous AI Voice Recruiter & Screening Platform',
+    template: '%s | Vowels.ai'
+  },
+  description: 'AIRA — Autonomous AI voice recruiter conducting adaptive, real-time voice interviews, dynamic coding challenges, and tamper-proof candidate evaluation.',
+  keywords: [
+    'AI recruiter',
+    'voice interview AI',
+    'autonomous hiring engine',
+    'technical interview screening',
+    'AIRA',
+    'live coding interview AI',
+    'candidate assessment rubric',
+    'automated voice interviewer'
+  ],
+  authors: [{ name: 'Vowels.ai Engineering Team', url: baseUrl }],
+  creator: 'Vowels.ai',
+  publisher: 'Vowels Technologies Inc.',
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: baseUrl,
+    siteName: 'Vowels.ai',
+    title: 'Vowels.ai | Autonomous AI Voice Recruiter',
+    description: 'Autonomous voice interviews and live coding screens with real-time AI evaluation and instant scorecards.',
+    images: [
+      {
+        url: '/aira-avatar.png',
+        width: 800,
+        height: 800,
+        alt: 'AIRA — Autonomous AI Voice Recruiter',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Vowels.ai | Autonomous AI Voice Recruiter',
+    description: 'Transform hiring with real-time autonomous voice interviews, live coding validation, and verified scorecards.',
+    images: ['/aira-avatar.png'],
+    creator: '@vowelsai',
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'google-site-verification-vowels-ai',
+  },
 }
 
 export default function RootLayout({
