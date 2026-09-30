@@ -19,11 +19,24 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   devIndicators: false,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion', 'recharts', 'axios'],
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      'axios',
+      'date-fns',
+      'clsx',
+      'tailwind-merge',
+      '@supabase/supabase-js'
+    ],
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       {
         protocol: 'https',
@@ -88,6 +101,15 @@ const nextConfig = {
           {
             key: 'X-Permitted-Cross-Domain-Policies',
             value: 'none',
+          },
+        ],
+      },
+      {
+        source: '/:path*.{ico,png,jpg,jpeg,svg,webp,avif,woff,woff2}',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400, stale-while-revalidate=604800',
           },
         ],
       },
