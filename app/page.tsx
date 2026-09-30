@@ -724,6 +724,7 @@ export default function HomePage() {
             <a href="#preview" className="hover:text-[#1D1D1F] transition-colors">Product Studio</a>
             <a href="/login" className="hover:text-[#1D1D1F] transition-colors">Recruiter Portal</a>
             <a href="/privacy" className="hover:text-[#1D1D1F] transition-colors cursor-pointer">Privacy</a>
+            <a href="/terms" className="hover:text-[#1D1D1F] transition-colors cursor-pointer">Terms</a>
             <a href="/security" className="hover:text-[#1D1D1F] transition-colors cursor-pointer">Security</a>
           </div>
         </div>

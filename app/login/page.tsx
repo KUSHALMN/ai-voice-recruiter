@@ -247,7 +247,7 @@ export default function LoginPage() {
               transition={{ duration: 0.2 }}
             >
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-primary mb-2">{isSignUp ? 'Create Account' : 'Welcome Back'}</h2>
+                <h1 className="text-3xl font-bold text-primary mb-2">{isSignUp ? 'Create Account' : 'Welcome Back'}</h1>
                 <p className="text-secondary">{isSignUp ? 'Sign up for' : 'Sign in to'} your {currentPortal.title.toLowerCase()}</p>
               </div>
 
