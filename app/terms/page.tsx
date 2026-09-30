@@ -2,9 +2,19 @@ import React from 'react'
 import Link from 'next/link'
 import { FileText, Shield, ArrowLeft, AlertTriangle, Scale, CheckCircle2 } from 'lucide-react'
 
-export const metadata = {
-  title: 'Terms of Service | AI Voice Recruiter',
-  description: 'Terms of Service and Acceptable Use Policy for AI Voice Recruiter.'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Terms of Service',
+  description: 'Terms of Service, Acceptable Use Policy, and recruiter/candidate agreements for Vowels.ai.',
+  alternates: {
+    canonical: '/terms',
+  },
+  openGraph: {
+    title: 'Terms of Service | Vowels.ai',
+    description: 'Terms of Service and Acceptable Use Policy for Vowels.ai.',
+    url: '/terms',
+  },
 }
 
 export default function TermsOfServicePage() {

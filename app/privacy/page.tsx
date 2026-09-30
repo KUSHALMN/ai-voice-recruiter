@@ -2,9 +2,19 @@ import React from 'react'
 import Link from 'next/link'
 import { Shield, Lock, Eye, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react'
 
-export const metadata = {
-  title: 'Privacy Policy | AI Voice Recruiter',
-  description: 'Enterprise Privacy Policy detailing AI voice processing, candidate data protection, and GDPR/CCPA compliance.'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description: 'Enterprise Privacy Policy detailing AI voice processing, candidate data protection, and GDPR/CCPA compliance.',
+  alternates: {
+    canonical: '/privacy',
+  },
+  openGraph: {
+    title: 'Privacy Policy | Vowels.ai',
+    description: 'Enterprise Privacy Policy detailing AI voice processing, candidate data protection, and GDPR/CCPA compliance.',
+    url: '/privacy',
+  },
 }
 
 export default function PrivacyPolicyPage() {

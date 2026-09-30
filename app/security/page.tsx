@@ -2,9 +2,19 @@ import React from 'react'
 import Link from 'next/link'
 import { Shield, Lock, ArrowLeft, CheckCircle2, ShieldCheck, AlertTriangle, Key, Terminal, Server } from 'lucide-react'
 
-export const metadata = {
-  title: 'Security Policy & Architecture | AI Voice Recruiter',
-  description: 'Enterprise security architecture, threat model, defense-in-depth protection, and vulnerability disclosure policy.'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Security Policy & Architecture',
+  description: 'Enterprise security architecture, threat model, defense-in-depth protection, and vulnerability disclosure policy.',
+  alternates: {
+    canonical: '/security',
+  },
+  openGraph: {
+    title: 'Security Architecture & Compliance | Vowels.ai',
+    description: 'Enterprise security architecture, threat model, defense-in-depth protection, and vulnerability disclosure policy.',
+    url: '/security',
+  },
 }
 
 export default function SecurityPage() {
