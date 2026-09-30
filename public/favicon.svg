@@ -1,7 +1,84 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-  <path d="M5 3v4"/>
-  <path d="M19 17v4"/>
-  <path d="M3 5h4"/>
-  <path d="M17 19h4"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <!-- Background Space Black Gradient -->
+    <linearGradient id="bgGrad" x1="64" y1="32" x2="448" y2="480" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1A1B23"/>
+      <stop offset="50%" stop-color="#0F1015"/>
+      <stop offset="100%" stop-color="#08080B"/>
+    </linearGradient>
+
+    <!-- Apple Intelligence Luminous Spectrum Gradient -->
+    <linearGradient id="vGrad" x1="120" y1="130" x2="390" y2="390" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="28%" stop-color="#E0E7FF"/>
+      <stop offset="55%" stop-color="#818CF8"/>
+      <stop offset="80%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <!-- Voice Pulse Spark Gradient -->
+    <linearGradient id="sparkGrad" x1="220" y1="150" x2="292" y2="222" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="60%" stop-color="#A5B4FC"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+
+    <!-- Ambient Core Glow -->
+    <radialGradient id="ambientGlow" cx="256" cy="270" r="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366F1" stop-opacity="0.32"/>
+      <stop offset="45%" stop-color="#8B5CF6" stop-opacity="0.16"/>
+      <stop offset="80%" stop-color="#38BDF8" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Glass Specular Reflection Highlight -->
+    <linearGradient id="rimGlow" x1="120" y1="16" x2="392" y2="496" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.25"/>
+      <stop offset="35%" stop-color="#FFFFFF" stop-opacity="0.08"/>
+      <stop offset="70%" stop-color="#FFFFFF" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#6366F1" stop-opacity="0.18"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter for The Mark -->
+    <filter id="markGlow" x="70" y="80" width="372" height="350" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="16" result="blur"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.388  0 0 0 0 0.4  0 0 0 0 0.945  0 0 0 0.45 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- iOS Apple Squircle Base -->
+  <rect x="16" y="16" width="480" height="480" rx="112" ry="112" fill="url(#bgGrad)"/>
+
+  <!-- Subtle Ambient Core Lighting -->
+  <rect x="16" y="16" width="480" height="480" rx="112" ry="112" fill="url(#ambientGlow)"/>
+
+  <!-- Precision Specular Glass Chamfer Border -->
+  <rect x="17.5" y="17.5" width="477" height="477" rx="110.5" ry="110.5" stroke="url(#rimGlow)" stroke-width="3"/>
+
+  <!-- The Mark: Monolithic Vowels "V" with Voice Intelligence Crest -->
+  <g filter="url(#markGlow)">
+    <!-- Acoustic Wave Bars Echo Behind Apex -->
+    <line x1="208" y1="210" x2="208" y2="246" stroke="#818CF8" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+    <line x1="256" y1="184" x2="256" y2="260" stroke="#A5B4FC" stroke-width="13" stroke-linecap="round" opacity="0.9"/>
+    <line x1="304" y1="210" x2="304" y2="246" stroke="#818CF8" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+
+    <!-- Monumental Sculpted "V" -->
+    <path 
+      d="M142 148 L256 376 L370 148" 
+      stroke="url(#vGrad)" 
+      stroke-width="50" 
+      stroke-linecap="round" 
+      stroke-linejoin="round"
+    />
+
+    <!-- Diamond Precision Spark of Intelligence at Crown -->
+    <path 
+      d="M256 128 Q256 156 242 170 Q256 156 256 184 Q256 156 270 170 Q256 156 256 128 Z" 
+      fill="url(#sparkGrad)"
+    />
+  </g>
 </svg>
