@@ -4,6 +4,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { CookieConsent } from '@/components/compliance'
+import { JsonLd } from '@/components/seo/JsonLd'
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -103,6 +104,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} ${newsreader.variable} ${plusJakartaSans.variable}`} suppressHydrationWarning>
       <head>
+        <JsonLd />
         <script
           dangerouslySetInnerHTML={{
             __html: `
