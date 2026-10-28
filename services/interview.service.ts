@@ -6,7 +6,7 @@ export class InterviewService {
   /**
    * Retrieves all interviews from Supabase with fallback
    */
-  async getInterviews(filter?: { status?: InterviewStatus; role?: string }): Promise<Interview[]> {
+  async getInterviews(filter?: { status?: InterviewStatus; role?: string; limit?: number; offset?: number }): Promise<Interview[]> {
     try {
       const supabase = getAdminClient()
       let query = supabase.from('interviews').select('*').order('created_at', { ascending: false })
@@ -16,6 +16,13 @@ export class InterviewService {
       }
       if (filter?.role) {
         query = query.ilike('role', `%${filter.role}%`)
+      }
+
+      const limit = Math.min(filter?.limit || 100, 200)
+      if (filter?.offset && filter.offset > 0) {
+        query = query.range(filter.offset, filter.offset + limit - 1)
+      } else {
+        query = query.limit(limit)
       }
 
       const { data, error } = await query

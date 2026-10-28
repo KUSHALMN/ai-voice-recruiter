@@ -14,8 +14,12 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const role = searchParams.get('role') || undefined
     const status = searchParams.get('status') as any || undefined
+    const limitParam = searchParams.get('limit')
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined
+    const offsetParam = searchParams.get('offset')
+    const offset = offsetParam ? parseInt(offsetParam, 10) : undefined
 
-    const interviews = await interviewService.getInterviews({ role, status })
+    const interviews = await interviewService.getInterviews({ role, status, limit, offset })
 
     return NextResponse.json({
       success: true,
