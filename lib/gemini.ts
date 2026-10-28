@@ -39,6 +39,24 @@ async function callGroq(prompt: string, temperature = 0.7, retries = 1): Promise
   return ''
 }
 
+export function safeParseJson<T>(raw: string, fallback: T): T {
+  if (!raw || !raw.trim()) return fallback
+  try {
+    const cleaned = raw.replace(/```(?:json)?/g, '').trim()
+    return JSON.parse(cleaned)
+  } catch {
+    const match = raw.match(/\{[\s\S]*\}/)
+    if (match) {
+      try {
+        return JSON.parse(match[0])
+      } catch {
+        return fallback
+      }
+    }
+    return fallback
+  }
+}
+
 export class GeminiService {
   async generateInterviewQuestions(jobTitle: string, jobDescription: string, interviewType: string, candidateType: string, duration: number, resumeText?: string, language: string = 'English'): Promise<string[]> {
     try {
@@ -217,7 +235,7 @@ Provide ONLY valid JSON response.`
     const text = await callGroq(prompt, 0)
 
     try {
-      const parsed = JSON.parse(text.replace(/```json|```/g, '').trim())
+      const parsed = safeParseJson<Record<string, any>>(text, {})
 
       // Convert to expected format
       const overallScore = parsed.score_out_of_10 || 0
@@ -972,7 +990,7 @@ Return ONLY valid JSON. No labels, no markdown formatting.`
 
     try {
       const text = await callGroq(prompt, 0.5)
-      const parsed = JSON.parse(text.replace(/```json|```/g, '').trim())
+      const parsed = safeParseJson<Record<string, any>>(text, {})
       return {
         responseText: parsed.responseText || `Thank you. Let's move on. ${nextQuestion}`,
         isFollowUp: parsed.isFollowUp || false,

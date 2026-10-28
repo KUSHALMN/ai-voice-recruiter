@@ -146,7 +146,13 @@ JSON Schema:
       })
 
       const rawJson = response.choices[0]?.message?.content || '{}'
-      const questionSet = JSON.parse(rawJson) as QuestionSet
+      let questionSet: QuestionSet
+      try {
+        questionSet = JSON.parse(rawJson)
+      } catch {
+        const match = rawJson.match(/\{[\s\S]*\}/)
+        questionSet = match ? JSON.parse(match[0]) : { questions: [] }
+      }
 
       // 4. Fill in dynamic IDs if the model didn't generate valid UUIDs
       if (questionSet.questions && Array.isArray(questionSet.questions)) {
