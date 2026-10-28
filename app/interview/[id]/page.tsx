@@ -7,7 +7,6 @@ import { Mic, Volume2, Loader2, CheckCircle, Clock, Send, Code2, Layout, Sparkle
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import CodeEditor from '@/components/CodeEditor'
-import confetti from 'canvas-confetti'
 import { supabase } from '@/lib/supabase'
 import type { QuestionSet, GeneratedQuestion } from '@/types/resume'
 import ResumeModal from '@/components/interview/ResumeModal'

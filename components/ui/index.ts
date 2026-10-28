@@ -2,6 +2,5 @@ export * from './Badge'
 export * from './Card'
 export * from './Modal'
 export * from './Skeleton'
-export * from './CodeEditor'
 export * from './OptimizedButton'
-export * from './DashboardCharts'
+

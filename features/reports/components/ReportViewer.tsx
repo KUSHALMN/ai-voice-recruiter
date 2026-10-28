@@ -1,6 +1,6 @@
 import React from 'react'
 import { Award, CheckCircle2, AlertCircle, Share2, Mail } from 'lucide-react'
-import { Badge } from '@/components/ui'
+import { Badge } from '@/components/ui/Badge'
 
 export interface ReportViewerProps {
   report: {

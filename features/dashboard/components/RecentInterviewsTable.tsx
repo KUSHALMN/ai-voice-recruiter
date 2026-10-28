@@ -1,7 +1,7 @@
 import React from 'react'
 import { ArrowRight, FileText, CheckCircle2, Clock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { Badge } from '@/components/ui'
+import { Badge } from '@/components/ui/Badge'
 
 export interface InterviewRow {
   id: string
