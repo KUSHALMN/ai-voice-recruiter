@@ -64,6 +64,38 @@ export function generateLocalDeterministicEmbedding(text: string, dimensions = E
   return Array.from(vector)
 }
 
+// In-memory LRU cache for computed vector embeddings (up to 500 vectors)
+const embeddingCache = new Map<string, number[]>()
+const MAX_EMBEDDING_CACHE = 500
+
+let cachedGenAI: GoogleGenerativeAI | null = null
+let cachedGenAIKey: string | null = null
+
+function getEmbeddingCacheKey(text: string): string {
+  let hash = 5381
+  for (let i = 0; i < text.length; i++) {
+    hash = ((hash << 5) + hash) ^ text.charCodeAt(i)
+  }
+  return `${text.length}:${hash}`
+}
+
+function getGenAIClient(key: string): GoogleGenerativeAI {
+  if (!cachedGenAI || cachedGenAIKey !== key) {
+    cachedGenAI = new GoogleGenerativeAI(key)
+    cachedGenAIKey = key
+  }
+  return cachedGenAI
+}
+
+function cacheVector(key: string, vec: number[]): number[] {
+  if (embeddingCache.size >= MAX_EMBEDDING_CACHE) {
+    const oldest = embeddingCache.keys().next().value
+    if (oldest) embeddingCache.delete(oldest)
+  }
+  embeddingCache.set(key, vec)
+  return vec
+}
+
 /**
  * Generate a single 768-dimensional embedding vector for input text.
  */
@@ -73,22 +105,27 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   }
 
   const cleanText = text.slice(0, 8000) // Safe truncation limit
+  const cacheKey = getEmbeddingCacheKey(cleanText)
+
+  if (embeddingCache.has(cacheKey)) {
+    return embeddingCache.get(cacheKey)!
+  }
 
   // 1. Check for Gemini API key
   const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
   if (geminiKey) {
     try {
-      const genAI = new GoogleGenerativeAI(geminiKey)
+      const genAI = getGenAIClient(geminiKey)
       const model = genAI.getGenerativeModel({ model: 'text-embedding-004' })
       const result = await model.embedContent(cleanText)
       const values = result.embedding.values
 
       if (values && values.length === EMBEDDING_DIMENSION) {
-        return values
+        return cacheVector(cacheKey, values)
       }
       if (values && values.length > 0) {
         // Adapt dimension if needed
-        return resizeVector(values, EMBEDDING_DIMENSION)
+        return cacheVector(cacheKey, resizeVector(values, EMBEDDING_DIMENSION))
       }
     } catch (err) {
       console.warn('Gemini embedding API unavailable, using resilient fallback:', err instanceof Error ? err.message : err)
@@ -116,7 +153,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
         const data = await res.json()
         const vec = data.data?.[0]?.embedding
         if (Array.isArray(vec) && vec.length === EMBEDDING_DIMENSION) {
-          return vec
+          return cacheVector(cacheKey, vec)
         }
       }
     } catch (err) {
@@ -125,7 +162,8 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   }
 
   // 3. Resilient deterministic semantic fallback
-  return generateLocalDeterministicEmbedding(cleanText, EMBEDDING_DIMENSION)
+  const fallbackVec = generateLocalDeterministicEmbedding(cleanText, EMBEDDING_DIMENSION)
+  return cacheVector(cacheKey, fallbackVec)
 }
 
 /**
