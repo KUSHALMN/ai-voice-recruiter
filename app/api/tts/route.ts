@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit } from '@/lib/security/rateLimit'
+import crypto from 'crypto'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+
+interface CachedAudio {
+  buffer: ArrayBuffer
+  timestamp: number
+}
+
+// In-memory audio cache for synthesized phrases (max 100 entries, 24-hr TTL)
+const audioCache = new Map<string, CachedAudio>()
+const MAX_CACHE_ENTRIES = 100
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000
+
+function getCacheKey(text: string): string {
+  return crypto.createHash('sha256').update(text.trim().toLowerCase()).digest('hex')
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,6 +43,22 @@ export async function POST(request: NextRequest) {
         { error: 'Speech text exceeds maximum length of 500 characters per synthesis.' },
         { status: 400 }
       )
+    }
+
+    // 3. Fast Cache Lookup
+    const cacheKey = getCacheKey(trimmedText)
+    const cached = audioCache.get(cacheKey)
+    const now = Date.now()
+
+    if (cached && now - cached.timestamp < CACHE_TTL_MS) {
+      return new NextResponse(cached.buffer.slice(0), {
+        headers: {
+          'Content-Type': 'audio/mpeg',
+          'Content-Length': cached.buffer.byteLength.toString(),
+          'Cache-Control': 'public, max-age=86400, s-maxage=604800, immutable',
+          'X-Cache': 'HIT'
+        }
+      })
     }
 
     const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY
@@ -70,11 +101,19 @@ export async function POST(request: NextRequest) {
 
     const audioBuffer = await response.arrayBuffer()
 
+    // Store in LRU cache
+    if (audioCache.size >= MAX_CACHE_ENTRIES) {
+      const oldestKey = audioCache.keys().next().value
+      if (oldestKey) audioCache.delete(oldestKey)
+    }
+    audioCache.set(cacheKey, { buffer: audioBuffer, timestamp: now })
+
     return new NextResponse(audioBuffer, {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Content-Length': audioBuffer.byteLength.toString(),
-        'Cache-Control': 'public, max-age=3600, s-maxage=86400, immutable'
+        'Cache-Control': 'public, max-age=86400, s-maxage=604800, immutable',
+        'X-Cache': 'MISS'
       }
     })
   } catch (error) {
@@ -82,3 +121,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to generate speech' }, { status: 500 })
   }
 }
+
