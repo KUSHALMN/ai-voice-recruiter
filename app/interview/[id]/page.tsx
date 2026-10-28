@@ -1433,18 +1433,13 @@ export default function InterviewPage() {
                   }}
                   transition={{ repeat: speaking ? Infinity : 0, duration: 1.5, ease: "easeInOut" }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src="/aira-avatar.webp"
-                    srcSet="/aira-avatar.webp 1x, /aira-avatar.png 1x"
                     width={640}
                     height={640}
+                    priority
                     alt="AIRA — AI Hiring Interviewer"
                     className="w-full h-full object-cover object-top"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                    }}
                   />
                   <div className="hidden absolute inset-0 bg-gradient-to-b from-blue-50 to-indigo-100 flex items-center justify-center">
                     <span className={`${showCodeEditor ? 'text-6xl' : 'text-9xl'}`}>👩‍💼</span>
@@ -1729,18 +1724,12 @@ export default function InterviewPage() {
             <div className="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
             <div className="aspect-[4/5] rounded-2xl overflow-hidden relative mb-6 border border-slate-700">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src="/aira-avatar.webp"
-                srcSet="/aira-avatar.webp 1x, /aira-avatar.png 1x"
                 width={640}
                 height={640}
                 alt="AIRA — AI Hiring Interviewer"
                 className="w-full h-full object-cover object-top"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                }}
               />
               <div className="hidden absolute inset-0 bg-slate-800 flex items-center justify-center text-6xl">
                 👩‍💼

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Sparkles, Mail, Lock, Eye, EyeOff, BarChart3, Users, Brain, Mic, Loader2 } from 'lucide-react'
 import { signIn, useSession } from 'next-auth/react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
@@ -176,9 +177,8 @@ export default function LoginPage() {
             className="relative z-10"
           >
             <div className="mb-8">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg mb-6 border border-white/60 bg-white">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.webp" alt="AIRA" width={64} height={64} className="w-full h-full object-cover" />
+              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg mb-6 border border-white/60 bg-white relative">
+                <Image src="/logo.webp" alt="AIRA" width={64} height={64} priority className="w-full h-full object-cover" />
               </div>
               <h1 className="text-4xl font-bold text-primary mb-4">{currentPortal.title}</h1>
               <p className="text-xl text-secondary mb-8">{currentPortal.subtitle}</p>
