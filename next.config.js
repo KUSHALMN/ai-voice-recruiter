@@ -31,7 +31,9 @@ const nextConfig = {
       'date-fns',
       'clsx',
       'tailwind-merge',
-      '@supabase/supabase-js'
+      '@supabase/supabase-js',
+      '@google/generative-ai',
+      'groq-sdk'
     ],
   },
   images: {

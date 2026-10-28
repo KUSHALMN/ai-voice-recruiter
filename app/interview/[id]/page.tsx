@@ -1097,17 +1097,21 @@ export default function InterviewPage() {
 
     const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min
 
-    const confettiInterval: ReturnType<typeof setInterval> = setInterval(function () {
-      const remaining = animationEnd - Date.now()
+    // Dynamically import confetti only on completion to keep initial bundle lightweight
+    import('canvas-confetti').then((module) => {
+      const confetti = module.default
+      const confettiInterval: ReturnType<typeof setInterval> = setInterval(function () {
+        const remaining = animationEnd - Date.now()
 
-      if (remaining <= 0) {
-        return clearInterval(confettiInterval)
-      }
+        if (remaining <= 0) {
+          return clearInterval(confettiInterval)
+        }
 
-      const particleCount = 50 * (remaining / duration)
-      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } })
-      confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } })
-    }, 250)
+        const particleCount = 50 * (remaining / duration)
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } })
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } })
+      }, 250)
+    }).catch(() => {})
 
     // Play completion audio NON-BLOCKING — don't wait for it
     playPreRecordedAudio('completion.mp3').catch(() =>
