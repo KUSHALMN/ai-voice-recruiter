@@ -5,19 +5,23 @@ interface RateLimitRecord {
   resetTime: number
 }
 
-// In-memory token/sliding-window bucket
+// In-memory token/sliding-window bucket with bounded size (max 10,000 keys)
 const rateLimitMap = new Map<string, RateLimitRecord>()
+const MAX_RATE_LIMIT_ENTRIES = 10000
 
 // Periodically clean up stale entries every 5 minutes to prevent memory leaks
 if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
+  const timer = setInterval(() => {
     const now = Date.now()
     rateLimitMap.forEach((record, key) => {
       if (now > record.resetTime) {
         rateLimitMap.delete(key)
       }
     })
-  }, 5 * 60 * 1000).unref?.()
+  }, 5 * 60 * 1000)
+  if (timer && typeof (timer as any).unref === 'function') {
+    (timer as any).unref()
+  }
 }
 
 export interface RateLimitOptions {
@@ -62,6 +66,11 @@ export function checkRateLimit(
   const record = rateLimitMap.get(key)
 
   if (!record || now > record.resetTime) {
+    if (rateLimitMap.size >= MAX_RATE_LIMIT_ENTRIES) {
+      const oldestKey = rateLimitMap.keys().next().value
+      if (oldestKey) rateLimitMap.delete(oldestKey)
+    }
+
     rateLimitMap.set(key, {
       count: 1,
       resetTime: now + windowMs
