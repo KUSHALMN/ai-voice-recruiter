@@ -81,7 +81,9 @@ export async function POST(
       interview.interview_type || 'technical',
       interview.candidate_type || 'mid',
       interview.duration || 15,
-      interview.parsed_resume || undefined
+      interview.parsed_resume || undefined,
+      'English',
+      interviewId
     )
 
     // 8. Update interview with the generated questions

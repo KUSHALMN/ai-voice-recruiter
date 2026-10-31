@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
           interview.candidate_type || candidateType || 'mid',
           interview.duration || duration || 15,
           interview.parsed_resume || undefined,
-          selectedLang
+          selectedLang,
+          interviewId
         )
 
         // Store the question set
@@ -72,7 +73,8 @@ export async function POST(request: NextRequest) {
       candidateType || 'mid',
       duration || 15,
       undefined,
-      language || 'English'
+      language || 'English',
+      interviewId || undefined
     )
 
     return NextResponse.json({
