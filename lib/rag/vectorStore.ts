@@ -41,11 +41,11 @@ export function invalidateResumeVectorCache(interviewId?: string): void {
     resumeVectorCache.clear()
     return
   }
-  for (const key of resumeVectorCache.keys()) {
+  resumeVectorCache.forEach((_, key) => {
     if (key.startsWith(interviewId + ':')) {
       resumeVectorCache.delete(key)
     }
-  }
+  })
 }
 
 function cacheVectorResults(key: string, results: ResumeChunkMatch[]): ResumeChunkMatch[] {
