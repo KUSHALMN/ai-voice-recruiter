@@ -23,6 +23,40 @@ export interface RubricMatch {
   similarity: number
 }
 
+interface VectorCacheEntry {
+  results: ResumeChunkMatch[]
+  timestamp: number
+}
+
+// In-memory LRU query cache for dense resume chunk vector retrieval
+const resumeVectorCache = new Map<string, VectorCacheEntry>()
+const VECTOR_CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes TTL
+const MAX_VECTOR_CACHE_SIZE = 300
+
+/**
+ * Invalidates the vector query cache for a specific interview or clears all.
+ */
+export function invalidateResumeVectorCache(interviewId?: string): void {
+  if (!interviewId) {
+    resumeVectorCache.clear()
+    return
+  }
+  for (const key of resumeVectorCache.keys()) {
+    if (key.startsWith(interviewId + ':')) {
+      resumeVectorCache.delete(key)
+    }
+  }
+}
+
+function cacheVectorResults(key: string, results: ResumeChunkMatch[]): ResumeChunkMatch[] {
+  if (resumeVectorCache.size >= MAX_VECTOR_CACHE_SIZE) {
+    const oldestKey = resumeVectorCache.keys().next().value
+    if (oldestKey) resumeVectorCache.delete(oldestKey)
+  }
+  resumeVectorCache.set(key, { results, timestamp: Date.now() })
+  return results
+}
+
 export interface CandidateProfileMatch {
   id: string
   candidate_name: string
@@ -48,6 +82,9 @@ export async function storeResumeChunks(
     if (!chunks || chunks.length === 0) {
       return { success: true, count: 0 }
     }
+
+    // Step 0: Invalidate vector query cache for this interview
+    invalidateResumeVectorCache(interviewId)
 
     // Step 1: Remove any previous chunks for this interview to prevent duplicates
     await supabase
@@ -98,6 +135,12 @@ export async function queryResumeChunks(
   limit = 4,
   threshold = 0.25
 ): Promise<ResumeChunkMatch[]> {
+  const cacheKey = `${interviewId}:${query.trim().toLowerCase()}:${limit}:${threshold}`
+  const cached = resumeVectorCache.get(cacheKey)
+  if (cached && (Date.now() - cached.timestamp < VECTOR_CACHE_TTL_MS)) {
+    return cached.results
+  }
+
   try {
     const supabase = getAdminClient()
     const queryEmbedding = await generateEmbedding(query)
@@ -111,7 +154,7 @@ export async function queryResumeChunks(
     })
 
     if (!rpcError && Array.isArray(rpcData) && rpcData.length > 0) {
-      return rpcData as ResumeChunkMatch[]
+      return cacheVectorResults(cacheKey, rpcData as ResumeChunkMatch[])
     }
 
     // Fallback: Query rows directly and calculate cosine similarity in-memory
@@ -143,7 +186,7 @@ export async function queryResumeChunks(
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, limit)
 
-    return scored
+    return cacheVectorResults(cacheKey, scored)
   } catch (err: unknown) {
     console.warn('queryResumeChunks error:', err instanceof Error ? err.message : err)
     return []

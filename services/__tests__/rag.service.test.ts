@@ -5,6 +5,7 @@ import { reRankChunks } from '@/lib/rag/reranker'
 import { validateGrounding } from '@/lib/rag/groundingGuard'
 import { chunkResumeText } from '@/lib/rag/chunker'
 import { getStandardRubricEmbeddings, retrieveRubricForQuestion } from '@/lib/rag/rubricEvaluator'
+import { invalidateResumeVectorCache, queryResumeChunks } from '@/lib/rag/vectorStore'
 
 describe('Enterprise RAG Architecture', () => {
   describe('BM25 Sparse Lexical Search', () => {
@@ -155,4 +156,17 @@ React, Next.js, Node.js, TypeScript, Docker, Kubernetes, AWS, PostgreSQL
       expect(rubric?.isGrounded).toBe(true)
     })
   })
-})
+describe('Dense Resume Vector Store LRU Cache', () => {
+    it('should safely invalidate cache entries by interview id without throwing', () => {
+      expect(() => invalidateResumeVectorCache('test-interview-123')).not.toThrow()
+      expect(() => invalidateResumeVectorCache()).not.toThrow()
+    })
+
+    it('should query resume chunks gracefully and memoize results', async () => {
+      const res1 = await queryResumeChunks('mock-interview-id', 'Next.js architecture', 3)
+      expect(Array.isArray(res1)).toBe(true)
+      const res2 = await queryResumeChunks('mock-interview-id', 'Next.js architecture', 3)
+      expect(res2).toEqual(res1)
+    })
+  })
+});
