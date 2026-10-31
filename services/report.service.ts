@@ -2,6 +2,16 @@ import { getAdminClient } from '@/lib/supabase-admin'
 import { DEMO_REPORTS, DEMO_REPORTS_MAP } from '@/lib/demo-data'
 import { CandidateReport } from '@/types/report'
 
+interface CachedReportEntry {
+  data: any
+  timestamp: number
+}
+
+// In-memory request deduplication and short-lived SWR cache
+const reportCache = new Map<string, CachedReportEntry>()
+const inFlightPromises = new Map<string, Promise<any>>()
+const REPORT_CACHE_TTL_MS = 60 * 1000 // 60 seconds
+
 export class ReportService {
   /**
    * Retrieves candidate reports with demo fallback
@@ -45,35 +55,61 @@ export class ReportService {
       return DEMO_REPORTS_MAP[id]
     }
 
-    try {
-      const supabase = getAdminClient()
-      const { data, error } = await supabase
-        .from('interviews')
-        .select(`
-          id, candidate_name, candidate_email, job_title, interview_type,
-          created_at, status, recruiter_email,
-          interview_sessions (
-            id, recommendation, scores, report, transcript
-          )
-        `)
-        .eq('id', id)
-        .single()
-
-      if (error || !data) {
-        return DEMO_REPORTS_MAP[id] || null
-      }
-
-      return data
-    } catch (err: any) {
-      console.error(`[ReportService.getReportById] Error fetching report ${id}:`, err.message)
-      return DEMO_REPORTS_MAP[id] || null
+    // 1. Check in-memory short-lived cache
+    const cached = reportCache.get(id)
+    if (cached && Date.now() - cached.timestamp < REPORT_CACHE_TTL_MS) {
+      return cached.data
     }
+
+    // 2. Deduplicate in-flight concurrent requests for the same report ID
+    if (inFlightPromises.has(id)) {
+      return inFlightPromises.get(id)
+    }
+
+    const fetchPromise = (async () => {
+      try {
+        const supabase = getAdminClient()
+        const { data, error } = await supabase
+          .from('interviews')
+          .select(`
+            id, candidate_name, candidate_email, job_title, interview_type,
+            created_at, status, recruiter_email,
+            interview_sessions (
+              id, recommendation, scores, report, transcript
+            )
+          `)
+          .eq('id', id)
+          .single()
+
+        if (error || !data) {
+          const fallback = DEMO_REPORTS_MAP[id] || null
+          if (fallback) {
+            reportCache.set(id, { data: fallback, timestamp: Date.now() })
+          }
+          return fallback
+        }
+
+        reportCache.set(id, { data, timestamp: Date.now() })
+        return data
+      } catch (err: any) {
+        console.error(`[ReportService.getReportById] Error fetching report ${id}:`, err.message)
+        const fallback = DEMO_REPORTS_MAP[id] || null
+        return fallback
+      } finally {
+        inFlightPromises.delete(id)
+      }
+    })()
+
+    inFlightPromises.set(id, fetchPromise)
+    return fetchPromise
   }
 
   /**
    * Deletes a report / interview session
    */
   async deleteReport(id: string): Promise<boolean> {
+    reportCache.delete(id)
+    inFlightPromises.delete(id)
     try {
       const supabase = getAdminClient()
       const { error } = await supabase

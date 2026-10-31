@@ -16,6 +16,14 @@ describe('ReportService', () => {
     expect(report?.job_title).toBe('Software Engineer')
   })
 
+  it('should deduplicate concurrent requests for the same report ID', async () => {
+    const [res1, res2] = await Promise.all([
+      reportService.getReportById('demo-1'),
+      reportService.getReportById('demo-1')
+    ])
+    expect(res1).toBe(res2)
+  })
+
   it('should generate synthetic candidate report with overall score', async () => {
     const report = await reportService.generateReport({
       interview_id: 'test_int_123',
