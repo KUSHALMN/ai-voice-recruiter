@@ -115,6 +115,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${outfit.variable} ${newsreader.variable} ${plusJakartaSans.variable}`} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://api.groq.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://api.groq.com" />
+        <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://generativelanguage.googleapis.com" />
         <JsonLd />
         <FaqJsonLd />
         <BreadcrumbJsonLd />
@@ -146,4 +150,3 @@ export default function RootLayout({
     </html>
   )
 }
-
