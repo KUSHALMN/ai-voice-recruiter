@@ -12,6 +12,35 @@ export interface GroundedRubric {
   similarity: number
 }
 
+export interface CachedRubricEmbedding {
+  rubric: StandardRubric
+  embedding: number[]
+}
+
+// In-memory memoized cache for standard rubric embeddings to avoid re-generating
+// vector embeddings on every question evaluation fallback.
+let cachedRubricEmbeddings: CachedRubricEmbedding[] | null = null
+
+/**
+ * Precomputes or retrieves cached 768-dim embeddings for standard rubrics.
+ * Eliminates redundant LLM/projection API calls during interview evaluations.
+ */
+export async function getStandardRubricEmbeddings(): Promise<CachedRubricEmbedding[]> {
+  if (cachedRubricEmbeddings && cachedRubricEmbeddings.length > 0) {
+    return cachedRubricEmbeddings
+  }
+
+  const results: CachedRubricEmbedding[] = []
+  for (const rubric of STANDARD_RUBRICS) {
+    const rubricText = `${rubric.category}: ${rubric.questionConcept} ${rubric.idealAnswer}`
+    const embedding = await generateEmbedding(rubricText)
+    results.push({ rubric, embedding })
+  }
+
+  cachedRubricEmbeddings = results
+  return results
+}
+
 /**
  * Retrieves the best matching evaluation rubric for a given interview question.
  * Checks the Supabase vector store first, and seamlessly falls back to the in-memory
@@ -42,20 +71,18 @@ export async function retrieveRubricForQuestion(
     console.warn('Vector store rubric lookup error, using catalog fallback:', err)
   }
 
-  // 2. Resilient fallback: semantic match across standard rubrics catalog
+  // 2. Resilient fallback: fast in-memory semantic match across standard rubrics catalog
   try {
     const qEmbedding = await generateEmbedding(question)
+    const catalogEmbeddings = await getStandardRubricEmbeddings()
     let bestMatch: StandardRubric | null = null
     let highestSim = -1
 
-    for (const rubric of STANDARD_RUBRICS) {
-      const rubricText = `${rubric.category}: ${rubric.questionConcept} ${rubric.idealAnswer}`
-      const rEmbedding = await generateEmbedding(rubricText)
-      const sim = cosineSimilarity(qEmbedding, rEmbedding)
-
+    for (const item of catalogEmbeddings) {
+      const sim = cosineSimilarity(qEmbedding, item.embedding)
       if (sim > highestSim) {
         highestSim = sim
-        bestMatch = rubric
+        bestMatch = item.rubric
       }
     }
 
@@ -76,3 +103,4 @@ export async function retrieveRubricForQuestion(
 
   return null
 }
+

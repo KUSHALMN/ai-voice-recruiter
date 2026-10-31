@@ -4,6 +4,7 @@ import { expandQuery } from '@/lib/rag/queryExpansion'
 import { reRankChunks } from '@/lib/rag/reranker'
 import { validateGrounding } from '@/lib/rag/groundingGuard'
 import { chunkResumeText } from '@/lib/rag/chunker'
+import { getStandardRubricEmbeddings, retrieveRubricForQuestion } from '@/lib/rag/rubricEvaluator'
 
 describe('Enterprise RAG Architecture', () => {
   describe('BM25 Sparse Lexical Search', () => {
@@ -133,6 +134,25 @@ React, Next.js, Node.js, TypeScript, Docker, Kubernetes, AWS, PostgreSQL
       expect(first.metadata.tokenEstimate).toBeGreaterThan(0)
       expect(first.metadata.hasMetrics).toBe(true)
       expect(first.metadata.detectedSkills.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Standard Rubrics Semantic Fallback', () => {
+    it('should precompute and memoize standard rubric embeddings efficiently', async () => {
+      const embeddings1 = await getStandardRubricEmbeddings()
+      expect(embeddings1.length).toBeGreaterThan(0)
+      expect(embeddings1[0].embedding.length).toBe(768)
+
+      // Second call should return exact same memoized array reference instantly
+      const embeddings2 = await getStandardRubricEmbeddings()
+      expect(embeddings2).toBe(embeddings1)
+    })
+
+    it('should retrieve a grounded rubric for React state optimization question', async () => {
+      const rubric = await retrieveRubricForQuestion('How do you optimize React component re-rendering and useMemo?')
+      expect(rubric).toBeDefined()
+      expect(rubric?.category).toContain('Frontend & React')
+      expect(rubric?.isGrounded).toBe(true)
     })
   })
 })
