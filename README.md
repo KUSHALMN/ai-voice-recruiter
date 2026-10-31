@@ -94,6 +94,7 @@ sequenceDiagram
 | 📄 **Smart Resume Parsing & RAG** | Automatically extracts skills, experience, and past projects from PDF resumes; chunks and indexes in pgvector for deep-dive questioning. |
 | 🔍 **AI Talent Matcher (ATS RAG)** | Recruiter natural language candidate search (e.g. "Senior React engineer with WebSockets") powered by 768-dim vector embeddings. |
 | 🎯 **Evaluation Rubric RAG** | Objective candidate scoring grounded against indexed gold-standard technical benchmarks and criteria rubrics. |
+| 🗣️ **Real-Voice Only Biometric Guard** | Real-time detection of synthetic AI voices, TTS generators (ElevenLabs, OpenAI TTS, VoiceMod), and virtual audio cables. Candidates must answer using their authentic human voice. |
 | 🛡️ **Anti-Cheat Proctoring** | Active tab-switch detection, webcam presence monitoring, and speech cadence analysis to flag scripted reading. |
 | 📊 **Multi-Metric Rubric** | Scores candidates across **Technical Depth**, **Communication**, **Problem Solving**, and **Professionalism**. |
 | 👑 **Enterprise Admin Suite** | Aggregated hiring funnels, recruiter leaderboards, score distributions, and reusable template libraries. |
@@ -193,6 +194,60 @@ The candidate interface (`/interview/[id]`) is optimized for focus, low latency,
 │   "I usually start by indexing... │   • Camera: Active  • Tabs: 0 Sw.  │
 └───────────────────────────────────┴────────────────────────────────────┘
 ```
+
+---
+
+---
+
+## 🎙️ Real-Voice Verification & Synthetic AI Voice Detection
+
+To preserve hiring integrity against candidate impersonation and AI voice proxies (where a candidate feeds an LLM response through a synthetic TTS voice or virtual microphone), AIRA incorporates a **multi-factor real-time voice authenticity engine**:
+
+```
+       [ Candidate Microphone Stream ]
+                     │
+       ┌─────────────┴─────────────┐
+       ▼                           ▼
+[ Hardware Device Scan ]    [ Acoustic Biometrics ]
+• VB-Audio Cable check      • F0 Pitch Jitter & Tremor
+• VoiceMeeter loopback      • Respiration / Breath Dips
+• BlackHole / Soundflower   • Spectral Flatness (Wiener)
+       │                           │
+       └─────────────┬─────────────┘
+                     ▼
+       [ Delivery Cadence & Latency ]
+       • AI Relay Pipeline Latency (3-6s initial gap)
+       • WPM Delivery Velocity & Isochrony
+       • Spontaneous Conversational Markers
+                     │
+                     ▼
+      ┌─────────────────────────────┐
+      │ Real-Voice Integrity Engine │
+      └──────────────┬──────────────┘
+                     │
+      ┌──────────────┴──────────────┐
+      ▼                             ▼
+[ PASS: Human Voice ]         [ FLAG: Synthetic Voice ]
+Authenticity Score > 70%      • Immediate Live UI Warning
+Verified human biometrics     • Proctoring Violation Logged
+                              • Recruiter Dossier Flagged
+```
+
+### Biometric Detection Dimensions
+
+| Detection Dimension | Human Vocal Tract Signal | Synthetic AI Voice / TTS Bot Signal |
+| :--- | :--- | :--- |
+| **Pitch Micro-Tremor (Jitter)** | Natural vocal cord perturbation (0.4% – 2.5% jitter). | Completely flat or unnatural periodic repetition (< 0.15% jitter). |
+| **Respiration & Pauses** | Biological breath pauses (200ms – 900ms soft energy dips). | Abrupt digital gating or endless continuous monologue with zero breaths. |
+| **Spectral Flatness** | Formant harmonic resonance bands (Wiener entropy < 0.25). | High-frequency vocoder cutoff artifacts and phase anomalies. |
+| **Audio Input Hardware** | Physical hardware microphone (Realtek, USB Audio, AirPods). | Virtual audio loopback devices (`VB-Audio`, `VoiceMeeter`, `BlackHole`). |
+| **AI Relay Pipeline Latency** | Natural thought pause (0.5s – 2.5s) with filler words. | Distinct 3.5s – 6s latency gap (LLM + TTS processing) followed by robotic speed. |
+
+### Live Enforcement Workflow
+1. **Hardware Interception**: Scans `navigator.mediaDevices.enumerateDevices()` for virtual loopback cables on room entry.
+2. **Real-Time Warning Banner**: If synthetic AI voice patterns or virtual devices are detected during an answer, the candidate is immediately prompted:  
+   > ⚠️ **Real Voice Required**: Synthetic AI voice detected. Please speak in your natural human voice.
+3. **Audit Trail**: Every answer records a `voice_authenticity` object with confidence scores and biometric flags in the recruiter report.
 
 ---
 

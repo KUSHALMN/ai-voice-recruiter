@@ -595,7 +595,9 @@ export default function InterviewPage() {
           questionId,
           answer,
           questionIndex: _questionIndex,
-          timeLeft: timeLeftRef.current
+          timeLeft: timeLeftRef.current,
+          responseDelaySeconds: responseDelay,
+          answerDurationSeconds: answerDuration
         })
       }).then(r => r.json())
     ])
@@ -606,8 +608,12 @@ export default function InterviewPage() {
       logViolation('High Risk Scripted Answer Detected: ' + (scriptedDetection?.Suspicion_Flags?.[0] || 'Unnatural speech pattern'))
     }
 
-    // Process evaluation scores
+    // Process evaluation scores & voice authenticity verification
     const evalData = evalResult.status === 'fulfilled' ? evalResult.value : null
+    if (evalData?.voiceEvaluation && !evalData.voiceEvaluation.isRealVoice) {
+      logViolation('Synthetic AI Voice Detected: ' + (evalData.voiceEvaluation.flags?.[0] || 'Unnatural speech pattern or virtual loopback'))
+      toast.error('⚠️ Real Voice Required: Synthetic AI voice detected. Please speak in your natural human voice.', { duration: 6000 })
+    }
     const finalScore = evalData ? evalData.score : 5
 
     // Normalize score to 4 metrics for frontend backwards-compatibility

@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { WebRTCAudioManager, WebRTCConfig } from '@/lib/audio/webrtcManager'
+import { VoiceAuthenticityReport } from '@/lib/audio/voiceAuthenticityDetector'
 
 export function useWebRTCAudio(config?: {
   onInterruption?: () => void
+  onVoiceAuthenticityAlert?: (report: VoiceAuthenticityReport) => void
 }) {
   const [isActive, setIsActive] = useState(false)
   const [isCandidateSpeaking, setIsCandidateSpeaking] = useState(false)
   const [volume, setVolume] = useState(0)
+  const [voiceReport, setVoiceReport] = useState<VoiceAuthenticityReport | null>(null)
   const managerRef = useRef<WebRTCAudioManager | null>(null)
 
   const startSession = useCallback(async (isAISpeaking: boolean = false) => {
@@ -17,6 +20,12 @@ export function useWebRTCAudio(config?: {
           onVolumeChange: (vol) => setVolume(vol),
           onInterruption: () => {
             config?.onInterruption?.()
+          },
+          onVoiceAuthenticityReport: (report) => {
+            setVoiceReport(report)
+            if (!report.isRealHumanVoice) {
+              config?.onVoiceAuthenticityAlert?.(report)
+            }
           }
         })
       }
@@ -46,6 +55,10 @@ export function useWebRTCAudio(config?: {
     }
   }, [])
 
+  const getVoiceAuthenticityReport = useCallback((): VoiceAuthenticityReport | null => {
+    return managerRef.current ? managerRef.current.getVoiceAuthenticityReport() : null
+  }, [])
+
   useEffect(() => {
     return () => {
       if (managerRef.current) {
@@ -58,8 +71,10 @@ export function useWebRTCAudio(config?: {
     isActive,
     isCandidateSpeaking,
     volume,
+    voiceReport,
     startSession,
     stopSession,
-    setAISpeaking
+    setAISpeaking,
+    getVoiceAuthenticityReport
   }
 }

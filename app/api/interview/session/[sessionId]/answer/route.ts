@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAdminClient } from '@/lib/supabase-admin'
 import { verifyCandidateJWT } from '@/lib/auth-candidate'
 import { evaluateAnswer } from '@/lib/ai/evaluateAnswer'
+import { evaluateVoiceAuthenticity } from '@/lib/security/voiceAuthenticity'
 import { AdaptiveDifficultyEngine, Question } from '@/lib/ai/adaptiveDifficulty'
 import { calculateTargetQuestions, evaluateInterviewPacing, MIN_QUESTION_TIME_BUFFER_SECONDS } from '@/lib/interview/pacingManager'
 import Groq from 'groq-sdk'
@@ -79,7 +80,7 @@ export async function POST(
   try {
     const { sessionId } = await params
     const body = await request.json()
-    const { questionId, answer, questionIndex, timeLeft } = body
+    const { questionId, answer, questionIndex, timeLeft, voiceTelemetry, responseDelaySeconds, answerDurationSeconds } = body
 
     // 1. Authenticate candidate using candidate JWT
     const authHeader = request.headers.get('Authorization')
@@ -131,6 +132,21 @@ export async function POST(
     console.log(`⌛ Scoring answer to: "${questionText.substring(0, 40)}..."`)
     const evalResult = await evaluateAnswer(questionText, answer, interview.job_title)
     console.log(`✅ Score: ${evalResult.score}/10`)
+    // 5b. Voice Authenticity & Synthetic Speech Detection
+    const voiceEvaluation = evaluateVoiceAuthenticity({
+      answerText: answer,
+      responseDelaySeconds: typeof responseDelaySeconds === 'number' ? responseDelaySeconds : 0,
+      answerDurationSeconds: typeof answerDurationSeconds === 'number' ? answerDurationSeconds : 0,
+      virtualDeviceDetected: voiceTelemetry?.virtualDeviceDetected || false,
+      pitchVariance: voiceTelemetry?.pitchVariance,
+      jitterEstimate: voiceTelemetry?.jitterEstimate,
+      breathPausesDetected: voiceTelemetry?.breathPausesDetected,
+      deviceLabel: voiceTelemetry?.deviceLabel || 'Microphone'
+    })
+    if (!voiceEvaluation.isRealVoice) {
+      console.warn(`⚠️ Synthetic AI voice detected for session ${sessionId}: ${voiceEvaluation.flags.join('; ')}`)
+    }
+
 
     // 6. Update Adaptive Difficulty state
     // Load historical scores to reconstruct state
@@ -191,7 +207,14 @@ export async function POST(
       questionId,
       questionText,
       score: evalResult.score,
-      feedback: evalResult.brief_feedback
+      feedback: evalResult.brief_feedback,
+      voice_authenticity: {
+        is_real_voice: voiceEvaluation.isRealVoice,
+        score: voiceEvaluation.authenticityScore,
+        risk_level: voiceEvaluation.riskLevel,
+        flags: voiceEvaluation.flags,
+        enforcement_action: voiceEvaluation.enforcementAction
+      }
     }]
     const updatedQuestions = [...askedQuestionsText]
     
@@ -225,6 +248,7 @@ export async function POST(
     return NextResponse.json({
       score: evalResult.score,
       feedback: evalResult.brief_feedback,
+      voiceEvaluation,
       nextQuestion: nextQuestionObj ? nextQuestionObj.text : null,
       nextQuestionId: nextQuestionObj ? nextQuestionObj.id : null,
       newDifficulty: action.newDifficulty,
