@@ -12,32 +12,79 @@ export interface GroundingValidation {
   confidence: 'high' | 'medium' | 'low'
 }
 
+const TECH_SYNONYMS: Record<string, string[]> = {
+  kubernetes: ['k8s', 'kube', 'kubernetes'],
+  postgresql: ['postgres', 'psql', 'postgresql'],
+  'node.js': ['node', 'nodejs', 'node.js'],
+  golang: ['go', 'golang'],
+  'next.js': ['next', 'nextjs', 'next.js'],
+  react: ['react', 'reactjs', 'react.js'],
+  vue: ['vue', 'vuejs', 'vue.js'],
+  typescript: ['ts', 'typescript'],
+  javascript: ['js', 'javascript'],
+  'ci/cd': ['cicd', 'ci/cd', 'continuous integration', 'continuous delivery'],
+  aws: ['aws', 'amazon web services'],
+  gcp: ['gcp', 'google cloud', 'google cloud platform'],
+  docker: ['docker', 'containerization', 'containers'],
+  graphql: ['gql', 'graphql'],
+  microservices: ['microservice', 'microservices']
+}
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, (m) => '\\' + m)
+}
+
+function entityMatchesContext(entity: string, context: string): boolean {
+  if (context.includes(entity)) return true
+  const aliases = TECH_SYNONYMS[entity]
+  if (aliases) {
+    for (const alias of aliases) {
+      const reg = new RegExp(`\\b${escapeRegex(alias)}\\b`, 'i')
+      if (reg.test(context)) return true
+    }
+  }
+  return false
+}
+
+const COMMON_TECH = [
+  'react', 'next.js', 'vue', 'angular', 'node.js', 'express', 'nest.js', 'python',
+  'django', 'fastapi', 'flask', 'typescript', 'javascript', 'golang', 'rust',
+  'java', 'spring boot', 'c++', 'c#', '.net', 'aws', 'gcp', 'azure', 'docker',
+  'kubernetes', 'terraform', 'graphql', 'rest', 'grpc', 'postgresql', 'mysql',
+  'mongodb', 'redis', 'elasticsearch', 'kafka', 'rabbitmq', 'git', 'ci/cd',
+  'vitest', 'jest', 'playwright', 'cypress', 'linux', 'tailwind', 'microservices'
+]
+
 /**
- * Extracts named technical entities, frameworks, libraries, and claims from text.
+ * Extracts named technical entities, frameworks, libraries, and claims from text,
+ * canonicalizing common synonyms and abbreviations.
  */
 function extractTechnicalEntities(text: string): string[] {
-  const commonTech = [
-    'react', 'next.js', 'vue', 'angular', 'node.js', 'express', 'nest.js', 'python',
-    'django', 'fastapi', 'flask', 'typescript', 'javascript', 'golang', 'rust',
-    'java', 'spring boot', 'c++', 'c#', '.net', 'aws', 'gcp', 'azure', 'docker',
-    'kubernetes', 'terraform', 'graphql', 'rest', 'grpc', 'postgresql', 'mysql',
-    'mongodb', 'redis', 'elasticsearch', 'kafka', 'rabbitmq', 'git', 'ci/cd',
-    'vitest', 'jest', 'playwright', 'cypress', 'linux', 'tailwind', 'microservices'
-  ]
-
   const lower = text.toLowerCase()
-  const detected: string[] = []
+  const detected = new Set<string>()
 
-  for (const tech of commonTech) {
-    // Exact word boundary matching for tech
-    const escaped = tech.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const regex = new RegExp(`\\b${escaped}\\b`, 'i')
-    if (regex.test(lower)) {
-      detected.push(tech)
+  // 1. Check synonym dictionary and map to canonical names
+  for (const [canonical, aliases] of Object.entries(TECH_SYNONYMS)) {
+    for (const alias of aliases) {
+      const reg = new RegExp(`\\b${escapeRegex(alias)}\\b`, 'i')
+      if (reg.test(lower)) {
+        detected.add(canonical)
+        break
+      }
     }
   }
 
-  return detected
+  // 2. Check remaining common tech list
+  for (const tech of COMMON_TECH) {
+    if (!detected.has(tech)) {
+      const reg = new RegExp(`\\b${escapeRegex(tech)}\\b`, 'i')
+      if (reg.test(lower)) {
+        detected.add(tech)
+      }
+    }
+  }
+
+  return Array.from(detected)
 }
 
 /**
@@ -85,7 +132,7 @@ export function validateGrounding(
   const unsupported: string[] = []
 
   for (const entity of generatedEntities) {
-    if (combinedContext.includes(entity)) {
+    if (entityMatchesContext(entity, combinedContext)) {
       supported.push(entity)
     } else {
       unsupported.push(entity)

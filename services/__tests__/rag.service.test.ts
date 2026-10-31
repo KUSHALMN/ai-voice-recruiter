@@ -101,6 +101,19 @@ describe('Enterprise RAG Architecture', () => {
       expect(result.isFaithful).toBe(true)
       expect(result.groundingScore).toBeGreaterThanOrEqual(0.6)
     })
+it('should correctly ground technical acronyms and synonyms (e.g. k8s and postgres)', () => {
+      const context = [
+        'Managed production kubernetes clusters and optimized postgresql database schemas.',
+      ]
+
+      // Question uses k8s and postgres aliases
+      const question = 'How did you configure your k8s ingress and optimize postgres queries?'
+      const result = validateGrounding(question, context)
+
+      expect(result.isFaithful).toBe(true)
+      expect(result.supportedClaims).toContain('kubernetes')
+      expect(result.supportedClaims).toContain('postgresql')
+    })
 
     it('should flag unsupported technical claims not present in context', () => {
       const context = [
