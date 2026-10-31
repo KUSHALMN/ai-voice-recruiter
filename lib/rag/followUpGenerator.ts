@@ -3,9 +3,14 @@ import { queryResumeChunks } from './vectorStore'
 import { BM25Index, reciprocalRankFusion } from './hybridSearch'
 import { validateGrounding } from './groundingGuard'
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY || '',
-})
+let cachedGroqClient: Groq | null = null
+
+function getGroqClient(apiKey: string): Groq {
+  if (!cachedGroqClient) {
+    cachedGroqClient = new Groq({ apiKey })
+  }
+  return cachedGroqClient
+}
 
 const ACTIVE_GROQ_MODELS = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b']
 
@@ -28,7 +33,7 @@ export async function generateLiveFollowUpProbe(
   candidateAnswer: string,
   jobTitle: string
 ): Promise<FollowUpProbe> {
-  if (!process.env.GROQ_API_KEY || !candidateAnswer || candidateAnswer.trim().length < 15) {
+  if (!candidateAnswer || candidateAnswer.trim().length < 15) {
     return { needsFollowUp: false, groundedInResume: false }
   }
 
@@ -69,22 +74,59 @@ Return ONLY valid JSON matching:
   "probeReason": "<why this follow-up is needed or null>"
 }`
 
-  for (const model of ACTIVE_GROQ_MODELS) {
-    try {
-      const completion = await groq.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model,
-        temperature: 0.3,
-        response_format: { type: 'json_object' },
-      })
+  const groqKey = process.env.GROQ_API_KEY
+  if (groqKey) {
+    for (const model of ACTIVE_GROQ_MODELS) {
+      try {
+        const groqClient = getGroqClient(groqKey)
+        const completion = await groqClient.chat.completions.create({
+          messages: [{ role: 'user', content: prompt }],
+          model,
+          temperature: 0.3,
+          response_format: { type: 'json_object' },
+        })
 
-      const raw = completion.choices[0]?.message?.content || '{}'
+        const raw = completion.choices[0]?.message?.content || '{}'
+        const parsed = JSON.parse(raw)
+
+        if (parsed.needsFollowUp && parsed.followUpQuestion) {
+          const validation = validateGrounding(parsed.followUpQuestion, chunkTexts)
+
+          return {
+            needsFollowUp: true,
+            followUpQuestion: parsed.followUpQuestion,
+            probeReason: parsed.probeReason || 'Probe candidate depth on claimed experience',
+            groundedInResume: Boolean(resumeSnippet && validation.isFaithful),
+            groundingScore: validation.groundingScore,
+          }
+        }
+
+        return {
+          needsFollowUp: false,
+          groundedInResume: false,
+        }
+      } catch (err) {
+        console.warn(`generateLiveFollowUpProbe error on ${model}:`, err instanceof Error ? err.message : err)
+      }
+    }
+  }
+
+  // Resilient multi-provider fallback: Google Gemini
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY
+  if (geminiKey) {
+    try {
+      const { GoogleGenerativeAI } = await import('@google/generative-ai')
+      const genAI = new GoogleGenerativeAI(geminiKey)
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        generationConfig: { responseMimeType: 'application/json', temperature: 0.3 }
+      })
+      const result = await model.generateContent(prompt)
+      const raw = result.response.text() || '{}'
       const parsed = JSON.parse(raw)
 
       if (parsed.needsFollowUp && parsed.followUpQuestion) {
-        // Validate grounding to prevent hallucination
         const validation = validateGrounding(parsed.followUpQuestion, chunkTexts)
-
         return {
           needsFollowUp: true,
           followUpQuestion: parsed.followUpQuestion,
@@ -93,14 +135,8 @@ Return ONLY valid JSON matching:
           groundingScore: validation.groundingScore,
         }
       }
-
-      return {
-        needsFollowUp: false,
-        groundedInResume: false,
-      }
-    } catch (err) {
-      console.warn(`generateLiveFollowUpProbe error on ${model}:`, err instanceof Error ? err.message : err)
-      // Loop continues to next active model
+    } catch (geminiErr) {
+      console.warn('Gemini follow-up probe fallback error:', geminiErr instanceof Error ? geminiErr.message : geminiErr)
     }
   }
 
