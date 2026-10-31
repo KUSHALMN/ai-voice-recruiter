@@ -136,6 +136,22 @@ React, Next.js, Node.js, TypeScript, Docker, Kubernetes, AWS, PostgreSQL
       expect(first.metadata.hasMetrics).toBe(true)
       expect(first.metadata.detectedSkills.length).toBeGreaterThan(0)
     })
+it('should cleanly preserve bullet points when chunking long resume sections', () => {
+      const bulletResume = `
+Work Experience
+Senior Staff Engineer at CloudScale
+• Architected real-time streaming pipeline using Kafka, Supabase, and WebRTC handling 50k events/sec
+• Scaled database throughput with Prisma, Redis caching, and connection pooling by 45%
+• Mentored 12 junior engineers and established end-to-end testing with Vitest and Playwright
+• Integrated LangChain and vector embeddings for contextual semantic retrieval across 10M records
+`;
+
+      const chunks = chunkResumeText(bulletResume, { maxChunkSize: 180, overlap: 30 })
+      expect(chunks.length).toBeGreaterThan(1)
+      expect(chunks.some(c => c.content.includes('• Architected'))).toBe(true)
+      expect(chunks.some(c => c.metadata.detectedSkills.includes('supabase'))).toBe(true)
+      expect(chunks.some(c => c.metadata.detectedSkills.includes('vitest'))).toBe(true)
+    })
   })
 
   describe('Standard Rubrics Semantic Fallback', () => {

@@ -41,7 +41,8 @@ const KNOWN_SKILL_PATTERNS = [
   'python', 'fastapi', 'django', 'flask', 'go', 'golang', 'rust', 'c++', 'c#', 'java',
   'spring', 'aws', 'gcp', 'azure', 'docker', 'kubernetes', 'terraform', 'ci/cd',
   'postgresql', 'postgres', 'sql', 'mysql', 'mongodb', 'redis', 'graphql', 'rest',
-  'microservices', 'tailwind', 'kafka', 'rabbitmq', 'elasticsearch'
+  'microservices', 'tailwind', 'kafka', 'rabbitmq', 'elasticsearch',
+  'supabase', 'prisma', 'drizzle', 'trpc', 'webrtc', 'livekit', 'svelte', 'vitest', 'playwright', 'cypress', 'langchain', 'llamaindex'
 ]
 
 function detectSkills(text: string): string[] {
@@ -152,17 +153,27 @@ export function chunkResumeText(text: string, options: ChunkOptions = {}): TextC
           const overlapText = accumulator.slice(-overlap)
           accumulator = `${overlapText}\n\n${pTrimmed}`
         } else {
-          // Paragraph itself exceeds maxChunkSize: split by sentences
-          const sentences = pTrimmed.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [pTrimmed]
+          // Paragraph exceeds maxChunkSize: check if it contains bullet lists or lines
+          const pLines = pTrimmed.split('\n').map(l => l.trim()).filter(Boolean)
+          const isBulletList = pLines.length > 1 && pLines.some(l => /^[•\-*–—\u2022\u25E6\u25AA]|\d+[.)]/.test(l))
+          
+          const subunits = isBulletList
+            ? pLines
+            : (pTrimmed.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [pTrimmed])
+
           let sAccumulator = ''
 
-          for (const s of sentences) {
-            if ((sAccumulator + s).length <= maxChunkSize) {
-              sAccumulator += s
+          for (const s of subunits) {
+            const separator = isBulletList ? '\n' : ' '
+            const combined = sAccumulator ? `${sAccumulator}${separator}${s}` : s
+            
+            if (combined.length <= maxChunkSize) {
+              sAccumulator = combined
             } else {
               if (sAccumulator) {
                 chunks.push(createChunk(chunkIndex++, sAccumulator.trim(), section.name))
-                sAccumulator = sAccumulator.slice(-overlap) + s
+                const overlapText = sAccumulator.slice(-overlap)
+                sAccumulator = `${overlapText}${separator}${s}`
               } else {
                 chunks.push(createChunk(chunkIndex++, s.trim(), section.name))
                 sAccumulator = ''
